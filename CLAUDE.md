@@ -1,0 +1,58 @@
+# Agent Harness — Claude Code Instructions
+
+## Project Phase: Deep Investigation (NOT Implementation)
+
+This project is in active research and pre-implementation planning. No code has been written. Nothing is locked in. Your job is to think, challenge, research, and go deep — not to build.
+
+## Ground Rules
+
+1. **NEVER edit a file without first explaining what you plan to change and why, then getting approval.** This applies to every document edit, no exceptions. Talk through your reasoning, wait for a yes.
+2. **Do not write code or propose implementations** unless explicitly asked. We are investigating, not building.
+3. **Be honest about uncertainty.** "I don't know" and "I haven't researched this" beat false confidence every time.
+4. **Think independently.** Challenge what you find in the docs. Push back on assumptions. Be a sparring partner, not a yes-man.
+5. **Ask questions liberally.** Use AskUserQuestion when you need alignment. Don't assume.
+6. **Track all findings** in the markdown files. If you discover something, document it.
+7. **Go deep, not broad.** 19 research agents already covered the landscape. What's needed is depth.
+8. **Use sub-agents for research.** Spawn them for investigations. Don't try to do everything inline.
+9. **Do not summarize docs back to the user.** They wrote them. Give your own perspective.
+
+## What This Project Is
+
+A hybrid Claude + Gemini orchestration layer. The user hits 85% of their weekly Claude Max rate limit in 1-2 days. The harness combines Claude Code with Gemini CLI so they feel like one system — shared memory, intelligent routing, invisible middleware. The user types `claude` normally and the harness is baked in.
+
+## What's Decided (Don't Re-Litigate)
+
+- Hybrid Claude+Gemini, not dual Claude (device keychain bug makes it broken)
+- Claude is always the top-level orchestrator
+- Gemini at free tier or AI Pro ($0-20/mo), NOT Ultra ($250/mo)
+- The harness is invisible — user types `claude` normally
+- Cross-model critique is user-triggered or complexity-triggered, not every task
+- Both providers exhausted = notify and stop
+
+## What's Open (Your Thinking Is Needed)
+
+- MCP server as mechanism (Level 3 confidence — "let's not double down on MCP yet")
+- Memory system (Mem0? ChromaDB? sqlite-vec? Files?)
+- Visual interface value for a terminal-native user
+- How Claude decides what to delegate
+- How this differs from PAL MCP + CodexBar + CLAUDE.md (zero-code baseline)
+- MVP scope
+- Whether we're investigating or already designing
+
+## Document Reading Order
+
+1. **SESSION_BRIDGE.md** — Primary orientation. Confidence registry, narrative, open questions, conduct guide.
+2. **ARCHITECTURE.md** — Technical decisions. MCP design, compensation list, gap analysis. Living draft, not settled.
+3. **RESEARCH.md** — Evidence base. 90+ sources. Use as reference.
+4. **HANDOFF.md** — Original vision. Part 3 (architecture) is superseded. Parts 1 and 5 still valid.
+5. **NEXT_SESSION_PROMPT.md** — Full handoff prompt with specific open questions to answer.
+
+## Do NOT
+
+- Edit files without explaining and getting approval first
+- Write code or propose implementations
+- Treat ARCHITECTURE.md as settled
+- Rush to conclusions
+- Go broad when depth is needed
+- Add API key vs subscription distinction to any documents
+- Conflate "I researched this" with "this is true" — many findings are single-source
