@@ -278,6 +278,64 @@
     </div>
   </div>
 
+  <!-- TERMINOLOGY SECTION -->
+  <div class="tool" style="margin-top: 2rem; border-color: var(--purple);">
+    <div class="tool-title">
+      <span class="tool-name">What Is An Agent Harness?</span>
+    </div>
+
+    <p class="tool-desc">
+      The 2026 industry consensus (Philipp Schmid/HuggingFace, Sequoia Capital, Aakash Gupta) is that <strong>"2026 Is Agent Harnesses"</strong> — the harness, not the model, is where differentiation happens. Manus rewrote their harness 5 times with the same underlying models; each rewrite improved reliability. The infrastructure matters more than the weights.
+    </p>
+
+    <div class="section-label" style="color: var(--purple);">Industry Definition</div>
+    <div class="section-content" style="border-color: rgba(163,113,247,0.4);">
+      <p style="margin-bottom: 0.75rem;">An <strong>agent harness</strong> is the complete architectural system surrounding an LLM that manages what the model can't do itself:</p>
+      <ul>
+        <li><strong>Execute tool calls</strong> — Model outputs intent, harness performs the action</li>
+        <li><strong>Manage memory</strong> — Persist context beyond conversation window</li>
+        <li><strong>Structure workflows</strong> — Coordinate multi-step operations</li>
+        <li><strong>Handle long-running tasks</strong> — Checkpointing, recovery, continuation</li>
+        <li><strong>Enforce rules</strong> — Guardrails, permissions, validation</li>
+      </ul>
+      <p style="margin-top: 0.75rem; color: var(--text-muted);">The harness is scaffolding — not the model, not the business logic, but the infrastructure that makes agents reliable.</p>
+    </div>
+
+    <div class="section-label" style="color: var(--yellow);">Your Concept: A Hybrid</div>
+    <div class="section-content" style="border-color: rgba(210,153,34,0.4);">
+      <p style="margin-bottom: 0.75rem;">What you're building is <strong>more than a harness</strong> — it combines three architectural components:</p>
+      <ul>
+        <li><strong>Harness component</strong> — Memory management, tool execution, context persistence across sessions</li>
+        <li><strong>Orchestrator component</strong> — Routing logic deciding Claude vs Gemini per task based on semantics</li>
+        <li><strong>Proxy/Router component</strong> — Intercepts requests, directs traffic, handles failover</li>
+      </ul>
+      <p style="margin-top: 0.75rem; color: var(--text-muted);">If you only call it a "harness," people expect infrastructure for ONE model. Your vision includes orchestration BETWEEN models — deciding which chef handles which dish, sharing prep work between kitchens.</p>
+    </div>
+
+    <div class="section-label" style="color: var(--blue);">Better Terminology Options</div>
+    <div class="section-content" style="border-color: rgba(88,166,255,0.4);">
+      <ul>
+        <li><strong>Agent Orchestration Layer</strong> — Clearest, industry-standard. Emphasizes coordination between providers.</li>
+        <li><strong>Multi-Model Harness</strong> — Extends the harness definition to explicitly cover cross-provider work.</li>
+        <li><strong>Agentic Router</strong> — If emphasizing the routing decision logic over infrastructure.</li>
+      </ul>
+    </div>
+
+    <div class="section-label" style="color: var(--text-dim);">Why Existing Tools Aren't This</div>
+    <div class="section-content" style="border-color: var(--border);">
+      <p style="margin-bottom: 0.75rem;">The 8 tools analyzed each handle ONE piece:</p>
+      <ul>
+        <li><strong>CCProxy, Portkey, OpenRouter</strong> — Proxies/gateways that route, but don't manage state</li>
+        <li><strong>claude-code-mux</strong> — Failover proxy, but loses reasoning state during handoff</li>
+        <li><strong>PAL MCP</strong> — Delegation tool, but no persistent memory or automatic routing</li>
+        <li><strong>hcom</strong> — Inter-agent messaging, but passive (tells what happened, not what should happen)</li>
+        <li><strong>Conductor Build</strong> — Parallel execution, but Claude-only, no cross-provider orchestration</li>
+        <li><strong>CLIProxyAPI</strong> — Quota visibility, but display-only, doesn't act on thresholds</li>
+      </ul>
+      <p style="margin-top: 0.75rem; color: var(--text-muted);"><strong>None combine:</strong> semantic routing + persistent memory + proactive rate prediction + mid-task context handoff. That's the ~40% gap.</p>
+    </div>
+  </div>
+
   <!-- ROUTING/PROXY LAYER -->
   <div class="category">
     <div class="category-name">Routing / Proxy Layer</div>
