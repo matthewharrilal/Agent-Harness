@@ -21,7 +21,7 @@
 
 ## EXECUTIVE SUMMARY
 
-This document represents a complete handoff from a claude.ai conversation to Claude Code CLI. The user has two Claude Max 20x accounts ($400/month combined) and wants to build an **agent harness** that makes them function as a **single unified experience**. The only thing that should be "split" between accounts is inference capacity—everything else (memory, plans, context, subagent coordination) should be shared through external infrastructure the user controls.
+This document represents a complete handoff from a claude.ai conversation to Claude Code CLI. ~~The user has two Claude Max 20x accounts ($400/month combined) and wants to build an **agent harness** that makes them function as a **single unified experience**.~~ **Updated: The user has Claude Max 20x ($200/mo) + Gemini CLI (free/$20/mo) = $200-220/mo. See ARCHITECTURE.md.** The only thing that should be "split" between ~~accounts~~ providers is inference capacity—everything else (memory, plans, context, subagent coordination) should be shared through external infrastructure the user controls.
 
 **This is NOT just load balancing. This is building a custom agent orchestration layer.**
 

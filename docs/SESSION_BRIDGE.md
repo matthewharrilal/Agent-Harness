@@ -170,7 +170,7 @@ The verticals needing depth (not exhaustive — part of the investigation is dis
 
 **RESEARCH.md** (~970 lines) — **The evidence base.** Read this when you need sources, data, or detailed findings to support or challenge a position. Organized by topic with 90+ sources. Three major rounds of research. Not everything is equally relevant now — some findings led to dead ends that informed thinking by elimination. Key sections: device rate limit bug (foundational), hybrid harness feasibility, Gemini CLI gap audit, dashboard patterns, MCP invocation research, meta-orchestration, dependency stack.
 
-**HANDOFF.md** (~310 lines) — **The original vision.** Read this to check whether current architecture has drifted from user goals. Written at the start of the project. **Part 3 (Proposed Architecture) is SUPERSEDED** — it describes a dual-Claude architecture that was abandoned after the device bug discovery. Parts 1 (Vision), 5 (Requirements), and 6 (Phases) are still relevant but need updating to reflect the hybrid approach.
+**HANDOFF.md** (~330 lines) — **The original vision.** Read this to check whether current architecture has drifted from user goals. Written at the start of the project. **Part 3 (Proposed Architecture) is SUPERSEDED** — it describes a dual-Claude architecture that was abandoned after the device bug discovery. Parts 1 (Vision), 5 (Requirements), and 6 (Phases) are still relevant but need updating to reflect the hybrid approach.
 
 **SESSION_BRIDGE.md (this file)** — **The meta-layer.** How to interpret the other three. Reading guide, narrative, confidence levels, and investigation roadmap. Read first, but don't treat as a substitute for the other documents.
 
@@ -478,9 +478,9 @@ The next session should resolve these contradictions:
 
 6. **One-provider exhaustion is unaddressed.** "Both exhausted → notify and stop" is decided. But what happens when ONLY Claude is exhausted and Gemini has capacity? This is the most common real-world scenario. Does the harness auto-route everything to Gemini? Does it ask the user? This gap is more practically important than the both-exhausted case.
 
-7. **Dashboard port inconsistency.** ARCHITECTURE.md uses both localhost:9876 and localhost:3200 in different sections. Pick one.
+7. ~~**Dashboard port inconsistency.**~~ **RESOLVED.** ARCHITECTURE.md now consistently uses localhost:3200.
 
-8. **Hook event count.** ARCHITECTURE.md says 8 events. RESEARCH.md says 12. The correct number is 12.
+8. ~~**Hook event count.**~~ **RESOLVED.** Both ARCHITECTURE.md and RESEARCH.md now correctly say 12 events.
 
 ---
 
