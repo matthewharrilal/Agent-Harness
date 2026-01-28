@@ -56,12 +56,12 @@ The zero-code baseline test (install PAL MCP + CCProxy + CodexBar, use them for 
 
 | Document | Purpose |
 |----------|---------|
-| `SESSION_BRIDGE.md` | Primary continuity document. Narrative history, decision confidence registry, open questions, investigation roadmap, session conduct guide. **Read this first.** |
-| `ARCHITECTURE.md` | Technical decisions and reflections. MCP server architecture, 21-item Gemini compensation list, Swarms/TeammateTool research, gap analysis (61 gaps). Living draft — not settled. |
-| `RESEARCH.md` | Evidence base from 19 research agents across 3 rounds. 90+ sources. Device rate limit analysis, Gemini CLI gap audit, ecosystem map, competitive landscape deep-dive. |
-| `HANDOFF.md` | Original vision from claude.ai conversation. Part 3 (dual-Claude architecture) is superseded. Parts 1 and 5 (vision, requirements) still valid. |
+| `CLAUDE.md` | Instructions for any Claude instance working on this repo. Ground rules, project phase, reading order. Auto-loaded by Claude Code. |
 | `NEXT_SESSION_PROMPT.md` | Comprehensive handoff prompt for a fresh Claude Code instance to pick up the investigation. |
-| `CLAUDE.md` | Instructions for any Claude instance working on this repo. Ground rules, project phase, reading order. |
+| `docs/SESSION_BRIDGE.md` | Primary continuity document. Narrative history, decision confidence registry, open questions, investigation roadmap, session conduct guide. **Read this first.** |
+| `docs/ARCHITECTURE.md` | Technical decisions and reflections. MCP server architecture, 21-item Gemini compensation list, Swarms/TeammateTool research, gap analysis (61 gaps), competitive landscape reality check. Living draft — not settled. |
+| `docs/RESEARCH.md` | Evidence base from 19 research agents across 3 rounds. 90+ sources. Device rate limit analysis, Gemini CLI gap audit, ecosystem map, competitive landscape deep-dive (30+ tools). |
+| `docs/HANDOFF.md` | Original vision from claude.ai conversation. Part 3 (dual-Claude architecture) is superseded. Parts 1 and 5 (vision, requirements) still valid. |
 
 ### Key Decisions Made
 

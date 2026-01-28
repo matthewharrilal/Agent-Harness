@@ -21,12 +21,14 @@ Claude always orchestrates. Gemini is the specialist. This is not negotiable.
 
 ## Load Full Context
 
-Read all 4 files in parallel from the working directory:
+Read all 4 files in parallel from `docs/`:
 
-1. **SESSION_BRIDGE.md** — Your primary orientation. Narrative history, confidence registry (what's locked vs open), 12 provocative questions, conduct guide, investigation roadmap. This is your map.
-2. **ARCHITECTURE.md** — Technical thinking. MCP server architecture, 21-item Gemini compensation list, dashboard design, Swarms/TeammateTool research, gap analysis (61 gaps). Some sections are well-reasoned; some are sketches. The confidence registry in SESSION_BRIDGE.md tells you which is which.
-3. **RESEARCH.md** — Evidence from 19 research agents, 90+ sources. Key sections: device rate limit bug (killed dual-Claude), Gemini CLI gap audit, ecosystem map, MCP invocation research. Use as reference.
-4. **HANDOFF.md** — Original vision from claude.ai. Part 3 (architecture) is SUPERSEDED. Parts 1 (vision) and 5 (requirements) still valid. Read to check if current thinking has drifted from my actual needs.
+1. **docs/SESSION_BRIDGE.md** — Your primary orientation. Narrative history, confidence registry (what's locked vs open), 12 provocative questions, conduct guide, investigation roadmap. This is your map.
+2. **docs/ARCHITECTURE.md** — Technical thinking. MCP server architecture, 21-item Gemini compensation list, dashboard design, Swarms/TeammateTool research, gap analysis (61 gaps), competitive landscape reality check. Some sections are well-reasoned; some are sketches. The confidence registry in SESSION_BRIDGE.md tells you which is which.
+3. **docs/RESEARCH.md** — Evidence from 19 research agents, 90+ sources. Key sections: device rate limit bug (killed dual-Claude), Gemini CLI gap audit, ecosystem map, competitive landscape deep-dive (30+ tools), MCP invocation research. Use as reference.
+4. **docs/HANDOFF.md** — Original vision from claude.ai. Part 3 (architecture) is SUPERSEDED. Parts 1 (vision) and 5 (requirements) still valid. Read to check if current thinking has drifted from my actual needs.
+
+Also read `CLAUDE.md` at the project root — it contains ground rules and project context that Claude Code loads automatically.
 
 ## What's Decided vs. What's Open
 
