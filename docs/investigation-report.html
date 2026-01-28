@@ -108,6 +108,50 @@
     .section-label.why { color: var(--purple); }
     .section-label.breaks { color: var(--red); }
     .section-label.gap { color: var(--yellow); }
+    .section-label.journey { color: var(--blue); }
+
+    .section-content.journey { border-color: rgba(88,166,255,0.4); }
+
+    .journey-scenario {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem;
+      margin: 0.75rem 0;
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+    .journey-scenario .time {
+      color: var(--blue);
+      font-weight: 600;
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 0.85rem;
+    }
+    .journey-scenario .action {
+      color: var(--text-dim);
+    }
+    .journey-contrast {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 0.75rem 0;
+    }
+    .journey-contrast-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.75rem;
+      font-size: 0.85rem;
+    }
+    .journey-contrast-item .label {
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+    }
+    .journey-contrast-item.current .label { color: var(--text-muted); }
+    .journey-contrast-item.hypothetical .label { color: var(--purple); }
 
     .section-content {
       color: var(--text-dim);
@@ -336,6 +380,37 @@
       </ul>
       <p style="margin-top: 0.75rem; color: var(--text-muted);"><strong>None combine:</strong> semantic routing + persistent memory + proactive rate prediction + mid-task context handoff. That's the ~40% gap.</p>
     </div>
+
+    <div class="section-label" style="color: var(--blue);">User Journey: What Might Change (Speculative)</div>
+    <div class="section-content" style="border-color: rgba(88,166,255,0.4);">
+      <p style="margin-bottom: 0.75rem;"><strong>Today's mental model:</strong> You manage the orchestration. You track rate limits, decide when to delegate, copy context between sessions, and choose which provider handles which task.</p>
+
+      <div class="journey-contrast">
+        <div class="journey-contrast-item current">
+          <div class="label">Current Reality</div>
+          <ul style="margin: 0; padding-left: 1rem; color: var(--text-dim); font-size: 0.85rem;">
+            <li>You watch CodexBar: "Claude 82%"</li>
+            <li>You decide: "This research can go to Gemini"</li>
+            <li>You invoke clink manually</li>
+            <li>Tomorrow, you copy findings to new session</li>
+          </ul>
+        </div>
+        <div class="journey-contrast-item hypothetical">
+          <div class="label">Hypothetical Harness</div>
+          <ul style="margin: 0; padding-left: 1rem; color: var(--text-dim); font-size: 0.85rem;">
+            <li>System sees: "Claude 82%, task is research"</li>
+            <li>System routes to Gemini automatically</li>
+            <li>You see routing decision in ambient log</li>
+            <li>Tomorrow, memory auto-injects context</li>
+          </ul>
+        </div>
+      </div>
+
+      <p style="margin-top: 0.75rem;"><strong>What shifts TO the system:</strong> Rate limit tracking, routing decisions, context persistence, provider selection.</p>
+      <p><strong>What stays WITH you:</strong> High-level task decomposition, veto authority over routing, approval of plans, understanding why decisions were made.</p>
+      <p><strong>New responsibilities:</strong> Trusting routing you didn't choose. Debugging when delegation fails. Understanding why the system chose Gemini over Claude. Handling conflicts if memory is stale.</p>
+      <p style="color: var(--text-muted); margin-top: 0.75rem;"><strong>Honest uncertainty:</strong> We don't know if this is worth building until we test the baseline. Does automatic routing actually save enough quota to justify the complexity? Does the mental model shift feel like relief or loss of control?</p>
+    </div>
   </div>
 
   <!-- ROUTING/PROXY LAYER -->
@@ -395,6 +470,36 @@
         <li><strong>Open question:</strong> Could heuristics (keyword matching) get 80% of semantic routing value without the latency cost?</li>
       </ul>
     </div>
+
+    <div class="section-label journey">User Journey</div>
+    <div class="section-content journey">
+      <p style="margin-bottom: 0.75rem;"><strong>Mental model:</strong> CCProxy is a fast, transparent gatekeeper. It's not intelligent — it's predictable. You understand what it can see (tokens, tools, model name) and what it can't (intent, semantics, task type).</p>
+
+      <div class="journey-scenario">
+        <p><span class="time">9:47 AM</span> <span class="action">— You configured CCProxy: "if tokens > 100K, route to Gemini." You type <code>claude</code> normally. CCProxy sits at localhost:4000, invisible.</span></p>
+        <p><span class="time">9:50 AM</span> <span class="action">— You ask: "Research latest XSS attack vectors and fix auth.ts." CCProxy sees: 12 tokens, no tools. Routes to Claude (default). You realize: this is research, but CCProxy can't tell. You accept the trade-off — research runs on Claude.</span></p>
+        <p><span class="time">10:15 AM</span> <span class="action">— Research done (15K tokens). You pivot to coding. CCProxy still under 100K threshold. No routing change. The research→coding semantic boundary was invisible to it.</span></p>
+      </div>
+
+      <p style="margin-top: 0.75rem;"><strong>Division of responsibility:</strong></p>
+      <ul>
+        <li><strong>CCProxy handles:</strong> Exact token counting, &lt;1ms rule evaluation, forwarding to correct endpoint</li>
+        <li><strong>You handle:</strong> Understanding your task is research vs coding, knowing when the threshold should have triggered, recognizing token count ≠ semantic complexity</li>
+      </ul>
+
+      <div class="journey-contrast">
+        <div class="journey-contrast-item current">
+          <div class="label">Without CCProxy</div>
+          <span style="color: var(--text-dim); font-size: 0.85rem;">Manually stop Claude, start Gemini for large analysis, copy-paste context between CLI instances.</span>
+        </div>
+        <div class="journey-contrast-item hypothetical">
+          <div class="label">With Orchestration Layer</div>
+          <span style="color: var(--text-dim); font-size: 0.85rem;">System detects "research task" → routes to Gemini. Detects "coding phase" → switches back to Claude mid-conversation.</span>
+        </div>
+      </div>
+
+      <p style="margin-top: 0.75rem; color: var(--text-muted);"><strong>Workflow fit:</strong> Token-aware load distribution when you accept manual decomposition of semantic intent. Works beautifully for "large audits → Gemini, code gen → Claude." Less useful for the research-then-code pattern where the semantic boundary matters more than token count.</p>
+    </div>
   </div>
 
   <div class="tool">
@@ -447,6 +552,37 @@
         <li><strong>Open question:</strong> Would a simple "here's what we've tried so far" summary injected into the new session be enough? Or do you need something more sophisticated?</li>
       </ul>
     </div>
+
+    <div class="section-label journey">User Journey</div>
+    <div class="section-content journey">
+      <p style="margin-bottom: 0.75rem;"><strong>Mental model:</strong> claude-code-mux is a stateless message router. It preserves your conversation text but not the model's reasoning state. When failover happens, the new instance re-reads messages but builds its own understanding from scratch.</p>
+
+      <div class="journey-scenario">
+        <p><span class="time">10:00 AM</span> <span class="action">— You're 25 minutes into debugging a race condition. Claude has eliminated 2 hypotheses, is testing a third involving async initialization order.</span></p>
+        <p><span class="time">10:25 AM</span> <span class="action">— Turn 6: You ask "Can you trace the initialization sequence?" Anthropic returns 429. Mux catches it, switches to OpenRouter (3-5 second delay).</span></p>
+        <p><span class="time">10:26 AM</span> <span class="action">— OpenRouter Claude receives all 6 turns of message history. But it's a fresh instance — no memory of the hypothesis chain. It might re-investigate the eliminated hypotheses. You notice the response feels like it's "starting over."</span></p>
+        <p><span class="time">10:35 AM</span> <span class="action">— You manually re-orient: "We already ruled out timing and lock scope. Focus on async init." The debugging continues, but you lost ~10 minutes.</span></p>
+      </div>
+
+      <p style="margin-top: 0.75rem;"><strong>Division of responsibility:</strong></p>
+      <ul>
+        <li><strong>Mux handles:</strong> 429 detection, automatic failover, provider priority, message forwarding</li>
+        <li><strong>You handle:</strong> Recognizing when failover happened, validating response quality, re-orienting the new instance if needed, deciding when to switch back</li>
+      </ul>
+
+      <div class="journey-contrast">
+        <div class="journey-contrast-item current">
+          <div class="label">Without mux</div>
+          <span style="color: var(--text-dim); font-size: 0.85rem;">429 error. You manually open Gemini, copy conversation, paste, explain "we were debugging X." 3-5 minute interruption.</span>
+        </div>
+        <div class="journey-contrast-item hypothetical">
+          <div class="label">With Persistent Memory</div>
+          <span style="color: var(--text-dim); font-size: 0.85rem;">Mux fails over + injects: "Prior reasoning: eliminated hypotheses A, B. Testing C." New instance continues from the exact point.</span>
+        </div>
+      </div>
+
+      <p style="margin-top: 0.75rem; color: var(--text-muted);"><strong>Workflow fit:</strong> Short, stateless requests where reasoning continuity doesn't matter. Less suited for long debugging chains where the model's "mental model" is critical to progress.</p>
+    </div>
   </div>
 
   <div class="tool">
@@ -498,6 +634,25 @@
         <li><strong>Open question:</strong> Should the classifier live in the gateway (simpler for user, less flexible) or upstream (more flexible, more work for user)?</li>
         <li><strong>Open question:</strong> Is Portkey's enterprise focus incompatible with individual Max subscriptions, or is there a bridge?</li>
       </ul>
+    </div>
+
+    <div class="section-label journey">User Journey</div>
+    <div class="section-content journey">
+      <p style="margin-bottom: 0.75rem;"><strong>Mental model:</strong> "I am the classifier; Portkey is the enforcer." You determine task type upstream, attach it as metadata, and Portkey routes based on your classification. The gateway doesn't understand your task — it trusts your labels.</p>
+
+      <div class="journey-scenario">
+        <p><span class="time">Setup</span> <span class="action">— You build a wrapper that classifies tasks. When you type "research JWT security," your code tags it <code>metadata.task_type = "research"</code> before calling Portkey.</span></p>
+        <p><span class="time">10:00 AM</span> <span class="action">— You debug OAuth implementation. Your classifier sees "debug" keyword, tags it <code>task_type = "coding"</code>. Portkey routes to Claude.</span></p>
+        <p><span class="time">10:30 AM</span> <span class="action">— You ask "What's the latest OAuth 2.1 spec?" Your classifier tags <code>"research"</code>. Portkey routes to Gemini. But wait — you're using Claude Max, which Portkey can't use. You'd need a separate Gemini API key.</span></p>
+      </div>
+
+      <p style="margin-top: 0.75rem;"><strong>Division of responsibility:</strong></p>
+      <ul>
+        <li><strong>Portkey handles:</strong> Conditional routing based on metadata, logging, caching, failover, cost tracking</li>
+        <li><strong>You handle:</strong> Building the classifier, maintaining it, handling edge cases where classification is wrong, managing separate API keys for each provider</li>
+      </ul>
+
+      <p style="margin-top: 0.75rem; color: var(--text-muted);"><strong>Workflow fit:</strong> Enterprise teams with API budgets who want observability and conditional routing. Less suited for individual Max subscribers — the OAuth incompatibility means double billing.</p>
     </div>
   </div>
 
@@ -552,6 +707,25 @@
         <li><strong>Open question:</strong> Is the 15-example training requirement actually a feature (personalization) or a friction point? Would generic defaults be good enough?</li>
         <li><strong>Open question:</strong> Could heuristics bootstrap Auto Router faster than manual labeling?</li>
       </ul>
+    </div>
+
+    <div class="section-label journey">User Journey</div>
+    <div class="section-content journey">
+      <p style="margin-bottom: 0.75rem;"><strong>Mental model:</strong> "One integration, infinite model access." You call one endpoint, specify any model name, and OpenRouter handles the provider complexity. Auto Router learns your patterns — but only after you teach it.</p>
+
+      <div class="journey-scenario">
+        <p><span class="time">Week 1</span> <span class="action">— You integrate OpenRouter. You manually pick models: <code>model: "anthropic/claude-3-opus"</code> for coding, <code>model: "google/gemini-pro"</code> for research. Auto Router is available but needs 15+ labeled examples to learn.</span></p>
+        <p><span class="time">Week 2</span> <span class="action">— You label 20 past requests with outcomes. Auto Router starts suggesting: "For prompts like this, Gemini performs 12% better." But Claude Code hardcodes model selection — you can't use Auto Router from the CLI.</span></p>
+        <p><span class="time">Week 3</span> <span class="action">— You want to use Claude Max ($200/mo) through OpenRouter to get routing benefits. Problem: OpenRouter needs API keys, Max uses OAuth. You'd need separate API credits — defeating the purpose.</span></p>
+      </div>
+
+      <p style="margin-top: 0.75rem;"><strong>Division of responsibility:</strong></p>
+      <ul>
+        <li><strong>OpenRouter handles:</strong> Unified API, model switching, fallback, cost comparison, Auto Router (after training)</li>
+        <li><strong>You handle:</strong> Providing 15+ training examples, managing API keys, accepting that Max subscriptions don't work here</li>
+      </ul>
+
+      <p style="margin-top: 0.75rem; color: var(--text-muted);"><strong>Workflow fit:</strong> API-first developers building apps who want model flexibility. Less suited for Claude Code power users on Max subscriptions — the integration path doesn't exist.</p>
     </div>
   </div>
 
@@ -614,6 +788,36 @@
         <li><strong>Open question:</strong> What's the right memory model? File-based (simple, grep-able) vs. vector DB (semantic search) vs. something else?</li>
       </ul>
     </div>
+
+    <div class="section-label journey">User Journey</div>
+    <div class="section-content journey">
+      <p style="margin-bottom: 0.75rem;"><strong>Mental model:</strong> Each clink call spawns a fresh process. Claude maintains session continuity; Gemini resets every time. You consciously manage context handoff via files or tool parameters.</p>
+
+      <div class="journey-scenario">
+        <p><span class="time">Day 1, 10:00 AM</span> <span class="action">— You ask Claude to analyze 47 auth modules (180K tokens). CLAUDE.md says: "If >100K tokens, delegate." Claude calls <code>clink(cli_name="gemini", prompt="Analyze JWT validation")</code>. Gemini returns findings: "JWT expiration bug in auth.ts:42, missing rate limiting."</span></p>
+        <p><span class="time">Day 1, 4:00 PM</span> <span class="action">— Session ends. You save key findings to <code>RESEARCH_FINDINGS.md</code> in your repo. This is manual — PAL doesn't persist Gemini's findings.</span></p>
+        <p><span class="time">Day 2, 9:00 AM</span> <span class="action">— New session. You tell Claude: "Read RESEARCH_FINDINGS.md, then continue analysis." Claude has continuity (same orchestrator). But when you call clink again, Gemini is fresh — no memory of Day 1. You pass context explicitly: <code>clink(context="Yesterday found JWT bug...", prompt="Analyze new modules")</code>.</span></p>
+      </div>
+
+      <p style="margin-top: 0.75rem;"><strong>Division of responsibility:</strong></p>
+      <ul>
+        <li><strong>PAL handles:</strong> Spawning CLI processes, passing prompts, returning structured output, role-based system prompts</li>
+        <li><strong>You handle:</strong> Deciding when to delegate (explicit clink or CLAUDE.md rules), maintaining cross-session context via files, passing context to fresh Gemini processes</li>
+      </ul>
+
+      <div class="journey-contrast">
+        <div class="journey-contrast-item current">
+          <div class="label">Without PAL MCP</div>
+          <span style="color: var(--text-dim); font-size: 0.85rem;">Run <code>gemini -p "task" > result.md</code> manually. Read file back into Claude. Fragmented workflow.</span>
+        </div>
+        <div class="journey-contrast-item hypothetical">
+          <div class="label">With Persistent Memory</div>
+          <span style="color: var(--text-dim); font-size: 0.85rem;">Day 2: System queries memory: "What did Gemini find yesterday?" Auto-injects context into fresh process.</span>
+        </div>
+      </div>
+
+      <p style="margin-top: 0.75rem; color: var(--text-muted);"><strong>Workflow fit:</strong> Clear, explicit control over delegation. You see exactly when Gemini is invoked and what context it receives. The trade-off: you manage continuity yourself via files and explicit context passing.</p>
+    </div>
   </div>
 
   <!-- INTER-AGENT COMMUNICATION -->
@@ -674,6 +878,27 @@
         <li><strong>Open question:</strong> Is centralized routing better than autonomous agents? Central routing is clearer but creates a single point of failure.</li>
         <li><strong>Open question:</strong> Could hcom's event stream be enriched with routing hints without becoming a full orchestrator?</li>
       </ul>
+    </div>
+
+    <div class="section-label journey">User Journey</div>
+    <div class="section-content journey">
+      <p style="margin-bottom: 0.75rem;"><strong>Mental model:</strong> Agents discover each other through async event logs. hcom doesn't tell agents what to DO — it tells them what HAPPENED. Each agent decides how to react.</p>
+
+      <div class="journey-scenario">
+        <p><span class="time">10:30:45</span> <span class="action">— Claude writes <code>rateLimit.ts</code>. PostToolUse hook fires, posts to SQLite: <code>{agent: "claude", event: "file_write", file: "rateLimit.ts"}</code>.</span></p>
+        <p><span class="time">10:30:48</span> <span class="action">— Gemini's hook polls SQLite (every ~1 sec), sees the event. Based on its configuration, Gemini spawns a review: "Analyze rateLimit.ts for bugs."</span></p>
+        <p><span class="time">10:31:15</span> <span class="action">— Gemini finds: race condition line 42, missing error handling line 78. Posts findings back to SQLite.</span></p>
+        <p><span class="time">10:31:32</span> <span class="action">— Claude's hook polls, sees Gemini's review. Claude reads feedback, fixes line 42.</span></p>
+        <p><span class="time">10:32:00</span> <span class="action">— Meanwhile, you also asked Gemini to add tests. Both Claude and Gemini edit <code>rateLimit.ts</code>. hcom detects the collision AFTER both writes. You resolve the merge conflict manually.</span></p>
+      </div>
+
+      <p style="margin-top: 0.75rem;"><strong>Division of responsibility:</strong></p>
+      <ul>
+        <li><strong>hcom handles:</strong> Broadcasting events, persistent event log, collision detection (after the fact), native hook integration</li>
+        <li><strong>You handle:</strong> Agent configuration (what events trigger what actions), resolving collisions, ensuring both agents are running, understanding that hcom is awareness not control</li>
+      </ul>
+
+      <p style="margin-top: 0.75rem; color: var(--text-muted);"><strong>Workflow fit:</strong> Parallel agents that need awareness of each other without centralized control. The trade-off: agents are autonomous (no single point of failure) but coordination is implicit (collisions detected, not prevented).</p>
     </div>
   </div>
 
@@ -737,6 +962,37 @@
         <li><strong>Open question:</strong> Would cross-agent communication be useful, or is isolation actually a feature (no interference)?</li>
       </ul>
     </div>
+
+    <div class="section-label journey">User Journey</div>
+    <div class="section-content journey">
+      <p style="margin-bottom: 0.75rem;"><strong>Mental model:</strong> Parallelism via git worktree isolation. Each agent works in its own branch, can't interfere with others. But all 5 agents draw from your single Claude Max subscription — 5x the rate limit burn.</p>
+
+      <div class="journey-scenario">
+        <p><span class="time">Monday 9:00 AM</span> <span class="action">— You have 5 independent features to build. You open Conductor, click "Create 5 agents." Each gets its own git worktree: <code>feature-auth</code>, <code>feature-api</code>, <code>feature-tests</code>, etc.</span></p>
+        <p><span class="time">Monday 11:00 AM</span> <span class="action">— All 5 agents are working simultaneously. Dashboard shows progress, terminal output, file changes. You're getting 5x the work done per hour.</span></p>
+        <p><span class="time">Monday 2:00 PM</span> <span class="action">— Agent 4 stalls silently. You check — it hit 429. Your quota that normally lasts a week is now at 60% after 5 hours. Two more agents start failing.</span></p>
+        <p><span class="time">Monday 4:00 PM</span> <span class="action">— Quota exhausted. All agents blocked. You've done 2 days of work in 7 hours, but now you're stuck until the weekly reset.</span></p>
+      </div>
+
+      <p style="margin-top: 0.75rem;"><strong>Division of responsibility:</strong></p>
+      <ul>
+        <li><strong>Conductor handles:</strong> Git worktree creation, agent spawning, visual dashboard, merge coordination</li>
+        <li><strong>You handle:</strong> Rate limit pacing (Conductor doesn't throttle), manual task assignment (no semantic routing), recovering from silent 429 failures</li>
+      </ul>
+
+      <div class="journey-contrast">
+        <div class="journey-contrast-item current">
+          <div class="label">Your Profile</div>
+          <span style="color: var(--text-dim); font-size: 0.85rem;">Already hit 85% in 1-2 days with 1 agent. Conductor would hit 100% in ~8 hours.</span>
+        </div>
+        <div class="journey-contrast-item hypothetical">
+          <div class="label">With Multi-Provider</div>
+          <span style="color: var(--text-dim); font-size: 0.85rem;">2 Claude agents + 3 Gemini agents = two independent quota pools. Sustained work across a week.</span>
+        </div>
+      </div>
+
+      <p style="margin-top: 0.75rem; color: var(--text-muted);"><strong>Workflow fit:</strong> "5 independent tasks, 48-hour sprint" — burst work with merge at the end. Less suited for "continuous work across a full week" where you need to pace rate limit consumption.</p>
+    </div>
   </div>
 
   <!-- QUOTA MONITORING -->
@@ -797,6 +1053,37 @@
         <li><strong>Open question:</strong> Is automatic routing at thresholds better than human judgment? User might WANT to burn Claude quota on important work.</li>
         <li><strong>Open question:</strong> What's the right threshold? 80%? 90%? Context-dependent? Should user configure it or should the system learn?</li>
       </ul>
+    </div>
+
+    <div class="section-label journey">User Journey</div>
+    <div class="section-content journey">
+      <p style="margin-bottom: 0.75rem;"><strong>Mental model:</strong> Real-time visibility, human decision-making. You see the numbers; you decide what to do. The tool shows you the score but doesn't play the game for you.</p>
+
+      <div class="journey-scenario">
+        <p><span class="time">10:00 AM</span> <span class="action">— Menu bar shows: Claude 72% | Gemini 15%. You're debugging a complex auth issue. You glance at the quota and think: "I have headroom, I'll keep going."</span></p>
+        <p><span class="time">10:45 AM</span> <span class="action">— Menu bar: Claude 85%. You're close to a breakthrough. You think: "I should switch to Gemini for the research portion... but I don't want to break flow. I'll risk it."</span></p>
+        <p><span class="time">11:15 AM</span> <span class="action">— Request fails: 429. Menu bar: Claude 100%. Your debugging session is interrupted. You manually start Gemini, copy context, re-explain the problem. 10 minutes lost.</span></p>
+        <p><span class="time">11:25 AM</span> <span class="action">— You realize: "I SAW it at 85%. I could have switched. The tool showed me; I chose not to act." The visibility was there; the agency was yours.</span></p>
+      </div>
+
+      <p style="margin-top: 0.75rem;"><strong>Division of responsibility:</strong></p>
+      <ul>
+        <li><strong>CLIProxyAPI handles:</strong> Intercepting requests, counting tokens, displaying percentages, round-robin across accounts, post-hoc failover</li>
+        <li><strong>You handle:</strong> Watching the numbers, deciding when to switch, accepting the consequences of staying on Claude at 85%</li>
+      </ul>
+
+      <div class="journey-contrast">
+        <div class="journey-contrast-item current">
+          <div class="label">Display-Only</div>
+          <span style="color: var(--text-dim); font-size: 0.85rem;">You see "Claude 85%." You decide to keep going. You hit 429. That's your call — CLIProxyAPI showed you the data.</span>
+        </div>
+        <div class="journey-contrast-item hypothetical">
+          <div class="label">With Proactive Routing</div>
+          <span style="color: var(--text-dim); font-size: 0.85rem;">System sees 82%, sees next task is research. Routes to Gemini automatically. You keep debugging on Claude uninterrupted.</span>
+        </div>
+      </div>
+
+      <p style="margin-top: 0.75rem; color: var(--text-muted);"><strong>Workflow fit:</strong> Users who want visibility but retain decision authority. The trade-off: you're informed but responsible. If you burn out at 85% on purpose because the work was worth it — that's a valid choice this tool respects.</p>
     </div>
   </div>
 
