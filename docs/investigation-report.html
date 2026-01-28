@@ -3,866 +3,755 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agent Harness Investigation Report</title>
+  <title>Competitive Landscape Analysis</title>
   <style>
-    /* Base Colors - Warm, Easy-on-Eyes */
     :root {
-      --bg-primary: #fefcf3;
-      --bg-secondary: #f9f6f0;
-      --bg-code: #f0ebe3;
-      --text-primary: #3d3d3d;
-      --text-heading: #5c4b3a;
-      --accent-teal: #2a7d7d;
-      --accent-blue: #4a7c9b;
-      --border-tan: #e0d5c5;
-      --success-sage: #6b9b7a;
-      --warning-amber: #c49052;
-      --error-coral: #c97065;
+      --bg: #0d1117;
+      --bg-card: #161b22;
+      --bg-elevated: #1c2128;
+      --text: #e6edf3;
+      --text-dim: #8b949e;
+      --text-muted: #6e7681;
+      --blue: #58a6ff;
+      --green: #3fb950;
+      --yellow: #d29922;
+      --red: #f85149;
+      --purple: #a371f7;
+      --border: #30363d;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      font-size: 17px;
-      line-height: 1.7;
-      color: var(--text-primary);
-      background: var(--bg-primary);
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
-
-    h1, h2, h3, h4 {
-      color: var(--text-heading);
-      font-weight: 600;
-      margin-top: 2rem;
-    }
-
-    h1 { font-size: 2.2rem; border-bottom: 3px solid var(--accent-teal); padding-bottom: 0.5rem; }
-    h2 { font-size: 1.6rem; border-bottom: 2px solid var(--border-tan); padding-bottom: 0.3rem; }
-    h3 { font-size: 1.3rem; }
-    h4 { font-size: 1.1rem; color: var(--accent-teal); }
-
-    /* You Are Here Context Box */
-    .you-are-here {
-      background: linear-gradient(135deg, #f0ebe3 0%, #fefcf3 100%);
-      border-left: 4px solid var(--accent-teal);
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-    }
-    .you-are-here h3 {
-      margin-top: 0;
-      color: var(--accent-teal);
-    }
-
-    /* Checkpoint Boxes */
-    .checkpoint {
-      background: var(--bg-code);
-      border-left: 4px solid var(--success-sage);
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin: 2rem 0;
-    }
-    .checkpoint-header {
-      color: var(--success-sage);
-      font-weight: 600;
-      font-size: 1.1rem;
-      margin-bottom: 0.5rem;
-    }
-
-    /* Warning Boxes */
-    .warning {
-      background: #fef8f0;
-      border-left: 4px solid var(--warning-amber);
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin: 2rem 0;
-    }
-    .warning-header {
-      color: var(--warning-amber);
-      font-weight: 600;
-      font-size: 1.1rem;
-      margin-bottom: 0.5rem;
-    }
-
-    /* Milestone */
-    .milestone {
-      background: linear-gradient(90deg, var(--success-sage) 0%, var(--accent-teal) 100%);
-      color: white;
-      padding: 1rem 1.5rem;
-      border-radius: 8px;
-      text-align: center;
-      margin: 2rem 0;
-      font-weight: 600;
-    }
-
-    /* Code Blocks */
-    .code-block {
-      background: var(--bg-code);
-      border-radius: 8px;
-      padding: 1rem;
-      position: relative;
-      font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
-      font-size: 14px;
-      overflow-x: auto;
-      margin: 1rem 0;
-      border: 1px solid var(--border-tan);
-    }
-    .copy-btn {
-      position: absolute;
-      top: 0.5rem;
-      right: 0.5rem;
-      background: var(--accent-teal);
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 0.25rem 0.5rem;
-      cursor: pointer;
-      font-size: 12px;
-    }
-    .copy-btn:hover {
-      background: #1e6060;
-    }
-
-    /* Tables */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 1.5rem 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
       font-size: 15px;
-    }
-    th, td {
-      padding: 0.75rem;
-      text-align: left;
-      border-bottom: 1px solid var(--border-tan);
-    }
-    th {
-      background: var(--bg-code);
-      color: var(--text-heading);
-      font-weight: 600;
-    }
-    tr:hover {
-      background: var(--bg-secondary);
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--bg);
+      padding: 3rem 2rem;
     }
 
-    /* Collapsible Sections */
-    details {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-tan);
+    .container { max-width: 860px; margin: 0 auto; }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .subtitle {
+      color: var(--text-dim);
+      margin-bottom: 2.5rem;
+    }
+
+    /* Category Headers */
+    .category {
+      margin: 3rem 0 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .category-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--purple);
+      margin-bottom: 0.25rem;
+    }
+    .category-desc {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+
+    /* Tool Sections */
+    .tool {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
       border-radius: 8px;
-      margin: 1rem 0;
-    }
-    summary {
-      padding: 1rem;
-      cursor: pointer;
-      font-weight: 600;
-      color: var(--text-heading);
-    }
-    summary:hover {
-      background: var(--bg-code);
-    }
-    details[open] summary {
-      border-bottom: 1px solid var(--border-tan);
-    }
-    details > div {
-      padding: 1rem;
-    }
-
-    /* Tool Cards */
-    .tool-card {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-tan);
-      border-radius: 12px;
       padding: 1.5rem;
-      margin: 1.5rem 0;
+      margin-bottom: 1.25rem;
     }
-    .tool-header {
+    .tool-title {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 1rem;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
     }
     .tool-name {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: var(--text-heading);
-    }
-    .coverage-badge {
-      background: var(--accent-teal);
-      color: white;
-      padding: 0.25rem 0.75rem;
-      border-radius: 20px;
-      font-size: 0.9rem;
+      font-size: 1.1rem;
       font-weight: 600;
     }
-    .coverage-badge.low { background: var(--error-coral); }
-    .coverage-badge.medium { background: var(--warning-amber); }
-    .coverage-badge.high { background: var(--success-sage); }
+    .tool-badge {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    .tool-badge.high { background: rgba(63,185,80,0.15); color: var(--green); }
+    .tool-badge.medium { background: rgba(210,153,34,0.15); color: var(--yellow); }
+    .tool-badge.low { background: rgba(248,81,73,0.15); color: var(--red); }
 
-    /* Decision Tree */
-    .decision-tree {
-      background: var(--bg-code);
-      border-radius: 8px;
-      padding: 1.5rem;
-      font-family: 'SF Mono', Monaco, monospace;
-      font-size: 14px;
-      line-height: 1.8;
-      white-space: pre;
-      overflow-x: auto;
+    .tool-desc {
+      color: var(--text-dim);
+      margin-bottom: 1.25rem;
+      line-height: 1.7;
     }
 
-    /* Gap Table Styling */
-    .gap-exists { color: var(--error-coral); }
-    .gap-filled { color: var(--success-sage); }
-
-    /* Dividers */
-    .divider-procedure { border-top: 3px solid var(--accent-teal); margin: 2rem 0; }
-    .divider-checkpoint { border-top: 3px solid var(--success-sage); margin: 2rem 0; }
-    .divider-warning { border-top: 3px solid var(--warning-amber); margin: 2rem 0; }
-
-    /* Navigation */
-    .nav-toc {
-      background: var(--bg-code);
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin: 2rem 0;
+    /* Section labels */
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
     }
-    .nav-toc h3 {
-      margin-top: 0;
+    .section-label.works { color: var(--green); }
+    .section-label.breaks { color: var(--red); }
+    .section-label.harness { color: var(--blue); }
+
+    .section-content {
+      color: var(--text-dim);
+      margin-bottom: 1.25rem;
+      padding-left: 0.75rem;
+      border-left: 2px solid var(--border);
     }
-    .nav-toc ul {
+    .section-content.works { border-color: rgba(63,185,80,0.4); }
+    .section-content.breaks { border-color: rgba(248,81,73,0.4); }
+    .section-content.harness { border-color: rgba(88,166,255,0.4); }
+
+    .section-content ul {
       list-style: none;
-      padding-left: 0;
+      padding: 0;
     }
-    .nav-toc li {
-      padding: 0.3rem 0;
+    .section-content li {
+      margin: 0.4rem 0;
+      padding-left: 1rem;
+      position: relative;
     }
-    .nav-toc a {
-      color: var(--accent-teal);
-      text-decoration: none;
-    }
-    .nav-toc a:hover {
-      text-decoration: underline;
+    .section-content li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--text-muted);
     }
 
-    /* Recommendation Box */
-    .recommendation {
-      background: linear-gradient(135deg, #e8f5e8 0%, #f0ebe3 100%);
-      border: 2px solid var(--success-sage);
-      border-radius: 12px;
+    /* Divider */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 3rem 0;
+    }
+
+    /* Summary Table */
+    .summary-section {
+      margin: 3rem 0;
+    }
+    .summary-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+
+    .capability-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 1rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+      align-items: start;
+    }
+    .capability-row:last-child { border-bottom: none; }
+
+    .capability-name {
+      color: var(--text);
+      font-weight: 500;
+    }
+    .capability-exists {
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+      min-width: 50px;
+    }
+    .capability-exists.yes { color: var(--green); }
+    .capability-exists.no { color: var(--red); }
+    .capability-who {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* Assessment Box */
+    .assessment {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
       padding: 1.5rem;
       margin: 2rem 0;
     }
-    .recommendation h3 {
-      color: var(--success-sage);
-      margin-top: 0;
+    .assessment-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--yellow);
+    }
+    .assessment-item {
+      margin: 0.75rem 0;
+      padding-left: 1.5rem;
+      position: relative;
+      color: var(--text-dim);
+    }
+    .assessment-item::before {
+      content: attr(data-num);
+      position: absolute;
+      left: 0;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+    .assessment-item strong {
+      color: var(--text);
     }
 
-    /* Print Styles */
-    @media print {
-      body { max-width: 100%; }
-      .copy-btn { display: none; }
+    /* Context box */
+    .context {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .context-row {
+      display: flex;
+      margin: 0.4rem 0;
+    }
+    .context-key {
+      color: var(--text-muted);
+      min-width: 140px;
+      font-size: 0.9rem;
+    }
+    .context-value {
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+
+    /* Code/scenario blocks */
+    code {
+      background: var(--bg-elevated);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 0.9em;
+      color: var(--blue);
+    }
+
+    .scenario {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem;
+      margin: 0.75rem 0;
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 0.8rem;
+      line-height: 1.6;
+      color: var(--text-muted);
+      white-space: pre-wrap;
+      overflow-x: auto;
     }
   </style>
 </head>
 <body>
 
-<h1>Agent Harness Investigation Report</h1>
+<div class="container">
 
-<div class="you-are-here">
-  <h3>You Are Here</h3>
-  <p><strong>Project:</strong> Hybrid Claude + Gemini Orchestration Layer</p>
-  <p><strong>Phase:</strong> Deep Investigation (NOT Implementation)</p>
-  <p><strong>The Problem:</strong> You hit 85% of weekly Claude Max rate limits in 1-2 days</p>
-  <p><strong>The Question:</strong> Is the ~40% gap between existing tools and the full vision worth building for?</p>
-</div>
+  <h1>Competitive Landscape Analysis</h1>
+  <p class="subtitle">8 tools analyzed for hybrid Claude + Gemini orchestration</p>
 
-<nav class="nav-toc">
-  <h3>Table of Contents</h3>
-  <ul>
-    <li><a href="#executive-summary">Executive Summary</a></li>
-    <li><a href="#competitive-landscape">The 8-Tool Competitive Landscape</a></li>
-    <li><a href="#the-gap">The ~40% Gap Analysis</a></li>
-    <li><a href="#recommendations">My Recommendations</a></li>
-    <li><a href="#decision-tree">Decision Tree</a></li>
-    <li><a href="#next-steps">Next Steps</a></li>
-  </ul>
-</nav>
-
-<div class="divider-procedure"></div>
-
-<h2 id="executive-summary">Executive Summary</h2>
-
-<div class="checkpoint">
-  <div class="checkpoint-header">Key Finding</div>
-  <p>Existing tools (CCProxy + PAL MCP + CodexBar) provide <strong>~55-60%</strong> of the vision with zero custom code. The genuine gap is <strong>~40%</strong>: semantic task routing, persistent memory, proactive rate prediction, and mid-task context handoff.</p>
-</div>
-
-<p><strong>The gap is REAL but whether it matters depends on one thing:</strong></p>
-<p style="font-size: 1.2rem; text-align: center; padding: 1rem; background: var(--bg-code); border-radius: 8px;">
-  How often does mid-task exhaustion happen in your actual workflow?
-</p>
-
-<table>
-  <tr>
-    <th>Frequency</th>
-    <th>Recommendation</th>
-  </tr>
-  <tr>
-    <td>0-1x per week</td>
-    <td><span class="gap-filled">Don't build. Use baseline.</span></td>
-  </tr>
-  <tr>
-    <td>2-3x per week</td>
-    <td><span style="color: var(--warning-amber);">Build minimal harness (context handoff only)</span></td>
-  </tr>
-  <tr>
-    <td>4+ per week</td>
-    <td><span class="gap-exists">Build full harness</span></td>
-  </tr>
-</table>
-
-<div class="divider-procedure"></div>
-
-<h2 id="competitive-landscape">The 8-Tool Competitive Landscape</h2>
-
-<p>Each tool analyzed for: what it does well, what breaks, and what the harness would add.</p>
-
-<!-- Tool 1: CCProxy -->
-<div class="tool-card">
-  <div class="tool-header">
-    <span class="tool-name">1. CCProxy</span>
-    <span class="coverage-badge high">~65% coverage</span>
-  </div>
-  <p><strong>What it is:</strong> Python-based proxy using LiteLLM. Routes based on token count, model name, thinking parameter, and tool invocation.</p>
-
-  <details>
-    <summary>What it does well</summary>
-    <div>
-      <div class="code-block">
-SCENARIO: Large codebase analysis
-
-You: "Analyze all 150 files in src/ for security vulnerabilities"
-
-CCProxy sees: ~180K tokens in context
-TokenCountRule: if tokens > 100000 → route to Gemini
-
-Result: Request seamlessly routes to Gemini (1M context window).
-        You never know it happened.
-
-This works because: Token count is MEASURABLE.
-      </div>
+  <div class="context">
+    <div class="context-row">
+      <span class="context-key">Problem</span>
+      <span class="context-value">85% of Claude Max rate limits hit in 1-2 days</span>
     </div>
-  </details>
-
-  <details>
-    <summary>What breaks</summary>
-    <div>
-      <div class="code-block">
-SCENARIO: Research vs coding task
-
-You: "Research the history of JWT security vulnerabilities"
-
-CCProxy sees:
-- 12 tokens (not >100K threshold)
-- No tools being used
-- Default model name
-
-CCProxy decision: Route to Claude (default)
-
-PROBLEM: This is a RESEARCH task. Gemini has web search.
-         But CCProxy can't tell "research" from "debug".
-         12 tokens look the same either way.
-      </div>
-      <p><strong>Why:</strong> Semantic routing requires understanding INTENT. That needs either an LLM call (50-200ms, costs tokens) or a trained classifier (needs labeled data). CCProxy's philosophy is zero overhead.</p>
+    <div class="context-row">
+      <span class="context-key">Proposed Solution</span>
+      <span class="context-value">Invisible middleware routing between Claude + Gemini</span>
     </div>
-  </details>
-
-  <table>
-    <tr><th>Gap</th><th>CCProxy Today</th><th>With Harness</th></tr>
-    <tr><td>Semantic routing</td><td class="gap-exists">None</td><td class="gap-filled">Auto-classifies intent</td></tr>
-    <tr><td>Rate awareness</td><td class="gap-exists">None</td><td class="gap-filled">Proactive at 80%</td></tr>
-    <tr><td>Failover</td><td class="gap-exists">Request fails</td><td class="gap-filled">Retry with backup</td></tr>
-  </table>
-</div>
-
-<!-- Tool 2: claude-code-mux -->
-<div class="tool-card">
-  <div class="tool-header">
-    <span class="tool-name">2. claude-code-mux</span>
-    <span class="coverage-badge high">~60% coverage</span>
-  </div>
-  <p><strong>What it is:</strong> Rust-based HTTP proxy with automatic failover. When Anthropic returns 429, it tries backup providers.</p>
-
-  <details>
-    <summary>What it does well</summary>
-    <div>
-      <div class="code-block">
-SCENARIO: Rate limit hit during normal request
-
-Turn 6: You send a message to Claude
-Anthropic returns: 429 Too Many Requests
-
-claude-code-mux catches this:
-  - Tries Priority 2: OpenRouter
-  - OpenRouter succeeds
-  - Returns response to Claude Code
-
-You see: Normal response. Session continues.
-You never knew Anthropic was rate-limited.
-      </div>
-    </div>
-  </details>
-
-  <details>
-    <summary>What breaks (CRITICAL)</summary>
-    <div>
-      <div class="code-block">
-SCENARIO: Mid-debugging 429 error
-
-Turn 1-5: Debugging a race condition with Claude
-  - Claude identified 3 potential causes
-  - Eliminated hypothesis A (timing issue)
-  - Eliminated hypothesis B (lock scope)
-  - Currently testing hypothesis C
-
-Turn 6: Anthropic returns 429
-
-claude-code-mux:
-  - Switches to OpenRouter
-  - Forwards MESSAGE HISTORY
-
-OpenRouter Claude receives messages BUT:
-  - This is a FRESH instance
-  - No "memory" of the reasoning process
-  - Only sees TEXT of conversation
-  - Doesn't know hypotheses A and B were eliminated
-  - Might re-investigate them (wasting time)
-
-Result: You lose 5-10 minutes of debugging progress
-      </div>
-      <p><strong>Why:</strong> claude-code-mux is a STATELESS PROXY by design. Each request is independent. Adding memory would change it from "proxy" to "orchestration layer."</p>
-    </div>
-  </details>
-
-  <table>
-    <tr><th>Gap</th><th>claude-code-mux Today</th><th>With Harness</th></tr>
-    <tr><td>Context continuity</td><td class="gap-exists">Messages only, reasoning lost</td><td class="gap-filled">Full reasoning state</td></tr>
-    <tr><td>Rate awareness</td><td class="gap-exists">Reacts to 429</td><td class="gap-filled">Proactive at 80%</td></tr>
-    <tr><td>Semantic routing</td><td class="gap-exists">None</td><td class="gap-filled">Routes by task type</td></tr>
-  </table>
-</div>
-
-<!-- Tool 3: PAL MCP -->
-<div class="tool-card">
-  <div class="tool-header">
-    <span class="tool-name">3. PAL MCP</span>
-    <span class="coverage-badge medium">~45% coverage</span>
-  </div>
-  <p><strong>What it is:</strong> MCP server (10K+ GitHub stars) with <code>clink</code> tool that spawns external CLI processes (Gemini, Codex).</p>
-
-  <details>
-    <summary>How clink works</summary>
-    <div>
-      <div class="code-block">
-1. You're in Claude Code session
-2. Claude calls: clink(cli_name="gemini", role="security-analyzer", prompt="...")
-3. PAL MCP:
-   - Loads config from conf/cli_clients/gemini.json
-   - Loads role prompt from systemprompts/clink/security-analyzer.md
-   - Spawns: gemini -p "combined prompt" --output-format json --yolo
-4. Gemini runs in isolation, produces output
-5. PAL returns result to Claude's conversation
-      </div>
-    </div>
-  </details>
-
-  <details>
-    <summary>What breaks: Multi-day analysis</summary>
-    <div>
-      <div class="code-block">
-Day 1:
-  You: "Use Gemini to analyze the auth module"
-  Claude calls clink → Gemini finds: JWT bug, rate limiting gap
-  Session ends.
-
-Day 2:
-  You: "Continue the auth analysis"
-  Claude calls clink again
-  PAL spawns a NEW Gemini process
-
-PROBLEM:
-  - This Gemini has ZERO memory of Day 1
-  - Doesn't know about the JWT bug
-  - Re-analyzes from scratch
-  - Might produce DIFFERENT findings
-
-Why: clink spawns FRESH processes. No persistence.
-      </div>
-    </div>
-  </details>
-</div>
-
-<!-- Tool 4: hcom -->
-<div class="tool-card">
-  <div class="tool-header">
-    <span class="tool-name">4. hcom</span>
-    <span class="coverage-badge low">~35% coverage</span>
-  </div>
-  <p><strong>What it is:</strong> Hook-based messaging using SQLite. Enables real-time inter-agent awareness.</p>
-
-  <details>
-    <summary>How messaging works</summary>
-    <div>
-      <div class="code-block">
-Claude Code ←→ Hooks ←→ SQLite ←→ Hooks ←→ Gemini CLI
-
-When Claude writes a file:
-1. PostToolUse hook fires
-2. Hook INSERTs to SQLite: {agent: "claude", event: "file_write"}
-3. Gemini's hook POLLs SQLite every 500ms-2sec
-4. Gemini sees event, can react
-      </div>
-    </div>
-  </details>
-
-  <div class="warning">
-    <div class="warning-header">Key Limitation</div>
-    <p>hcom is MESSAGING, not ROUTING. It tells agents what happened, not what SHOULD happen. No semantic understanding of task types.</p>
-  </div>
-</div>
-
-<!-- Tool 5: Portkey -->
-<div class="tool-card">
-  <div class="tool-header">
-    <span class="tool-name">5. Portkey</span>
-    <span class="coverage-badge low">~30% coverage</span>
-  </div>
-  <p><strong>What it is:</strong> Cloud AI gateway for enterprise. Routes based on metadata YOU provide.</p>
-
-  <div class="warning">
-    <div class="warning-header">Critical Limitation</div>
-    <p><strong>Cannot use Claude Max subscriptions.</strong> Anthropic banned third-party OAuth access in Jan 2026. Portkey requires API keys (pay-per-token). You'd pay for Max AND API credits.</p>
-  </div>
-
-  <p><strong>The "upstream logic" problem:</strong> Portkey routes based on metadata you attach. YOU must classify the task first, then tell Portkey. The classification is YOUR responsibility.</p>
-</div>
-
-<!-- Tool 6: OpenRouter -->
-<div class="tool-card">
-  <div class="tool-header">
-    <span class="tool-name">6. OpenRouter</span>
-    <span class="coverage-badge low">~25% coverage</span>
-  </div>
-  <p><strong>What it is:</strong> API gateway for 300+ models. Single endpoint, all providers.</p>
-
-  <p><strong>Same subscription problem as Portkey:</strong> Cannot use Max through OpenRouter. API keys only.</p>
-
-  <p><strong>OpenRouter vs Cursor:</strong></p>
-  <ul>
-    <li><strong>Cursor:</strong> IDE (code editor). Visual app. You type code, AI assists.</li>
-    <li><strong>OpenRouter:</strong> API gateway (infrastructure). You call from code.</li>
-    <li>Cursor is the restaurant. OpenRouter is the food distributor.</li>
-  </ul>
-</div>
-
-<!-- Tool 7: Conductor Build -->
-<div class="tool-card">
-  <div class="tool-header">
-    <span class="tool-name">7. Conductor Build</span>
-    <span class="coverage-badge low">~15% coverage</span>
-  </div>
-  <p><strong>What it is:</strong> macOS Electron app (YC-backed) running multiple Claude instances in parallel git worktrees.</p>
-
-  <div class="warning">
-    <div class="warning-header">Rate Limit Math</div>
-    <div class="code-block">
-Claude Max: ~240-480 hours/week of Sonnet 4
-
-With Conductor (5 agents):
-  - 5 agents = 5x rate limit burn
-  - What lasts a week now lasts 1-2 days
-
-Your profile: Already hit 85% in 1-2 days
-Conductor: Would hit 100% in ~8 hours
-
-Conductor solves: "5 tasks, 48-hour sprint"
-Your problem: "Continuous work across a week"
+    <div class="context-row">
+      <span class="context-key">Key Question</span>
+      <span class="context-value">Is the ~40% gap between existing tools and the vision worth building?</span>
     </div>
   </div>
-</div>
 
-<!-- Tool 8: CLIProxyAPI -->
-<div class="tool-card">
-  <div class="tool-header">
-    <span class="tool-name">8. CLIProxyAPI</span>
-    <span class="coverage-badge high">~60% coverage</span>
+  <!-- ROUTING/PROXY LAYER -->
+  <div class="category">
+    <div class="category-name">Routing / Proxy Layer</div>
+    <div class="category-desc">Tools that sit between your client and AI providers, intercepting and routing requests</div>
   </div>
-  <p><strong>What it is:</strong> Local proxy with macOS menu bar widget showing quota. Round-robin load balancing.</p>
 
-  <div class="warning">
-    <div class="warning-header">Visibility vs Action Gap</div>
-    <div class="code-block">
-10:00 AM - Menu bar: Claude 72%
-  You see it. Think "I'll switch later."
+  <div class="tool">
+    <div class="tool-title">
+      <span class="tool-name">CCProxy</span>
+      <span class="tool-badge high">~65%</span>
+    </div>
+    <p class="tool-desc">
+      Python-based proxy using LiteLLM that intercepts Claude Code API requests. Routes based on 4 rule types: <code>TokenCountRule</code> (if tokens > threshold), <code>MatchModelRule</code> (model name matching), <code>ThinkingRule</code> (thinking parameter presence), and <code>MatchToolRule</code> (tool invocation detection). Design philosophy is zero overhead, transparent proxy — rules evaluate in &lt;1ms.
+    </p>
 
-10:45 AM - Menu bar: Claude 85%
-  Still debugging. Don't want to break flow.
+    <div class="section-label works">What It Does Well</div>
+    <div class="section-content works">
+      <ul>
+        <li>Token-based routing works perfectly for large context scenarios — request with 180K tokens automatically routes to Gemini's 1M context window</li>
+        <li>Tool-based routing enables WebSearch → Perplexity scenarios without manual intervention</li>
+        <li>Zero latency overhead since rules are simple conditionals, not model calls</li>
+        <li>Works with Claude Max subscriptions (OAuth compatible)</li>
+        <li>Transparent to Claude Code — it doesn't know the proxy exists</li>
+      </ul>
+    </div>
 
-11:15 AM - Request fails: 429
-  Session interrupted. Manual restart needed.
+    <div class="section-label breaks">What Breaks</div>
+    <div class="section-content breaks">
+      <ul>
+        <li>Cannot understand task semantics — "Research JWT vulnerabilities" and "Debug auth.ts" both look like ~10 tokens with no tools, route identically</li>
+        <li>No rate limit awareness — doesn't know you're at 85% Claude quota</li>
+        <li>No failover — if Anthropic fails, request fails</li>
+        <li>No shared state between requests — each request is independent</li>
+        <li>Why no semantic routing? Would require LLM call (50-200ms, costs tokens) or trained classifier (needs labeled data). CCProxy prioritizes simplicity.</li>
+      </ul>
+    </div>
 
-The gap: CLIProxyAPI SHOWS data but doesn't ACT on it.
+    <div class="section-label harness">With Harness</div>
+    <div class="section-content harness">
+      <ul>
+        <li>Semantic router classifies "research" vs "coding" vs "debugging" automatically, routes research to Gemini without explicit rules</li>
+        <li>Proactive rate prediction at 80% threshold, auto-routes non-critical tasks before hitting 429</li>
+        <li>Automatic retry with backup provider on failure</li>
+      </ul>
     </div>
   </div>
+
+  <div class="tool">
+    <div class="tool-title">
+      <span class="tool-name">claude-code-mux</span>
+      <span class="tool-badge high">~60%</span>
+    </div>
+    <p class="tool-desc">
+      Rust-based HTTP proxy providing automatic failover between AI providers. When Anthropic returns 429, it immediately tries your backup providers (OpenRouter, Vertex AI, etc.). Supports 18+ providers, OAuth authentication, &lt;1ms routing overhead, ~5MB memory footprint. Designed as a stateless proxy — each request is independent.
+    </p>
+
+    <div class="section-label works">What It Does Well</div>
+    <div class="section-content works">
+      <ul>
+        <li>Seamless failover on 429 errors — you send a request, Anthropic fails, mux catches it, tries OpenRouter, returns response. You never know the switch happened.</li>
+        <li>Priority-based provider configuration — set Anthropic as priority 1, OpenRouter as priority 2, Vertex as priority 3</li>
+        <li>OAuth authentication support — works with Claude Max subscriptions</li>
+        <li>Minimal resource usage — Rust binary, efficient</li>
+      </ul>
+    </div>
+
+    <div class="section-label breaks">What Breaks</div>
+    <div class="section-content breaks">
+      <ul>
+        <li><strong>Context continuity breaks during failover.</strong> Turn 1-5: debugging a race condition, Claude eliminated 2 hypotheses, testing the third. Turn 6: 429 error, mux switches to OpenRouter. OpenRouter Claude gets the message history but it's a FRESH instance — no memory of the reasoning process. It might re-investigate the eliminated hypotheses. You lose 5-10 minutes.</li>
+        <li>No semantic routing — doesn't understand task type, just does priority-based failover</li>
+        <li>No rate limit prediction — reacts to 429, doesn't predict it</li>
+        <li>Why no Mem0? By design it's stateless. Adding memory would change it from "proxy" to "orchestration layer."</li>
+      </ul>
+    </div>
+
+    <div class="section-label harness">With Harness</div>
+    <div class="section-content harness">
+      <ul>
+        <li>Shared memory captures reasoning state: "Investigating race condition. Eliminated hypothesis A (timing) and B (lock scope). Testing hypothesis C (async init order)."</li>
+        <li>New provider instance receives synthesized context, continues from hypothesis C</li>
+        <li>Proactive routing before hitting 429</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="tool">
+    <div class="tool-title">
+      <span class="tool-name">Portkey</span>
+      <span class="tool-badge low">~30%</span>
+    </div>
+    <p class="tool-desc">
+      Cloud AI gateway for enterprise use. Every request goes through Portkey's servers where it can be routed based on metadata, logged, cached, and monitored. Supports complex conditional routing rules, excellent observability (costs, latency, tokens), request caching, failover/retries, and per-team spending limits. SOC 2 compliant.
+    </p>
+
+    <div class="section-label works">What It Does Well</div>
+    <div class="section-content works">
+      <ul>
+        <li>Metadata-based conditional routing — <code>IF metadata.task_type == "research" THEN route to Gemini</code></li>
+        <li>Excellent observability — every request logged with costs, latency, token counts</li>
+        <li>Caching — identical requests return cached responses, saves money</li>
+        <li>Failover and retries — if Provider A fails, try Provider B</li>
+        <li>Enterprise features — audit logs, cost controls per team/project</li>
+      </ul>
+    </div>
+
+    <div class="section-label breaks">What Breaks</div>
+    <div class="section-content breaks">
+      <ul>
+        <li><strong>Cannot use Claude Max subscriptions.</strong> Anthropic banned third-party OAuth access in Jan 2026. Portkey requires API keys (pay-per-token). You'd pay for Max AND API credits — double cost.</li>
+        <li>No semantic routing — routes based on metadata YOU provide. "Upstream logic" problem: YOU must classify "research" vs "coding" BEFORE calling Portkey, then attach <code>metadata.task_type</code>. Portkey is the router, you are the classifier.</li>
+        <li>Stateless — no memory between requests</li>
+        <li>Cloud dependency — requests route through Portkey's servers</li>
+      </ul>
+    </div>
+
+    <div class="section-label harness">With Harness</div>
+    <div class="section-content harness">
+      <ul>
+        <li>Harness does the semantic classification upstream, Portkey handles the routing infrastructure</li>
+        <li>Harness uses Max subscription credentials directly, no API key needed</li>
+        <li>Persistent memory layer added on top</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="tool">
+    <div class="tool-title">
+      <span class="tool-name">OpenRouter</span>
+      <span class="tool-badge low">~25%</span>
+    </div>
+    <p class="tool-desc">
+      API gateway providing unified access to 300+ AI models from 60+ providers through a single endpoint. One integration, all models — call <code>openrouter.ai/api/v1/messages</code> with any model name (Claude, GPT-4, Gemini, Llama, Mistral). Has "Auto Router" feature powered by NotDiamond that learns which models perform best for task types. BYOK option available with 5% fee.
+    </p>
+
+    <div class="section-label works">What It Does Well</div>
+    <div class="section-content works">
+      <ul>
+        <li>Single endpoint for 300+ models — one integration, all providers</li>
+        <li>Easy model switching — just change the model name in the API call</li>
+        <li>Auto Router — learned routing that analyzes prompts and picks optimal model</li>
+        <li>Cost comparison — see pricing across all models in one place</li>
+        <li>Fallback support — if model A fails, try model B</li>
+        <li>BYOK option — use your own API keys (with 5% fee)</li>
+      </ul>
+    </div>
+
+    <div class="section-label breaks">What Breaks</div>
+    <div class="section-content breaks">
+      <ul>
+        <li><strong>Cannot use Claude Max subscriptions.</strong> Same OAuth problem as Portkey — requires API keys, not subscription auth.</li>
+        <li>Auto Router requires 15+ labeled training examples before it works well. Cold start problem.</li>
+        <li>Claude Code hardcodes model selection — Auto Router feature not exposed to CLI tools</li>
+        <li>Stateless — no shared memory between requests</li>
+        <li>5% BYOK fee adds cost on top of provider pricing</li>
+      </ul>
+    </div>
+
+    <div class="section-label harness">With Harness</div>
+    <div class="section-content harness">
+      <ul>
+        <li>Harness preserves Max subscription benefits while adding routing</li>
+        <li>Zero-config semantic routing without 15+ training examples</li>
+        <li>MCP server exposes routing to Claude Code</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- DELEGATION LAYER -->
+  <div class="category">
+    <div class="category-name">Delegation / MCP Layer</div>
+    <div class="category-desc">Tools that let Claude delegate tasks to other AI models</div>
+  </div>
+
+  <div class="tool">
+    <div class="tool-title">
+      <span class="tool-name">PAL MCP</span>
+      <span class="tool-badge medium">~45%</span>
+    </div>
+    <p class="tool-desc">
+      MCP server (10K+ GitHub stars) that runs inside Claude Code, providing the <code>clink</code> tool ("CLI Link") that spawns external CLI processes. Claude can delegate to Gemini, Codex, or other Claude instances. Supports role-based prompting via pre-configured system prompts, file passing, and structured JSON output. Core idea: Claude Code has limits (200K context, no web search), PAL lets it call models with different strengths.
+    </p>
+
+    <div class="section-label works">What It Does Well</div>
+    <div class="section-content works">
+      <ul>
+        <li>Clean delegation interface — <code>clink(cli_name="gemini", role="security-analyzer", prompt="Analyze auth.ts")</code></li>
+        <li>Role-based prompting — pre-configured system prompts for different task types load automatically</li>
+        <li>Result integration — Gemini's output flows naturally back into Claude's conversation as a tool result</li>
+        <li>Multiple CLI support — configure Gemini, Codex, other Claude instances, anything with a CLI</li>
+        <li>Delegates large context work to Gemini (1M context) while Claude orchestrates</li>
+        <li>Battle-tested, production-ready with active community</li>
+      </ul>
+    </div>
+
+    <div class="section-label breaks">What Breaks</div>
+    <div class="section-content breaks">
+      <ul>
+        <li><strong>No persistent memory across sessions.</strong> Day 1: Gemini finds JWT bug, rate limiting gap. Day 2: you call clink again, PAL spawns NEW Gemini process with ZERO memory of Day 1. Re-analyzes from scratch, might produce different findings.</li>
+        <li>Delegation is MANUAL — no automatic routing. Either you explicitly say "use Gemini" or you write CLAUDE.md rules and Claude decides. No semantic classification.</li>
+        <li>25K token output limit — MCP tool responses capped, large analyses get truncated</li>
+        <li>2-minute timeout — long-running Gemini tasks may timeout</li>
+        <li>No rate limit awareness — doesn't know if Claude/Gemini approaching limits</li>
+        <li>Context passed, not shared — Gemini sees files you specify, not Claude's reasoning state</li>
+      </ul>
+    </div>
+
+    <div class="section-label harness">With Harness</div>
+    <div class="section-content harness">
+      <ul>
+        <li>Persistent memory store auto-injects prior findings: "Yesterday's analysis found JWT bug in auth.ts:42"</li>
+        <li>Semantic router classifies tasks automatically, routes without explicit clink calls</li>
+        <li>Proactive prediction switches providers at 80% quota</li>
+        <li>Shared memory includes Claude's reasoning, not just files</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- INTER-AGENT COMMUNICATION -->
+  <div class="category">
+    <div class="category-name">Inter-Agent Communication</div>
+    <div class="category-desc">Tools that let multiple AI agents communicate with each other</div>
+  </div>
+
+  <div class="tool">
+    <div class="tool-title">
+      <span class="tool-name">hcom</span>
+      <span class="tool-badge low">~35%</span>
+    </div>
+    <p class="tool-desc">
+      Hook-based messaging layer using SQLite as a message bus. When Claude writes a file, a hook posts to SQLite. Gemini's hook polls SQLite and sees the event. Enables real-time inter-agent awareness through Claude Code's native hook system. Messages are structured event notifications (file_write, review_comment), not text chat.
+    </p>
+
+    <div class="section-label works">What It Does Well</div>
+    <div class="section-content works">
+      <ul>
+        <li>Real-time inter-agent awareness — Claude writes rateLimit.ts → hook posts to SQLite → Gemini's hook polls → Gemini reviews file → posts findings back → Claude sees feedback. ~100 second feedback loop.</li>
+        <li>Collision detection — both agents notified if they touch same file</li>
+        <li>Persistent event log — SQLite preserves history across polling gaps</li>
+        <li>Native integration — works with Claude Code's existing hook system</li>
+        <li>Lightweight — just SQLite + hook scripts, no heavy infrastructure</li>
+        <li>Enables coordination without explicit orchestration</li>
+      </ul>
+    </div>
+
+    <div class="section-label breaks">What Breaks</div>
+    <div class="section-content breaks">
+      <ul>
+        <li><strong>Messaging only, NOT routing.</strong> hcom tells agents what happened, not what SHOULD happen. "Claude wrote auth.ts" is information, not a decision about who should write tests.</li>
+        <li>Collision detected, not prevented — both agents edit same file, THEN see the collision. No locking.</li>
+        <li>No automatic context injection — messages are raw events, not synthesized actionable context</li>
+        <li>Requires both agents running simultaneously — Gemini must be active to receive messages</li>
+        <li>Polling delays — 500ms-2sec gaps between event and reaction</li>
+        <li>No failure handling — if Gemini's review times out, messages pile up</li>
+      </ul>
+    </div>
+
+    <div class="section-label harness">With Harness</div>
+    <div class="section-content harness">
+      <ul>
+        <li>Semantic router assigns tasks to appropriate agent proactively, not reactively</li>
+        <li>File locking before write prevents collisions</li>
+        <li>Events synthesized into actionable context summaries</li>
+        <li>Rate limit capacity info included in messages</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- PARALLEL EXECUTION -->
+  <div class="category">
+    <div class="category-name">Parallel Execution</div>
+    <div class="category-desc">Tools that run multiple AI agents simultaneously</div>
+  </div>
+
+  <div class="tool">
+    <div class="tool-title">
+      <span class="tool-name">Conductor Build</span>
+      <span class="tool-badge low">~15%</span>
+    </div>
+    <p class="tool-desc">
+      macOS Electron app (YC-backed, by Melty Labs) that runs multiple Claude Code instances in parallel, each isolated in its own git worktree. Visual dashboard monitors all agents simultaneously. Core idea: 5 independent features? Spin up 5 Claude instances, each on a different branch, merge when done. Conductor CREATES agents — it's the controller, not a viewer.
+    </p>
+
+    <div class="section-label works">What It Does Well</div>
+    <div class="section-content works">
+      <ul>
+        <li>True parallel execution — 5 agents on 5 CPU cores simultaneously</li>
+        <li>Git isolation via worktrees — Agent 1 modifies auth.ts without affecting Agent 2's copy. No merge conflicts during development.</li>
+        <li>Visual dashboard — see all agents' progress, terminal output, file changes, diffs at a glance</li>
+        <li>Merge coordination — helps combine branches when agents finish</li>
+        <li>No manual git commands — worktree management is automatic</li>
+        <li>YC-backed, actively developed with real support</li>
+      </ul>
+    </div>
+
+    <div class="section-label breaks">What Breaks</div>
+    <div class="section-content breaks">
+      <ul>
+        <li><strong>5 agents = 5x rate limit burn.</strong> All use your single Claude Max subscription. What lasts a week now lasts 1-2 days. Your profile: already hit 85% in 1-2 days. Conductor: would hit 100% in ~8 hours.</li>
+        <li>Claude-only — no Gemini, no GPT-4, no model selection</li>
+        <li>No cross-agent communication — agents can't see what each other is doing</li>
+        <li>No shared memory — each agent is fully isolated</li>
+        <li>No semantic task routing — you manually assign tasks</li>
+        <li>Silent failures — agents stall on 429 without clear notification</li>
+        <li>Conductor solves "5 independent tasks, 48-hour sprint." Your problem is "continuous work across a full week."</li>
+      </ul>
+    </div>
+
+    <div class="section-label harness">With Harness</div>
+    <div class="section-content harness">
+      <ul>
+        <li>Claude + Gemini + others — two independent rate limit pools</li>
+        <li>Quota-aware throttling, load balancing across providers</li>
+        <li>Shared message bus enables cross-agent awareness</li>
+        <li>Semantic routing to appropriate model per task</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- QUOTA MONITORING -->
+  <div class="category">
+    <div class="category-name">Quota Monitoring</div>
+    <div class="category-desc">Tools that track and display rate limit usage</div>
+  </div>
+
+  <div class="tool">
+    <div class="tool-title">
+      <span class="tool-name">CLIProxyAPI / CodexBar</span>
+      <span class="tool-badge high">~60%</span>
+    </div>
+    <p class="tool-desc">
+      Local proxy server with macOS menu bar widget showing real-time quota usage across AI providers. Also does round-robin load balancing if you have multiple API keys/accounts. Menu bar displays: Claude 78% | Gemini 15% | $4.23 today. Works with Claude Max subscriptions.
+    </p>
+
+    <div class="section-label works">What It Does Well</div>
+    <div class="section-content works">
+      <ul>
+        <li>Glanceable quota visibility — menu bar always shows current usage percentages</li>
+        <li>Multi-account load distribution — if you have 3 API keys, spreads load across them (3x effective quota)</li>
+        <li>Post-hoc failover — if one account fails, tries the next</li>
+        <li>Cost tracking — see total spend per provider per day</li>
+        <li>Lightweight — just a menu bar widget, minimal overhead</li>
+        <li>Works with Claude Max — tracks subscription usage, not just API</li>
+      </ul>
+    </div>
+
+    <div class="section-label breaks">What Breaks</div>
+    <div class="section-content breaks">
+      <ul>
+        <li><strong>Visibility without agency.</strong> 10:00 AM: see Claude at 72%. 10:45 AM: see Claude at 85%, still debugging. 11:15 AM: 429 error. You SAW the quota but CLIProxyAPI didn't ACT on it. Display only.</li>
+        <li>Reactive only — fails over AFTER 429, not before. You already hit the limit, request failed.</li>
+        <li>No semantic routing — treats all requests equally regardless of task type</li>
+        <li>No proactive thresholds — can't configure "switch at 80%"</li>
+        <li>No prediction — shows current state, not "2.3 hours until limit at current rate"</li>
+        <li>Round-robin loses caching benefits — Anthropic caches per-account, rotating breaks this</li>
+      </ul>
+    </div>
+
+    <div class="section-label harness">With Harness</div>
+    <div class="section-content harness">
+      <ul>
+        <li>Routes at 80% threshold automatically — non-critical research goes to Gemini, preserves Claude quota for debugging</li>
+        <li>Semantic awareness — knows "this is research, safe to route to Gemini"</li>
+        <li>Prediction: "At current rate, 2.3 hours until limit"</li>
+        <li>Data drives routing decisions, not just display</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- SUMMARY TABLE -->
+  <div class="summary-section">
+    <div class="summary-title">Capability Matrix: What Exists Today?</div>
+
+    <div class="capability-row">
+      <span class="capability-name">Route by token count/metadata</span>
+      <span class="capability-exists yes">YES</span>
+      <span class="capability-who">CCProxy, Portkey, OpenRouter</span>
+    </div>
+
+    <div class="capability-row">
+      <span class="capability-name">Auto-failover on 429</span>
+      <span class="capability-exists yes">YES</span>
+      <span class="capability-who">claude-code-mux, CLIProxyAPI</span>
+    </div>
+
+    <div class="capability-row">
+      <span class="capability-name">Manual delegation to Gemini</span>
+      <span class="capability-exists yes">YES</span>
+      <span class="capability-who">PAL MCP (clink tool)</span>
+    </div>
+
+    <div class="capability-row">
+      <span class="capability-name">Real-time agent messaging</span>
+      <span class="capability-exists yes">YES</span>
+      <span class="capability-who">hcom</span>
+    </div>
+
+    <div class="capability-row">
+      <span class="capability-name">Parallel Claude instances</span>
+      <span class="capability-exists yes">YES</span>
+      <span class="capability-who">Conductor Build</span>
+    </div>
+
+    <div class="capability-row">
+      <span class="capability-name">Quota visibility</span>
+      <span class="capability-exists yes">YES</span>
+      <span class="capability-who">CLIProxyAPI, CodexBar</span>
+    </div>
+
+    <div class="capability-row" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+      <span class="capability-name">Semantic task routing (research vs code)</span>
+      <span class="capability-exists no">NO</span>
+      <span class="capability-who">Nobody — requires upstream classifier</span>
+    </div>
+
+    <div class="capability-row">
+      <span class="capability-name">Persistent cross-session memory</span>
+      <span class="capability-exists no">NO</span>
+      <span class="capability-who">Nobody — PAL has 3hr limit, hcom logs but doesn't inject</span>
+    </div>
+
+    <div class="capability-row">
+      <span class="capability-name">Proactive rate prediction (before 429)</span>
+      <span class="capability-exists no">NO</span>
+      <span class="capability-who">Nobody — all are reactive</span>
+    </div>
+
+    <div class="capability-row">
+      <span class="capability-name">Automatic mid-task context handoff</span>
+      <span class="capability-exists no">NO</span>
+      <span class="capability-who">Nobody — claude-code-mux loses reasoning state</span>
+    </div>
+
+    <div class="capability-row">
+      <span class="capability-name">Cross-model critique orchestration</span>
+      <span class="capability-exists no">NO</span>
+      <span class="capability-who">Nobody — no loopback architecture</span>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- HONEST ASSESSMENT -->
+  <div class="assessment">
+    <div class="assessment-title">Honest Assessment: Is the Gap Worth Building For?</div>
+
+    <p style="color: var(--text-dim); margin-bottom: 1rem;">
+      The 40% gap is real, but concentrated in specific scenarios:
+    </p>
+
+    <div class="assessment-item" data-num="1.">
+      <strong>If you rarely hit rate limits mid-task:</strong> CCProxy + PAL MCP + CodexBar is probably enough. Install baseline, use for 2-4 weeks, see if friction is real.
+    </div>
+
+    <div class="assessment-item" data-num="2.">
+      <strong>If you hit limits mid-debug 2-3x/week:</strong> The context handoff gap is painful — you lose reasoning state, waste time re-explaining. Worth building minimal harness.
+    </div>
+
+    <div class="assessment-item" data-num="3.">
+      <strong>If you want semantic routing:</strong> Nobody has this. You'd need to build the classifier regardless of other tools. But CLAUDE.md heuristics might be 80% as good.
+    </div>
+
+    <div class="assessment-item" data-num="4.">
+      <strong>If you want cross-session memory:</strong> Nobody has this. You'd need to build the memory layer. But manual AGENTS.md files might work for light use.
+    </div>
+
+    <p style="color: var(--text-muted); margin-top: 1.5rem; font-size: 0.9rem;">
+      Bottom line: The ONLY capability you truly can't replicate with existing tools + CLAUDE.md instructions is <strong>mid-task context handoff</strong>. Everything else has workarounds. Test the baseline before building.
+    </p>
+  </div>
+
 </div>
-
-<div class="divider-procedure"></div>
-
-<h2 id="the-gap">The ~40% Gap Analysis</h2>
-
-<h3>What NO Existing Tool Provides</h3>
-
-<table>
-  <tr>
-    <th>Capability</th>
-    <th>Why Novel</th>
-    <th>Why It Matters</th>
-  </tr>
-  <tr>
-    <td><strong>Semantic task routing</strong></td>
-    <td>All tools route by metadata. NONE understand intent.</td>
-    <td>Route research→Gemini, coding→Claude, automatically</td>
-  </tr>
-  <tr>
-    <td><strong>Persistent memory</strong></td>
-    <td>PAL spawns fresh processes. claude-code-mux is stateless.</td>
-    <td>Day 2 knows what Day 1 discovered</td>
-  </tr>
-  <tr>
-    <td><strong>Proactive rate prediction</strong></td>
-    <td>CLIProxyAPI shows quota but doesn't act. Mux reacts to 429.</td>
-    <td>Route at 80%, never hit 429</td>
-  </tr>
-  <tr>
-    <td><strong>Mid-task context handoff</strong></td>
-    <td>Mux preserves messages but loses reasoning state</td>
-    <td>Gemini continues from exact hypothesis</td>
-  </tr>
-  <tr>
-    <td><strong>Subscription auth routing</strong></td>
-    <td>Portkey/OpenRouter need API keys. Max uses OAuth.</td>
-    <td>Use Max through routing layer</td>
-  </tr>
-</table>
-
-<h3>What Existing Tools Already Do Well</h3>
-
-<table>
-  <tr>
-    <th>Capability</th>
-    <th>Best Tool</th>
-    <th>Coverage</th>
-  </tr>
-  <tr>
-    <td>Token-count routing</td>
-    <td>CCProxy</td>
-    <td><span class="gap-filled">Excellent</span></td>
-  </tr>
-  <tr>
-    <td>Manual delegation</td>
-    <td>PAL MCP (clink)</td>
-    <td><span class="gap-filled">Good</span></td>
-  </tr>
-  <tr>
-    <td>Rate limit visibility</td>
-    <td>CodexBar, CLIProxyAPI</td>
-    <td><span class="gap-filled">Excellent</span></td>
-  </tr>
-  <tr>
-    <td>Auto-failover on 429</td>
-    <td>claude-code-mux</td>
-    <td><span style="color: var(--warning-amber);">Good (loses reasoning)</span></td>
-  </tr>
-  <tr>
-    <td>Inter-agent messaging</td>
-    <td>hcom</td>
-    <td><span class="gap-filled">Good</span></td>
-  </tr>
-</table>
-
-<div class="divider-checkpoint"></div>
-
-<h2 id="recommendations">My Recommendations</h2>
-
-<div class="recommendation">
-  <h3>The Honest Assessment</h3>
-  <p><strong>Is the 40% gap worth building for?</strong></p>
-  <p>It depends on ONE thing: <strong>How often do you hit rate limits mid-task?</strong></p>
-  <p>The ONLY capability you can't replicate with existing tools is <strong>context handoff</strong>. Everything else can be approximated:</p>
-  <ul>
-    <li>Semantic routing → CLAUDE.md instructions</li>
-    <li>Memory → Manual AGENTS.md files</li>
-    <li>Rate visibility → CodexBar</li>
-  </ul>
-  <p>But when Claude dies mid-debug? <strong>Nothing helps. That's the gap.</strong></p>
-</div>
-
-<h3>Phased Approach</h3>
-
-<div class="milestone">Phase 0: Baseline Test (2-4 weeks) — DO THIS FIRST</div>
-
-<p>Don't build anything. Install and use:</p>
-<ol>
-  <li><strong>PAL MCP</strong> — Manual Gemini delegation via clink</li>
-  <li><strong>CodexBar</strong> — Menu bar rate limit visibility</li>
-  <li><strong>(Optional) CCProxy</strong> — Token-count routing</li>
-</ol>
-
-<p>Track every friction point:</p>
-<div class="code-block">
-2026-01-29: Hit 429 mid-debugging auth issue. Lost 10 min re-explaining.
-2026-02-01: Wished Gemini remembered yesterday's findings. Spent 5 min copy-pasting.
-2026-02-03: Manually routed research to Gemini. Worked fine.
-</div>
-
-<div class="milestone">Phase 1: CLAUDE.md Heuristics (If Baseline Isn't Enough)</div>
-
-<p>Before writing code, try instruction-based routing:</p>
-<div class="code-block">
-<button class="copy-btn" onclick="copyCode(this)">Copy</button>
-# CLAUDE.md addition
-
-## Delegation Strategy
-- Research tasks (keywords: "research", "find", "what is"): Use clink → Gemini
-- Large file analysis (>50 files): Use clink → Gemini
-- Precision debugging: Handle locally
-- At end of session: Write findings to AGENTS.md for tomorrow
-</div>
-
-<p>This gets you <strong>~40-50%</strong> of the harness value with 2-3 hours of work.</p>
-
-<div class="milestone">Phase 2: Minimal MCP (If Instructions Aren't Enough)</div>
-
-<p>Build only 3 tools:</p>
-<ol>
-  <li><code>check_rate_limits</code> — Query Claude/Gemini quota</li>
-  <li><code>delegate_with_context</code> — Send task + reasoning state to Gemini</li>
-  <li><code>shared_memory</code> — Read/write cross-session findings</li>
-</ol>
-
-<p>This is <strong>1-2 weeks</strong> of work for ~75% of full harness value.</p>
-
-<div class="milestone">Phase 3: Full Harness (Only If Absolutely Necessary)</div>
-
-<p>Only build this if Phases 0-2 all fail. This is <strong>2-3 months</strong> of work.</p>
-
-<div class="divider-procedure"></div>
-
-<h2 id="decision-tree">Decision Tree</h2>
-
-<div class="decision-tree">
-START: Install baseline (PAL MCP + CodexBar)
-  │
-  ├─ Use for 2-4 weeks
-  │
-  ▼
-Did you hit mid-task 429 errors?
-  │
-  ├─ No (0-1x/week) → STOP. Baseline is sufficient.
-  │
-  ├─ Yes, but manual context-passing was fine → STOP.
-  │
-  └─ Yes, and it was painful (lost work, wasted time)
-       │
-       ▼
-     Try CLAUDE.md heuristics for 1-2 weeks
-       │
-       ├─ Problem solved → STOP.
-       │
-       └─ Still painful
-            │
-            ▼
-          Build minimal MCP (Phase 2)
-            │
-            ├─ Problem solved → STOP.
-            │
-            └─ Still painful → Build full harness (rare)
-</div>
-
-<div class="divider-checkpoint"></div>
-
-<h2 id="next-steps">What I Would Do In Your Position</h2>
-
-<div class="checkpoint">
-  <div class="checkpoint-header">Recommended Action Plan</div>
-  <ol>
-    <li><strong>This week:</strong> Install PAL MCP + CodexBar</li>
-    <li><strong>Next 3 weeks:</strong> Use them on real work, log friction</li>
-    <li><strong>Week 4:</strong> Review logs. If mid-task exhaustion happened 3+ times with pain, proceed to Phase 1</li>
-    <li><strong>Week 5-6:</strong> Try CLAUDE.md heuristics</li>
-    <li><strong>Week 7+:</strong> Only if still painful, build minimal MCP</li>
-  </ol>
-  <p style="margin-bottom: 0;"><strong>Do NOT skip to building.</strong> The baseline might be enough. You won't know until you try.</p>
-</div>
-
-<div class="divider-warning"></div>
-
-<h2>Investigation Status</h2>
-
-<table>
-  <tr>
-    <th>Question</th>
-    <th>Status</th>
-    <th>Key Finding</th>
-  </tr>
-  <tr>
-    <td>Q0: Worth building?</td>
-    <td><span class="gap-filled">Answered</span></td>
-    <td>Depends on mid-task exhaustion frequency</td>
-  </tr>
-  <tr>
-    <td>Q1: How do gateways route?</td>
-    <td><span class="gap-filled">Answered</span></td>
-    <td>Rule-based, not semantic</td>
-  </tr>
-  <tr>
-    <td>Q2: Who invokes agents?</td>
-    <td><span class="gap-filled">Answered</span></td>
-    <td>GUIs are controllers, not viewers</td>
-  </tr>
-  <tr>
-    <td>Q3: What do you lose?</td>
-    <td><span class="gap-filled">Answered</span></td>
-    <td>Context continuity, memory, proactive awareness</td>
-  </tr>
-  <tr>
-    <td>Q4: Does/doesn't analysis</td>
-    <td><span class="gap-filled">Answered</span></td>
-    <td>Full analysis for all 8 tools</td>
-  </tr>
-  <tr>
-    <td>Q5-Q9</td>
-    <td><span class="gap-filled">Answered</span></td>
-    <td>See full report</td>
-  </tr>
-</table>
-
-<div class="milestone">Investigation Phase Complete. Baseline Testing Recommended.</div>
-
-<script>
-function copyCode(btn) {
-  const codeBlock = btn.parentElement;
-  const code = codeBlock.textContent.replace('Copy', '').trim();
-  navigator.clipboard.writeText(code);
-  btn.textContent = 'Copied!';
-  setTimeout(() => btn.textContent = 'Copy', 2000);
-}
-</script>
 
 </body>
 </html>
