@@ -31,11 +31,12 @@ A hybrid Claude + Gemini orchestration layer. The user hits 85% of their weekly 
 
 ## What's Open (Your Thinking Is Needed)
 
+- **Is the 40% gap worth building for?** Existing tools (CCProxy, PAL MCP, CodexBar) cover ~55-60% of the vision. The genuine gap is semantic routing, persistent memory, proactive rate prediction, and cross-model critique. Is that gap worth months of building? Or should the user just install existing tools? This is THE question.
 - MCP server as mechanism (Level 3 confidence — "let's not double down on MCP yet")
 - Memory system (Mem0? ChromaDB? sqlite-vec? Files?)
 - Visual interface value for a terminal-native user
 - How Claude decides what to delegate
-- How this differs from PAL MCP + CodexBar + CLAUDE.md (zero-code baseline)
+- How this differs from PAL MCP + CCProxy + CodexBar (zero-code baseline)
 - MVP scope
 - Whether we're investigating or already designing
 

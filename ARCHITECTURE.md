@@ -584,6 +584,29 @@ For routine tasks, Claude handles them and routes subtasks to Gemini without adv
 
 ---
 
+## COMPETITIVE LANDSCAPE REALITY CHECK (Added End of Session 1)
+
+> **Critical finding**: The landscape is closer to our vision than earlier research suggested. Existing tools cover ~55-60% of what we described when combined. The genuinely novel gap is ~40%.
+
+**Tools that exist and partially solve this:**
+- **CCProxy** (starbased): Rule-based routing with Max subscription support. Routes by token count, thinking mode, tool use. ~65% coverage.
+- **claude-code-mux**: Rust proxy with OAuth, auto-failover, 18+ providers. ~60% coverage.
+- **PAL MCP**: Manual delegation + conversation threading + context revival. ~45% coverage.
+- **hcom**: Hook-based inter-agent messaging between Claude and Gemini. ~35% coverage.
+
+**What remains genuinely novel (the ~40% gap):**
+1. Semantic task-type routing (by what the task IS, not metadata)
+2. Persistent cross-provider memory (across sessions, with semantic search)
+3. Proactive rate limit prediction (before 429, not after)
+4. Cross-model critique orchestration (Team of Rivals pattern)
+5. The integrated invisible experience (all above, working together)
+
+**The honest question**: Is the 40% gap worth building for? Or should we use PAL + CCProxy + CodexBar and see if it's enough?
+
+See RESEARCH.md § "COMPETITIVE LANDSCAPE DEEP-DIVE" for the full 30+ tool analysis.
+
+---
+
 ## THE SOUS CHEF ANALOGY (Why This Hasn't Been Built)
 
 The existing tools are kitchen equipment. Claude Code is a professional chef. Gemini is another chef with different specialties. Both have full kitchens.

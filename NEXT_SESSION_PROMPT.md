@@ -56,14 +56,17 @@ Read all 4 files in parallel from the working directory:
 
 Go deep. Use sub-agents for research. Give honest assessments, not hand-waves.
 
+### 0. THE MOST IMPORTANT QUESTION: Is This Worth Building?
+End-of-session research found the competitive landscape is closer than expected. CCProxy does rule-based routing with Max subscription support (~65% coverage). claude-code-mux does auto-failover with OAuth (~60%). PAL MCP + CCProxy + CodexBar combined gets ~55-60% of the vision for zero custom code. The genuinely novel gap is ~40%: semantic task routing, persistent cross-provider memory, proactive rate prediction, cross-model critique. **Is that 40% worth building for? Or should I just install the existing tools?** See RESEARCH.md § "COMPETITIVE LANDSCAPE DEEP-DIVE" for the full tool-by-tool analysis. This is the question everything else hangs on.
+
 ### 1. MCP Server vs. Bash + File I/O
 "Why is an MCP server better than `gemini -p 'task' > result.md` followed by a Read?" Claude can already run Bash commands and read files. What specifically does an MCP server provide that Bash + file I/O does not? Be concrete — not "better integration" but actual capabilities gained and lost. This is the single most impactful architectural question.
 
 ### 2. What Does a Visual Interface Actually Provide on Top of CLI?
 The docs describe 5 dashboard panels and a CodexBar widget. But I'm a terminal-native power user. What specific information or capability would a visual interface give me that `cat .harness/status.json` or a well-formatted CLI output cannot? What is genuinely worth the context-switching cost of a browser tab?
 
-### 3. How Does This Concretely Differ From PAL MCP + CodexBar + CLAUDE.md?
-Today, right now, you can: install PAL MCP (10K stars) for Gemini delegation, install CodexBar for rate limit monitoring, and write CLAUDE.md delegation rules. That gives you ~70% of the vision for zero custom code. What specific workflow fails in that setup? What is the 30% gap, and is it worth building for? Be ruthlessly honest.
+### 3. How Does This Differ From PAL MCP + CCProxy + CodexBar?
+Today, right now, you can: install PAL MCP for Gemini delegation, CCProxy for rule-based routing with subscription auth, and CodexBar for rate limit monitoring. That gets ~55-60% of the vision. What specific workflows fail? What's the 40% gap in practice, and does it matter day-to-day? Be ruthlessly honest.
 
 ### 4. The Single-Provider Exhaustion Scenario
 Both-providers-exhausted is handled (notify and stop). But the common case is: Claude is rate-limited, Gemini still has capacity. What happens? Does the harness auto-route everything to Gemini? Does it ask me? Can Gemini even handle Claude's typical workload given its gaps (no mature subagents, no production plan mode, 4x more control-flow errors)? Walk through this scenario concretely.
@@ -78,9 +81,9 @@ Look at the 12 provocative questions in SESSION_BRIDGE.md and the 23-vertical T-
 - In what order and why
 - What specific sub-questions within each vertical
 
-## Consider the Zero-Code Baseline
+## Consider the Zero-Code Baseline (Possibly the Most Important Next Step)
 
-SESSION_BRIDGE.md describes a zero-code baseline: install PAL MCP + CodexBar, write CLAUDE.md rules, use it for a day. Should this actually be the first step before ANY more research? I'd learn what's missing from direct experience rather than hypothetical analysis. Make a recommendation.
+End-of-session competitive research suggests: **PAL MCP + CCProxy + CodexBar** delivers ~55-60% of the harness vision with zero custom code. Rather than theorizing about the 40% gap, I could install these tools, use them for a week, and discover from lived experience what's actually missing. Should this be the first action before any more research or design? Make a strong recommendation.
 
 ## Key Context
 
