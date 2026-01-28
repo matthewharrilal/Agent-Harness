@@ -46,7 +46,10 @@ A hybrid Claude + Gemini orchestration layer. The user hits 85% of their weekly 
 2. **docs/ARCHITECTURE.md** — Technical decisions. MCP design, compensation list, gap analysis, competitive landscape reality check. Living draft, not settled.
 3. **docs/RESEARCH.md** — Evidence base. 90+ sources. Competitive landscape deep-dive (30+ tools). Use as reference.
 4. **docs/HANDOFF.md** — Original vision. Part 3 (architecture) is superseded. Parts 1 and 5 still valid.
-5. **NEXT_SESSION_PROMPT.md** — Full handoff prompt with specific open questions to answer.
+
+## How to Start a New Session
+
+The user will copy-paste the contents of `NEXT_SESSION_PROMPT.md` as their first message. It contains specific open questions, context, and marching orders. Follow its instructions — do not re-read it as a file since you already have the content.
 
 ## Do NOT
 

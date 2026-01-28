@@ -28,7 +28,7 @@ Read all 4 files in parallel from `docs/`:
 3. **docs/RESEARCH.md** — Evidence from 19 research agents, 90+ sources. Key sections: device rate limit bug (killed dual-Claude), Gemini CLI gap audit, ecosystem map, competitive landscape deep-dive (30+ tools), MCP invocation research. Use as reference.
 4. **docs/HANDOFF.md** — Original vision from claude.ai. Part 3 (architecture) is SUPERSEDED. Parts 1 (vision) and 5 (requirements) still valid. Read to check if current thinking has drifted from my actual needs.
 
-Also read `CLAUDE.md` at the project root — it contains ground rules and project context that Claude Code loads automatically.
+`CLAUDE.md` at the project root is auto-loaded by Claude Code — you already have it. No need to read it again.
 
 ## What's Decided vs. What's Open
 
@@ -59,7 +59,7 @@ Also read `CLAUDE.md` at the project root — it contains ground rules and proje
 Go deep. Use sub-agents for research. Give honest assessments, not hand-waves.
 
 ### 0. THE MOST IMPORTANT QUESTION: Is This Worth Building?
-End-of-session research found the competitive landscape is closer than expected. CCProxy does rule-based routing with Max subscription support (~65% coverage). claude-code-mux does auto-failover with OAuth (~60%). PAL MCP + CCProxy + CodexBar combined gets ~55-60% of the vision for zero custom code. The genuinely novel gap is ~40%: semantic task routing, persistent cross-provider memory, proactive rate prediction, cross-model critique. **Is that 40% worth building for? Or should I just install the existing tools?** See RESEARCH.md § "COMPETITIVE LANDSCAPE DEEP-DIVE" for the full tool-by-tool analysis. This is the question everything else hangs on.
+End-of-session research found the competitive landscape is closer than expected. CCProxy does rule-based routing with Max subscription support (~65% coverage). claude-code-mux does auto-failover with OAuth (~60%). PAL MCP + CCProxy + CodexBar combined gets ~55-60% of the vision for zero custom code. The genuinely novel gap is ~40%: semantic task routing, persistent cross-provider memory, proactive rate prediction, cross-model critique. **Is that 40% worth building for? Or should I just install the existing tools?** See docs/RESEARCH.md § "COMPETITIVE LANDSCAPE DEEP-DIVE" for the full tool-by-tool analysis. This is the question everything else hangs on.
 
 ### 1. MCP Server vs. Bash + File I/O
 "Why is an MCP server better than `gemini -p 'task' > result.md` followed by a Read?" Claude can already run Bash commands and read files. What specifically does an MCP server provide that Bash + file I/O does not? Be concrete — not "better integration" but actual capabilities gained and lost. This is the single most impactful architectural question.

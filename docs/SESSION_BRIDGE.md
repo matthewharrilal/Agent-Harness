@@ -166,9 +166,9 @@ The verticals needing depth (not exhaustive — part of the investigation is dis
 
 ### How to Read Each Document
 
-**ARCHITECTURE.md** (~450 lines) — **The current state of thinking.** Read this for decisions, reflections, and architectural reasoning. Organized by topic (core realization, composed architecture, hybrid model, abstraction problem, Team of Rivals pattern, compensation list, dashboard design, gap analysis, open questions). This is the most actively maintained document. BUT: not everything in it is equally confident. Some sections are well-reasoned; some are sketches. The Decision Confidence Registry below clarifies which is which.
+**ARCHITECTURE.md** (~880 lines) — **The current state of thinking.** Read this for decisions, reflections, and architectural reasoning. Organized by topic (core realization, composed architecture, hybrid model, abstraction problem, Team of Rivals pattern, compensation list, dashboard design, gap analysis, open questions). This is the most actively maintained document. BUT: not everything in it is equally confident. Some sections are well-reasoned; some are sketches. The Decision Confidence Registry below clarifies which is which.
 
-**RESEARCH.md** (~600+ lines) — **The evidence base.** Read this when you need sources, data, or detailed findings to support or challenge a position. Organized by topic with 90+ sources. Three major rounds of research. Not everything is equally relevant now — some findings led to dead ends that informed thinking by elimination. Key sections: device rate limit bug (foundational), hybrid harness feasibility, Gemini CLI gap audit, dashboard patterns, MCP invocation research, meta-orchestration, dependency stack.
+**RESEARCH.md** (~970 lines) — **The evidence base.** Read this when you need sources, data, or detailed findings to support or challenge a position. Organized by topic with 90+ sources. Three major rounds of research. Not everything is equally relevant now — some findings led to dead ends that informed thinking by elimination. Key sections: device rate limit bug (foundational), hybrid harness feasibility, Gemini CLI gap audit, dashboard patterns, MCP invocation research, meta-orchestration, dependency stack.
 
 **HANDOFF.md** (~310 lines) — **The original vision.** Read this to check whether current architecture has drifted from user goals. Written at the start of the project. **Part 3 (Proposed Architecture) is SUPERSEDED** — it describes a dual-Claude architecture that was abandoned after the device bug discovery. Parts 1 (Vision), 5 (Requirements), and 6 (Phases) are still relevant but need updating to reflect the hybrid approach.
 
@@ -324,11 +324,12 @@ If a smart, well-intentioned skeptic read our architecture, they would ask:
 
 This is important. Before writing a single line of code, the user should try this combination that exists TODAY:
 
-1. **Install PAL MCP Server** (10K stars, Python) — gives Claude Code the ability to delegate to Gemini CLI via `clink` tool
-2. **Install CodexBar** (macOS menu bar app) — shows rate limits and costs for Claude + Gemini in the menu bar
-3. **Write CLAUDE.md delegation rules** — instruct Claude when to use PAL's `clink` tool for Gemini delegation
+1. **Install CCProxy** (starbased, rule-based routing) — automatic routing with Max subscription support, ~65% coverage alone
+2. **Install PAL MCP Server** (10K stars, Python) — gives Claude Code the ability to delegate to Gemini CLI via `clink` tool
+3. **Install CodexBar** (macOS menu bar app) — shows rate limits and costs for Claude + Gemini in the menu bar
+4. **Write CLAUDE.md delegation rules** — instruct Claude when to use PAL's `clink` tool for Gemini delegation
 
-**This gives you:** Gemini delegation from Claude Code, rate limit monitoring, and behavioral steering. For free. Today. No custom code.
+**This gives you:** Rule-based routing, Gemini delegation from Claude Code, rate limit monitoring, and behavioral steering. For free. Today. No custom code.
 
 **This does NOT give you:** Intelligent routing (you decide when to delegate, not the system), shared memory across models, cross-model critique, unified dashboard with routing analytics, Gemini gap compensation (plan mode, subagents), or cost comparison tracking.
 
@@ -429,7 +430,7 @@ These are designed to drive productive investigation, not confirm existing think
 
 ### "Do You Actually Need This?" Questions
 
-1. **"If you install PAL MCP + CodexBar + good CLAUDE.md rules today, you get 70% of the value with zero custom code. What specific workflow fails that makes the other 30% worth months of building?"**
+1. **"If you install PAL MCP + CCProxy + CodexBar + good CLAUDE.md rules today, you get ~55-60% of the value with zero custom code. What specific workflow fails that makes the other ~40% worth months of building?"**
 
 2. **"You hit 85% of weekly limits in 1-2 days. But Claude Max 20x gives 240-480 hours/week of Sonnet 4. Are you hitting the weekly token cap, or the 5-hour session cap that resets after a break? These are different problems with different solutions."**
 
