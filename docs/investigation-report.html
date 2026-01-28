@@ -105,8 +105,9 @@
       margin-bottom: 0.5rem;
     }
     .section-label.works { color: var(--green); }
+    .section-label.why { color: var(--purple); }
     .section-label.breaks { color: var(--red); }
-    .section-label.harness { color: var(--blue); }
+    .section-label.gap { color: var(--yellow); }
 
     .section-content {
       color: var(--text-dim);
@@ -115,8 +116,9 @@
       border-left: 2px solid var(--border);
     }
     .section-content.works { border-color: rgba(63,185,80,0.4); }
+    .section-content.why { border-color: rgba(163,113,247,0.4); }
     .section-content.breaks { border-color: rgba(248,81,73,0.4); }
-    .section-content.harness { border-color: rgba(88,166,255,0.4); }
+    .section-content.gap { border-color: rgba(210,153,34,0.4); }
 
     .section-content ul {
       list-style: none;
@@ -362,23 +364,35 @@
       </ul>
     </div>
 
+    <div class="section-label why">Why It Works This Way</div>
+    <div class="section-content why">
+      <ul>
+        <li><strong>Architectural constraint:</strong> A proxy sees the request envelope (tokens, model name, tools), not the semantic intent inside. It operates at the HTTP boundary.</li>
+        <li><strong>Speed over intelligence:</strong> Rules evaluate in &lt;1ms. Adding semantic classification would add 50-200ms latency per request — that's no longer a "transparent proxy."</li>
+        <li><strong>Simplicity over accuracy:</strong> 4 clear rule types vs. a classifier that needs training data, maintenance, and can misroute 10-15% of requests unpredictably.</li>
+        <li><strong>Fails predictably:</strong> If token-count routing is wrong, it's wrong consistently. Classifier errors are unpredictable and harder to debug.</li>
+        <li><strong>This is a valid trade-off:</strong> CCProxy chose transparency and speed. Not every tool needs to be intelligent — some should just be fast and reliable.</li>
+      </ul>
+    </div>
+
     <div class="section-label breaks">What Breaks</div>
     <div class="section-content breaks">
       <ul>
         <li>Cannot understand task semantics — "Research JWT vulnerabilities" and "Debug auth.ts" both look like ~10 tokens with no tools, route identically</li>
-        <li>No rate limit awareness — doesn't know you're at 85% Claude quota</li>
-        <li>No failover — if Anthropic fails, request fails</li>
-        <li>No shared state between requests — each request is independent</li>
-        <li>Why no semantic routing? Would require LLM call (50-200ms, costs tokens) or trained classifier (needs labeled data). CCProxy prioritizes simplicity.</li>
+        <li>No rate limit awareness — doesn't know you're at 85% Claude quota, routes next request to Claude anyway</li>
+        <li>No failover — if Anthropic fails, request fails. No retry logic.</li>
+        <li>No shared state between requests — each request is independent, no learning from patterns</li>
+        <li>Mixed-intent requests route entirely to one provider — "Research X then code Y" goes 100% to Claude, wasting quota on research</li>
       </ul>
     </div>
 
-    <div class="section-label harness">With Harness</div>
-    <div class="section-content harness">
+    <div class="section-label gap">The Gap</div>
+    <div class="section-content gap">
       <ul>
-        <li>Semantic router classifies "research" vs "coding" vs "debugging" automatically, routes research to Gemini without explicit rules</li>
-        <li>Proactive rate prediction at 80% threshold, auto-routes non-critical tasks before hitting 429</li>
-        <li>Automatic retry with backup provider on failure</li>
+        <li><strong>Missing capability:</strong> Task-intent classification — distinguishing research from coding from debugging based on the prompt content</li>
+        <li><strong>Missing capability:</strong> Rate limit awareness — knowing quota state and routing accordingly</li>
+        <li><strong>Open question:</strong> Is adding 50-200ms latency for semantic routing worth the quota savings? Depends on how often misrouting actually happens in your workflow.</li>
+        <li><strong>Open question:</strong> Could heuristics (keyword matching) get 80% of semantic routing value without the latency cost?</li>
       </ul>
     </div>
   </div>
@@ -398,26 +412,39 @@
         <li>Seamless failover on 429 errors — you send a request, Anthropic fails, mux catches it, tries OpenRouter, returns response. You never know the switch happened.</li>
         <li>Priority-based provider configuration — set Anthropic as priority 1, OpenRouter as priority 2, Vertex as priority 3</li>
         <li>OAuth authentication support — works with Claude Max subscriptions</li>
-        <li>Minimal resource usage — Rust binary, efficient</li>
+        <li>Minimal resource usage — Rust binary, &lt;1ms routing, ~5MB memory</li>
+        <li>Fault isolation — one bad request doesn't affect subsequent requests</li>
+      </ul>
+    </div>
+
+    <div class="section-label why">Why It Works This Way</div>
+    <div class="section-content why">
+      <ul>
+        <li><strong>Stateless by design:</strong> Each request is independent. No database, no storage, no persistence. This means zero infrastructure requirements and no state corruption risks.</li>
+        <li><strong>Proxy, not orchestrator:</strong> Adding memory would change the tool's nature entirely. It would need a database, state extraction logic, injection logic — a different product.</li>
+        <li><strong>The hard problem:</strong> Extracting "reasoning state" from Claude's session is non-trivial. You can't just dump the conversation — Claude's internal hypothesis chain isn't in the text.</li>
+        <li><strong>Failure mode simplicity:</strong> Stateless means easy debugging (each request reproducible), horizontal scaling (spin up more proxies), and crash recovery (restart, zero data loss).</li>
+        <li><strong>This is a valid trade-off:</strong> For a failover proxy, reliability beats intelligence. Memory adds complexity and new failure modes.</li>
       </ul>
     </div>
 
     <div class="section-label breaks">What Breaks</div>
     <div class="section-content breaks">
       <ul>
-        <li><strong>Context continuity breaks during failover.</strong> Turn 1-5: debugging a race condition, Claude eliminated 2 hypotheses, testing the third. Turn 6: 429 error, mux switches to OpenRouter. OpenRouter Claude gets the message history but it's a FRESH instance — no memory of the reasoning process. It might re-investigate the eliminated hypotheses. You lose 5-10 minutes.</li>
-        <li>No semantic routing — doesn't understand task type, just does priority-based failover</li>
-        <li>No rate limit prediction — reacts to 429, doesn't predict it</li>
-        <li>Why no Mem0? By design it's stateless. Adding memory would change it from "proxy" to "orchestration layer."</li>
+        <li><strong>Context continuity breaks during failover.</strong> Turn 1-5: debugging a race condition, Claude eliminated 2 hypotheses, testing the third. Turn 6: 429, switches to OpenRouter. Fresh instance re-reads messages, might re-investigate eliminated hypotheses. You lose 5-10 minutes.</li>
+        <li>No semantic routing — doesn't understand task type, just priority-based failover</li>
+        <li>No rate limit prediction — reacts to 429 after it happens, doesn't predict or prevent it</li>
+        <li>Message history preserved, reasoning state lost — the text is there but the "mental model" isn't</li>
       </ul>
     </div>
 
-    <div class="section-label harness">With Harness</div>
-    <div class="section-content harness">
+    <div class="section-label gap">The Gap</div>
+    <div class="section-content gap">
       <ul>
-        <li>Shared memory captures reasoning state: "Investigating race condition. Eliminated hypothesis A (timing) and B (lock scope). Testing hypothesis C (async init order)."</li>
-        <li>New provider instance receives synthesized context, continues from hypothesis C</li>
-        <li>Proactive routing before hitting 429</li>
+        <li><strong>Missing capability:</strong> Reasoning state preservation during provider handoff — some way to capture "where Claude was" in its debugging process</li>
+        <li><strong>Missing capability:</strong> Proactive rate prediction — routing before hitting limits, not after</li>
+        <li><strong>Open question:</strong> How do you capture reasoning state? Is it in the message history (could be summarized)? Or is it truly internal to the inference session (fundamentally lost)?</li>
+        <li><strong>Open question:</strong> Would a simple "here's what we've tried so far" summary injected into the new session be enough? Or do you need something more sophisticated?</li>
       </ul>
     </div>
   </div>
@@ -438,26 +465,38 @@
         <li>Excellent observability — every request logged with costs, latency, token counts</li>
         <li>Caching — identical requests return cached responses, saves money</li>
         <li>Failover and retries — if Provider A fails, try Provider B</li>
-        <li>Enterprise features — audit logs, cost controls per team/project</li>
+        <li>Enterprise features — audit logs, cost controls per team/project, SOC 2 compliance</li>
+      </ul>
+    </div>
+
+    <div class="section-label why">Why It Works This Way</div>
+    <div class="section-content why">
+      <ul>
+        <li><strong>Gateway principle:</strong> The routing layer shouldn't own business logic. Your application understands your tasks better than a generic gateway ever could.</li>
+        <li><strong>Separation of concerns:</strong> Portkey's job is to forward, log, and cache. Classification is YOUR responsibility — you know what "research" means in your context.</li>
+        <li><strong>Flexibility:</strong> You can use ANY classifier upstream (keyword matching, embeddings, LLM calls, heuristics). Portkey doesn't constrain your approach.</li>
+        <li><strong>Stateless simplicity:</strong> Gateway stays simple, fast, and reliable. Complexity lives upstream where it belongs.</li>
+        <li><strong>API keys by design:</strong> Enterprise gateways work with API keys because that's how providers bill enterprises. Subscription OAuth is a consumer pattern.</li>
       </ul>
     </div>
 
     <div class="section-label breaks">What Breaks</div>
     <div class="section-content breaks">
       <ul>
-        <li><strong>Cannot use Claude Max subscriptions.</strong> Anthropic banned third-party OAuth access in Jan 2026. Portkey requires API keys (pay-per-token). You'd pay for Max AND API credits — double cost.</li>
-        <li>No semantic routing — routes based on metadata YOU provide. "Upstream logic" problem: YOU must classify "research" vs "coding" BEFORE calling Portkey, then attach <code>metadata.task_type</code>. Portkey is the router, you are the classifier.</li>
-        <li>Stateless — no memory between requests</li>
-        <li>Cloud dependency — requests route through Portkey's servers</li>
+        <li><strong>Cannot use Claude Max subscriptions.</strong> Anthropic banned third-party OAuth access in Jan 2026. Portkey requires API keys. You'd pay for Max AND API credits — double cost.</li>
+        <li>No semantic understanding — routes based on metadata YOU provide. "Upstream logic" problem: YOU classify, then tell Portkey via metadata.</li>
+        <li>Stateless — no memory between requests, no context persistence</li>
+        <li>Cloud dependency — every request routes through Portkey's servers, adding latency and requiring trust</li>
       </ul>
     </div>
 
-    <div class="section-label harness">With Harness</div>
-    <div class="section-content harness">
+    <div class="section-label gap">The Gap</div>
+    <div class="section-content gap">
       <ul>
-        <li>Harness does the semantic classification upstream, Portkey handles the routing infrastructure</li>
-        <li>Harness uses Max subscription credentials directly, no API key needed</li>
-        <li>Persistent memory layer added on top</li>
+        <li><strong>Missing capability:</strong> Automatic semantic classification — something needs to decide "this is research" without requiring your code to do it</li>
+        <li><strong>Missing capability:</strong> Subscription authentication — using Max/$200mo through routing infrastructure</li>
+        <li><strong>Open question:</strong> Should the classifier live in the gateway (simpler for user, less flexible) or upstream (more flexible, more work for user)?</li>
+        <li><strong>Open question:</strong> Is Portkey's enterprise focus incompatible with individual Max subscriptions, or is there a bridge?</li>
       </ul>
     </div>
   </div>
@@ -476,10 +515,21 @@
       <ul>
         <li>Single endpoint for 300+ models — one integration, all providers</li>
         <li>Easy model switching — just change the model name in the API call</li>
-        <li>Auto Router — learned routing that analyzes prompts and picks optimal model</li>
+        <li>Auto Router — learned routing powered by NotDiamond, picks optimal model per task</li>
         <li>Cost comparison — see pricing across all models in one place</li>
         <li>Fallback support — if model A fails, try model B</li>
         <li>BYOK option — use your own API keys (with 5% fee)</li>
+      </ul>
+    </div>
+
+    <div class="section-label why">Why It Works This Way</div>
+    <div class="section-content why">
+      <ul>
+        <li><strong>Unified interface principle:</strong> One endpoint simplifies integration. You don't need 60 SDKs or manage 60 API keys.</li>
+        <li><strong>Explicit over implicit:</strong> Auto Router doesn't auto-activate. YOU decide when to use it. This gives control to the user.</li>
+        <li><strong>Learning from YOUR patterns:</strong> Auto Router needs 15+ examples to learn what works FOR YOU. Generic routing wouldn't match your specific task distribution.</li>
+        <li><strong>Avoiding over-fitting:</strong> Not every team uses models the same way. The training requirement ensures personalization rather than generic one-size-fits-all routing.</li>
+        <li><strong>BYOK flexibility:</strong> Some users want to pay per-token through OpenRouter, others want to use their existing API keys. Both options exist.</li>
       </ul>
     </div>
 
@@ -487,19 +537,20 @@
     <div class="section-content breaks">
       <ul>
         <li><strong>Cannot use Claude Max subscriptions.</strong> Same OAuth problem as Portkey — requires API keys, not subscription auth.</li>
-        <li>Auto Router requires 15+ labeled training examples before it works well. Cold start problem.</li>
-        <li>Claude Code hardcodes model selection — Auto Router feature not exposed to CLI tools</li>
-        <li>Stateless — no shared memory between requests</li>
+        <li>Auto Router requires 15+ labeled training examples. Cold start problem — you need to manually label tasks before it helps.</li>
+        <li>Claude Code hardcodes model selection — Auto Router feature not exposed to CLI tools like Claude Code</li>
+        <li>Stateless — no shared memory between requests, no context persistence</li>
         <li>5% BYOK fee adds cost on top of provider pricing</li>
       </ul>
     </div>
 
-    <div class="section-label harness">With Harness</div>
-    <div class="section-content harness">
+    <div class="section-label gap">The Gap</div>
+    <div class="section-content gap">
       <ul>
-        <li>Harness preserves Max subscription benefits while adding routing</li>
-        <li>Zero-config semantic routing without 15+ training examples</li>
-        <li>MCP server exposes routing to Claude Code</li>
+        <li><strong>Missing capability:</strong> Zero-config routing — something that works out of the box without 15+ training examples</li>
+        <li><strong>Missing capability:</strong> Integration with Claude Code — exposing routing decisions to CLI tools</li>
+        <li><strong>Open question:</strong> Is the 15-example training requirement actually a feature (personalization) or a friction point? Would generic defaults be good enough?</li>
+        <li><strong>Open question:</strong> Could heuristics bootstrap Auto Router faster than manual labeling?</li>
       </ul>
     </div>
   </div>
@@ -527,15 +578,26 @@
         <li>Result integration — Gemini's output flows naturally back into Claude's conversation as a tool result</li>
         <li>Multiple CLI support — configure Gemini, Codex, other Claude instances, anything with a CLI</li>
         <li>Delegates large context work to Gemini (1M context) while Claude orchestrates</li>
-        <li>Battle-tested, production-ready with active community</li>
+        <li>Battle-tested, production-ready with 10K+ GitHub stars</li>
+      </ul>
+    </div>
+
+    <div class="section-label why">Why It Works This Way</div>
+    <div class="section-content why">
+      <ul>
+        <li><strong>Process isolation:</strong> Fresh subprocess = fresh state = no cleanup, no corruption risk. One call's failure doesn't contaminate the next.</li>
+        <li><strong>Clarity over magic:</strong> Users know exactly what Gemini sees (the prompt you sent). No hidden context injection surprises.</li>
+        <li><strong>Manual control:</strong> YOU decide when to delegate via explicit clink calls. This avoids classification errors where the system misroutes your task.</li>
+        <li><strong>Debuggability:</strong> "Show me what PAL sent to Gemini" is straightforward. With automatic routing, debugging "why did it choose Gemini?" is harder.</li>
+        <li><strong>MCP scope:</strong> PAL is a delegation tool, not an orchestration layer. Adding persistent memory would expand scope significantly.</li>
       </ul>
     </div>
 
     <div class="section-label breaks">What Breaks</div>
     <div class="section-content breaks">
       <ul>
-        <li><strong>No persistent memory across sessions.</strong> Day 1: Gemini finds JWT bug, rate limiting gap. Day 2: you call clink again, PAL spawns NEW Gemini process with ZERO memory of Day 1. Re-analyzes from scratch, might produce different findings.</li>
-        <li>Delegation is MANUAL — no automatic routing. Either you explicitly say "use Gemini" or you write CLAUDE.md rules and Claude decides. No semantic classification.</li>
+        <li><strong>No persistent memory across sessions.</strong> Day 1: Gemini finds JWT bug. Day 2: PAL spawns NEW Gemini with ZERO memory. Re-analyzes from scratch, might find different things.</li>
+        <li>Delegation is MANUAL — no automatic routing. You explicitly call clink or write CLAUDE.md rules.</li>
         <li>25K token output limit — MCP tool responses capped, large analyses get truncated</li>
         <li>2-minute timeout — long-running Gemini tasks may timeout</li>
         <li>No rate limit awareness — doesn't know if Claude/Gemini approaching limits</li>
@@ -543,13 +605,13 @@
       </ul>
     </div>
 
-    <div class="section-label harness">With Harness</div>
-    <div class="section-content harness">
+    <div class="section-label gap">The Gap</div>
+    <div class="section-content gap">
       <ul>
-        <li>Persistent memory store auto-injects prior findings: "Yesterday's analysis found JWT bug in auth.ts:42"</li>
-        <li>Semantic router classifies tasks automatically, routes without explicit clink calls</li>
-        <li>Proactive prediction switches providers at 80% quota</li>
-        <li>Shared memory includes Claude's reasoning, not just files</li>
+        <li><strong>Missing capability:</strong> Cross-session memory — Day 2 should know what Day 1 discovered without manual copy-paste</li>
+        <li><strong>Missing capability:</strong> Automatic delegation — routing based on task type without explicit clink calls</li>
+        <li><strong>Open question:</strong> Is manual delegation actually a feature (user control) or a friction point? Would automatic routing misroute often enough to be worse?</li>
+        <li><strong>Open question:</strong> What's the right memory model? File-based (simple, grep-able) vs. vector DB (semantic search) vs. something else?</li>
       </ul>
     </div>
   </div>
@@ -572,34 +634,45 @@
     <div class="section-label works">What It Does Well</div>
     <div class="section-content works">
       <ul>
-        <li>Real-time inter-agent awareness — Claude writes rateLimit.ts → hook posts to SQLite → Gemini's hook polls → Gemini reviews file → posts findings back → Claude sees feedback. ~100 second feedback loop.</li>
+        <li>Real-time inter-agent awareness — Claude writes rateLimit.ts → hook posts to SQLite → Gemini polls → reviews file → posts findings → Claude sees feedback. ~100 second loop.</li>
         <li>Collision detection — both agents notified if they touch same file</li>
         <li>Persistent event log — SQLite preserves history across polling gaps</li>
-        <li>Native integration — works with Claude Code's existing hook system</li>
-        <li>Lightweight — just SQLite + hook scripts, no heavy infrastructure</li>
-        <li>Enables coordination without explicit orchestration</li>
+        <li>Native integration — works with Claude Code's existing hook system, no new infrastructure</li>
+        <li>Lightweight — just SQLite + hook scripts</li>
+        <li>Coordination without explicit orchestration — agents can react to each other without a central controller</li>
+      </ul>
+    </div>
+
+    <div class="section-label why">Why It Works This Way</div>
+    <div class="section-content why">
+      <ul>
+        <li><strong>Lightweight over heavyweight:</strong> SQLite + hooks is minimal infrastructure. No central orchestrator to run, maintain, or become a single point of failure.</li>
+        <li><strong>No single point of failure:</strong> If the message bus goes down, agents still run independently. They just lose awareness, not functionality.</li>
+        <li><strong>Agent autonomy:</strong> Agents decide how to react to messages. The bus doesn't prescribe behavior — it just broadcasts events.</li>
+        <li><strong>Messaging ≠ Routing:</strong> hcom answers "what happened?" not "who should do this?" That's a deliberate scope boundary.</li>
+        <li><strong>Native to Claude Code:</strong> Uses existing hook system. No new concepts to learn, no foreign infrastructure.</li>
       </ul>
     </div>
 
     <div class="section-label breaks">What Breaks</div>
     <div class="section-content breaks">
       <ul>
-        <li><strong>Messaging only, NOT routing.</strong> hcom tells agents what happened, not what SHOULD happen. "Claude wrote auth.ts" is information, not a decision about who should write tests.</li>
-        <li>Collision detected, not prevented — both agents edit same file, THEN see the collision. No locking.</li>
-        <li>No automatic context injection — messages are raw events, not synthesized actionable context</li>
-        <li>Requires both agents running simultaneously — Gemini must be active to receive messages</li>
+        <li><strong>Messaging only, NOT routing.</strong> hcom tells agents what happened, not what SHOULD happen. "Claude wrote auth.ts" is information, not a decision.</li>
+        <li>Collision detected, not prevented — both agents edit same file, THEN see the collision. No locking before edit.</li>
+        <li>No automatic context injection — messages are raw events, not synthesized actionable summaries</li>
+        <li>Requires both agents running — Gemini must be active to receive messages</li>
         <li>Polling delays — 500ms-2sec gaps between event and reaction</li>
-        <li>No failure handling — if Gemini's review times out, messages pile up</li>
+        <li>No failure handling — if Gemini's review times out, messages pile up unprocessed</li>
       </ul>
     </div>
 
-    <div class="section-label harness">With Harness</div>
-    <div class="section-content harness">
+    <div class="section-label gap">The Gap</div>
+    <div class="section-content gap">
       <ul>
-        <li>Semantic router assigns tasks to appropriate agent proactively, not reactively</li>
-        <li>File locking before write prevents collisions</li>
-        <li>Events synthesized into actionable context summaries</li>
-        <li>Rate limit capacity info included in messages</li>
+        <li><strong>Missing capability:</strong> Task routing — something that decides WHO should handle a task, not just announces what happened</li>
+        <li><strong>Missing capability:</strong> Collision prevention — locking files before write, not detecting conflicts after</li>
+        <li><strong>Open question:</strong> Is centralized routing better than autonomous agents? Central routing is clearer but creates a single point of failure.</li>
+        <li><strong>Open question:</strong> Could hcom's event stream be enriched with routing hints without becoming a full orchestrator?</li>
       </ul>
     </div>
   </div>
@@ -631,26 +704,37 @@
       </ul>
     </div>
 
+    <div class="section-label why">Why It Works This Way</div>
+    <div class="section-content why">
+      <ul>
+        <li><strong>Deep integration over broad integration:</strong> Conductor optimizes for Claude's strengths (precision coding, debugging). Supporting multiple models would dilute focus.</li>
+        <li><strong>Simplicity of scope:</strong> 5 Claudes is simpler than Claude + Gemini + GPT-4. One model = consistent behavior, cost structure, performance expectations.</li>
+        <li><strong>Merge strategy assumes homogeneity:</strong> Git worktree merging works because all agents produce similar code style. Mixed models would complicate merges.</li>
+        <li><strong>Rate limit semantics are clear:</strong> One subscription, one pool. Easier to reason about than tracking multiple provider limits.</li>
+        <li><strong>Visual-first design:</strong> A dashboard for 5 identical Claude instances is simpler than a dashboard showing heterogeneous model behaviors.</li>
+      </ul>
+    </div>
+
     <div class="section-label breaks">What Breaks</div>
     <div class="section-content breaks">
       <ul>
-        <li><strong>5 agents = 5x rate limit burn.</strong> All use your single Claude Max subscription. What lasts a week now lasts 1-2 days. Your profile: already hit 85% in 1-2 days. Conductor: would hit 100% in ~8 hours.</li>
-        <li>Claude-only — no Gemini, no GPT-4, no model selection</li>
+        <li><strong>5 agents = 5x rate limit burn.</strong> All use your single subscription. What lasts a week lasts 1-2 days. Your profile: 85% in 1-2 days. Conductor: 100% in ~8 hours.</li>
+        <li>Claude-only — no Gemini, no GPT-4, no model selection for different task types</li>
         <li>No cross-agent communication — agents can't see what each other is doing</li>
-        <li>No shared memory — each agent is fully isolated</li>
-        <li>No semantic task routing — you manually assign tasks</li>
+        <li>No shared memory — each agent is fully isolated in its worktree</li>
+        <li>No semantic task routing — you manually assign tasks to agents</li>
         <li>Silent failures — agents stall on 429 without clear notification</li>
         <li>Conductor solves "5 independent tasks, 48-hour sprint." Your problem is "continuous work across a full week."</li>
       </ul>
     </div>
 
-    <div class="section-label harness">With Harness</div>
-    <div class="section-content harness">
+    <div class="section-label gap">The Gap</div>
+    <div class="section-content gap">
       <ul>
-        <li>Claude + Gemini + others — two independent rate limit pools</li>
-        <li>Quota-aware throttling, load balancing across providers</li>
-        <li>Shared message bus enables cross-agent awareness</li>
-        <li>Semantic routing to appropriate model per task</li>
+        <li><strong>Missing capability:</strong> Multi-provider support — using Claude AND Gemini to spread rate limits across independent pools</li>
+        <li><strong>Missing capability:</strong> Rate limit awareness — knowing when to throttle or route to prevent 429s</li>
+        <li><strong>Open question:</strong> Is parallel execution the right model for your workflow (burst work) or is sequential with intelligent routing (sustained work) better?</li>
+        <li><strong>Open question:</strong> Would cross-agent communication be useful, or is isolation actually a feature (no interference)?</li>
       </ul>
     </div>
   </div>
@@ -682,25 +766,36 @@
       </ul>
     </div>
 
+    <div class="section-label why">Why It Works This Way</div>
+    <div class="section-content why">
+      <ul>
+        <li><strong>Observability vs control separation:</strong> CLIProxyAPI's job is to show you what's happening. YOUR job is to decide what to do about it.</li>
+        <li><strong>User keeps agency:</strong> You see Claude at 85% and decide: "Keep going on this important debug" or "Switch to Gemini for this research." Human judgment.</li>
+        <li><strong>Simplicity:</strong> Monitoring is straightforward (intercept, count tokens, display). Decision-making is hard and context-dependent.</li>
+        <li><strong>Avoiding over-automation:</strong> Not every context warrants switching. You might WANT to exhaust Claude on critical debugging rather than switching to Gemini.</li>
+        <li><strong>Multi-account focus:</strong> Round-robin makes sense for multiple SAME-provider accounts. Cross-provider routing is a different, more complex problem.</li>
+      </ul>
+    </div>
+
     <div class="section-label breaks">What Breaks</div>
     <div class="section-content breaks">
       <ul>
-        <li><strong>Visibility without agency.</strong> 10:00 AM: see Claude at 72%. 10:45 AM: see Claude at 85%, still debugging. 11:15 AM: 429 error. You SAW the quota but CLIProxyAPI didn't ACT on it. Display only.</li>
-        <li>Reactive only — fails over AFTER 429, not before. You already hit the limit, request failed.</li>
+        <li><strong>Visibility without agency.</strong> 10:00 AM: Claude at 72%. 10:45 AM: Claude at 85%, still debugging. 11:15 AM: 429. You SAW quota but it didn't ACT. Display only.</li>
+        <li>Reactive only — fails over AFTER 429. Request already failed, context may be lost.</li>
         <li>No semantic routing — treats all requests equally regardless of task type</li>
-        <li>No proactive thresholds — can't configure "switch at 80%"</li>
-        <li>No prediction — shows current state, not "2.3 hours until limit at current rate"</li>
+        <li>No proactive thresholds — can't configure "route to Gemini when Claude hits 80%"</li>
+        <li>No prediction — shows current state, not "at this rate, 2.3 hours until limit"</li>
         <li>Round-robin loses caching benefits — Anthropic caches per-account, rotating breaks this</li>
       </ul>
     </div>
 
-    <div class="section-label harness">With Harness</div>
-    <div class="section-content harness">
+    <div class="section-label gap">The Gap</div>
+    <div class="section-content gap">
       <ul>
-        <li>Routes at 80% threshold automatically — non-critical research goes to Gemini, preserves Claude quota for debugging</li>
-        <li>Semantic awareness — knows "this is research, safe to route to Gemini"</li>
-        <li>Prediction: "At current rate, 2.3 hours until limit"</li>
-        <li>Data drives routing decisions, not just display</li>
+        <li><strong>Missing capability:</strong> Proactive threshold routing — acting on quota data before hitting 429, not just displaying it</li>
+        <li><strong>Missing capability:</strong> Rate prediction — "at current consumption rate, X hours until limit"</li>
+        <li><strong>Open question:</strong> Is automatic routing at thresholds better than human judgment? User might WANT to burn Claude quota on important work.</li>
+        <li><strong>Open question:</strong> What's the right threshold? 80%? 90%? Context-dependent? Should user configure it or should the system learn?</li>
       </ul>
     </div>
   </div>
