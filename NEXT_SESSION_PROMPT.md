@@ -70,19 +70,22 @@ Claude Squad and Conductor Build show multiple instances in a visual interface. 
 ### 3. Provider Abstraction Layers: What Do You Actually Lose?
 PAL MCP's `clink` tool lets Claude Code delegate to Gemini from inside a conversation. But it has no shared memory, no routing intelligence, no rate limit awareness — I manually decide what to delegate. Paint me concrete user journey scenarios showing what that actually looks like day-to-day. What breaks? What's friction? What do I lose by NOT having shared memory, routing intelligence, and rate limit awareness? And then contrast: what would those same scenarios look like WITH a full harness? I need to feel the gap, not just be told it exists.
 
-### 4. MCP Server vs. Bash + File I/O
+### 4. The Competitive Landscape: What Each Tool Does AND Doesn't Do
+The README lists tools (CCProxy, claude-code-mux, CLIProxyAPI, PAL MCP, hcom) with what they do and a coverage percentage. But I'm confused about what each one DOESN'T do. For example, CCProxy "routes by token count, thinking mode, tool use" — okay, but what happens when I need something it can't do? For EACH tool in the competitive landscape table: (a) give a concrete scenario where it works well, (b) give a concrete scenario where it falls short — what breaks, what's missing, what do I have to do manually, (c) explain the implications of that gap for my daily workflow. Then show me: what would those "falls short" scenarios look like if the harness existed? This is how I'll understand what gap we're actually building for and which specific problems each existing tool leaves unsolved. Don't be abstract — walk me through real workflows.
+
+### 5. MCP Server vs. Bash + File I/O
 "Why is an MCP server better than `gemini -p 'task' > result.md` followed by a Read?" Claude can already run Bash commands and read files. What specifically does an MCP server provide that Bash + file I/O does not? Be concrete — not "better integration" but actual capabilities gained and lost. This is the single most impactful architectural question.
 
-### 5. What Does a Visual Interface Actually Provide on Top of CLI?
+### 6. What Does a Visual Interface Actually Provide on Top of CLI?
 The docs describe 5 dashboard panels and a CodexBar widget. But I'm a terminal-native power user. What specific information or capability would a visual interface give me that `cat .harness/status.json` or a well-formatted CLI output cannot? What is genuinely worth the context-switching cost of a browser tab?
 
-### 6. How Does This Differ From PAL MCP + CCProxy + CodexBar?
+### 7. How Does This Differ From PAL MCP + CCProxy + CodexBar?
 Today, right now, you can: install PAL MCP for Gemini delegation, CCProxy for rule-based routing with subscription auth, and CodexBar for rate limit monitoring. That gets ~55-60% of the vision. What specific workflows fail? What's the 40% gap in practice, and does it matter day-to-day? Be ruthlessly honest.
 
-### 7. The Single-Provider Exhaustion Scenario
+### 8. The Single-Provider Exhaustion Scenario
 Both-providers-exhausted is handled (notify and stop). But the common case is: Claude is rate-limited, Gemini still has capacity. What happens? Does the harness auto-route everything to Gemini? Does it ask me? Can Gemini even handle Claude's typical workload given its gaps (no mature subagents, no production plan mode, 4x more control-flow errors)? Walk through this scenario concretely.
 
-### 8. Are We Investigating or Designing?
+### 9. Are We Investigating or Designing?
 SESSION_BRIDGE.md says "deep investigation, NOT implementation." But ARCHITECTURE.md contains a full MCP server code example, a dashboard ASCII diagram with 5 named panels, a routing decision JSON schema, and a 21-item compensation list. Is the project actually past investigation? Should I acknowledge we're in design phase? Or should the design specs be treated as hypothetical sketches?
 
 ## After the Questions: Map the Research Path
