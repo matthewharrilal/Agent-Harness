@@ -661,6 +661,17 @@ Before the session ends, update this file. At minimum: add a session log entry, 
 - MVP scope not defined
 - No code written. No implementation planned. Investigation continues.
 
+**Critical late-session finding: The landscape is closer than we thought.**
+End-of-session research (3 deep agents, 30+ tools evaluated) revealed:
+- **CCProxy** (starbased): Rule-based routing with Max subscription support, ~65% coverage
+- **claude-code-mux**: Rust proxy with OAuth support and auto-failover, ~60% coverage
+- **PAL MCP + CCProxy + CodexBar**: Combined zero-code setup gets ~55-60% of our vision
+- **The genuinely novel gap is ~40%**: semantic task-type routing, persistent cross-provider memory, proactive rate limit prediction, cross-model critique
+- **Conductor Build**: Claude-only parallelization. Does NOT route between providers, share memory, or detect rate limits. Different problem entirely.
+- **Nobody has built the full integrated "sous chef"** — but the individual pieces are closer than our earlier research suggested
+- **Zero-code baseline test is now even more important**: Install existing tools, use them, discover what's actually missing from experience
+- Full competitive analysis documented in RESEARCH.md
+
 **User's parting priority:** "Focus on the continuity document. Make sure everything is documented. My usage is about to run out."
 
 ---

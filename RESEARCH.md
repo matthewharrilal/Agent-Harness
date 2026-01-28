@@ -892,6 +892,62 @@ Sources:
 
 ---
 
+## COMPETITIVE LANDSCAPE DEEP-DIVE (End of Session 1)
+
+### The Honest Assessment: How Close Are Existing Tools?
+
+Late-session research (3 agents, 30+ tools) revealed the landscape is closer to our vision than earlier research suggested. Here is the tool-by-tool assessment against 5 requirements: (1) subscription auth, (2) intelligent routing, (3) shared memory, (4) inside Claude Code, (5) rate limit failover.
+
+| Tool | Sub Auth | Routing | Memory | In Claude Code | Rate Limit | Coverage |
+|------|:--------:|:-------:|:------:|:--------------:|:----------:|:--------:|
+| **CCProxy** (starbased) | Yes | Rule-based | No | Yes (proxy) | Partial (reactive) | ~65% |
+| **claude-code-mux** | Yes (OAuth) | Priority-based | No | Yes (proxy) | Yes (failover) | ~60% |
+| **CLIProxyAPI** | Yes (OAuth) | Round-robin | Partial | Yes (proxy) | Yes (quota tracking) | ~60% |
+| **PAL MCP** | Separate | Manual only | Partial (3hr/20 turns) | Yes (MCP) | No | ~45% |
+| **claude-code-router** | Mixed | By request type | No | Yes (proxy) | Limited | ~50% |
+| **hcom** | Yes | No routing | Yes (messaging) | Yes (hooks) | No | ~35% |
+| **Portkey** | Yes | Metadata-based | No | Yes (gateway) | Yes (retries) | ~30% |
+| **OpenRouter** | Yes (forwarded) | Auto Router exists* | No | Yes (gateway) | Partial | ~25% |
+| **Conductor Build** | Yes | No (Claude-only) | No (.context folder) | No (separate app) | No | ~15% |
+
+*OpenRouter's Auto Router exists but Claude Code doesn't use it — Claude Code hardcodes model selection.
+
+### What's Genuinely Novel (The ~40% Gap)
+
+1. **Semantic task-type routing**: "This is a code review → Claude. This is research → Gemini." No tool routes by what the task IS. CCProxy routes by token count and model name. Not the same.
+2. **Persistent cross-provider memory**: hcom does real-time messaging. PAL does 3hr conversation threads. Nobody has a persistent store both providers read/write to across sessions.
+3. **Proactive rate limit prediction**: Every tool REACTS to 429 errors. Nobody PREDICTS "Claude is at 80%, route next task to Gemini preemptively."
+4. **Cross-model critique orchestration**: Nobody implements "Claude generates, Gemini reviews" automatically. The Team of Rivals pattern is unimplemented.
+5. **The integrated "sous chef"**: All of the above, working together invisibly inside interactive Claude Code.
+
+### Best Zero-Code Combo Available Today
+
+**PAL MCP + CCProxy + CodexBar** delivers ~55-60% of the vision:
+- PAL: manual delegation and context revival
+- CCProxy: automatic large-context routing to Gemini
+- CodexBar: visual rate limit awareness
+
+Gap: no semantic routing, no persistent memory, no proactive rate switching, no cross-model critique, context revival is lossy and time-limited.
+
+### Tools Discovered This Round (Not in Earlier Research)
+
+- **CCProxy** (starbased-co/ccproxy): LiteLLM-based proxy with Max subscription support and rule-based routing. TokenCountRule, ThinkingRule, MatchModelRule, MatchToolRule. Source: github.com/starbased-co/ccproxy
+- **claude-code-mux** (9j/claude-code-mux): Rust-powered proxy, 18+ providers, OAuth support, ~5MB RAM, <1ms overhead. Source: github.com/9j/claude-code-mux
+- **CLIProxyAPI** (router-for-me/CLIProxyAPI): macOS menu bar proxy with OAuth subscription support and real-time quota tracking. Source: github.com/router-for-me/CLIProxyAPI
+- **hcom** (aannoo/hcom): Hook-based inter-agent communication between Claude Code and Gemini CLI. Transcript sharing, cross-agent search. Source: github.com/aannoo/hcom
+- **Not Diamond**: AI model router using learned semantic routing (not rule-based). Best-in-class task-type routing but API-only, not integrated with Claude Code. Source: notdiamond.ai
+- **Jenova AI**: Unified multi-model platform with persistent memory and intelligent routing — but it's a separate app, not CLI middleware. Source: jenova.ai
+
+### Conductor Build Details
+
+YC-backed, free Mac app by Melty Labs. Runs multiple Claude Code instances in parallel git worktrees with a polished GUI (diff viewer, file explorer, terminal, checkpoints, PR integration). Supports Claude Code + Codex + some Gemini via env vars.
+
+**What it does NOT do**: No intelligent routing between providers, no rate limit awareness, no shared live memory between agents, no automated task distribution. Agents are fully isolated by design. Closed source. Mac-only. When rate-limited, "your workflow stalls."
+
+**Verdict**: Conductor solves parallelism within Claude, not multi-provider orchestration. ~15% overlap with the harness vision.
+
+---
+
 ## KNOWN RESEARCH GAPS
 
 The following topics have been identified as needing investigation but have NOT been researched yet:
