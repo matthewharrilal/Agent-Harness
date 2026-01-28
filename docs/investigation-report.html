@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Harness Investigation Report</title>
+  <style>
+    /* Base Colors - Warm, Easy-on-Eyes */
+    :root {
+      --bg-primary: #fefcf3;
+      --bg-secondary: #f9f6f0;
+      --bg-code: #f0ebe3;
+      --text-primary: #3d3d3d;
+      --text-heading: #5c4b3a;
+      --accent-teal: #2a7d7d;
+      --accent-blue: #4a7c9b;
+      --border-tan: #e0d5c5;
+      --success-sage: #6b9b7a;
+      --warning-amber: #c49052;
+      --error-coral: #c97065;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.7;
+      color: var(--text-primary);
+      background: var(--bg-primary);
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    h1, h2, h3, h4 {
+      color: var(--text-heading);
+      font-weight: 600;
+      margin-top: 2rem;
+    }
+
+    h1 { font-size: 2.2rem; border-bottom: 3px solid var(--accent-teal); padding-bottom: 0.5rem; }
+    h2 { font-size: 1.6rem; border-bottom: 2px solid var(--border-tan); padding-bottom: 0.3rem; }
+    h3 { font-size: 1.3rem; }
+    h4 { font-size: 1.1rem; color: var(--accent-teal); }
+
+    /* You Are Here Context Box */
+    .you-are-here {
+      background: linear-gradient(135deg, #f0ebe3 0%, #fefcf3 100%);
+      border-left: 4px solid var(--accent-teal);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .you-are-here h3 {
+      margin-top: 0;
+      color: var(--accent-teal);
+    }
+
+    /* Checkpoint Boxes */
+    .checkpoint {
+      background: var(--bg-code);
+      border-left: 4px solid var(--success-sage);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+    }
+    .checkpoint-header {
+      color: var(--success-sage);
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Warning Boxes */
+    .warning {
+      background: #fef8f0;
+      border-left: 4px solid var(--warning-amber);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+    }
+    .warning-header {
+      color: var(--warning-amber);
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Milestone */
+    .milestone {
+      background: linear-gradient(90deg, var(--success-sage) 0%, var(--accent-teal) 100%);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      text-align: center;
+      margin: 2rem 0;
+      font-weight: 600;
+    }
+
+    /* Code Blocks */
+    .code-block {
+      background: var(--bg-code);
+      border-radius: 8px;
+      padding: 1rem;
+      position: relative;
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+      font-size: 14px;
+      overflow-x: auto;
+      margin: 1rem 0;
+      border: 1px solid var(--border-tan);
+    }
+    .copy-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: var(--accent-teal);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 0.25rem 0.5rem;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .copy-btn:hover {
+      background: #1e6060;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 15px;
+    }
+    th, td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-tan);
+    }
+    th {
+      background: var(--bg-code);
+      color: var(--text-heading);
+      font-weight: 600;
+    }
+    tr:hover {
+      background: var(--bg-secondary);
+    }
+
+    /* Collapsible Sections */
+    details {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-tan);
+      border-radius: 8px;
+      margin: 1rem 0;
+    }
+    summary {
+      padding: 1rem;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--text-heading);
+    }
+    summary:hover {
+      background: var(--bg-code);
+    }
+    details[open] summary {
+      border-bottom: 1px solid var(--border-tan);
+    }
+    details > div {
+      padding: 1rem;
+    }
+
+    /* Tool Cards */
+    .tool-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-tan);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    .tool-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .tool-name {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text-heading);
+    }
+    .coverage-badge {
+      background: var(--accent-teal);
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .coverage-badge.low { background: var(--error-coral); }
+    .coverage-badge.medium { background: var(--warning-amber); }
+    .coverage-badge.high { background: var(--success-sage); }
+
+    /* Decision Tree */
+    .decision-tree {
+      background: var(--bg-code);
+      border-radius: 8px;
+      padding: 1.5rem;
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 14px;
+      line-height: 1.8;
+      white-space: pre;
+      overflow-x: auto;
+    }
+
+    /* Gap Table Styling */
+    .gap-exists { color: var(--error-coral); }
+    .gap-filled { color: var(--success-sage); }
+
+    /* Dividers */
+    .divider-procedure { border-top: 3px solid var(--accent-teal); margin: 2rem 0; }
+    .divider-checkpoint { border-top: 3px solid var(--success-sage); margin: 2rem 0; }
+    .divider-warning { border-top: 3px solid var(--warning-amber); margin: 2rem 0; }
+
+    /* Navigation */
+    .nav-toc {
+      background: var(--bg-code);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+    }
+    .nav-toc h3 {
+      margin-top: 0;
+    }
+    .nav-toc ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    .nav-toc li {
+      padding: 0.3rem 0;
+    }
+    .nav-toc a {
+      color: var(--accent-teal);
+      text-decoration: none;
+    }
+    .nav-toc a:hover {
+      text-decoration: underline;
+    }
+
+    /* Recommendation Box */
+    .recommendation {
+      background: linear-gradient(135deg, #e8f5e8 0%, #f0ebe3 100%);
+      border: 2px solid var(--success-sage);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+    }
+    .recommendation h3 {
+      color: var(--success-sage);
+      margin-top: 0;
+    }
+
+    /* Print Styles */
+    @media print {
+      body { max-width: 100%; }
+      .copy-btn { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<h1>Agent Harness Investigation Report</h1>
+
+<div class="you-are-here">
+  <h3>You Are Here</h3>
+  <p><strong>Project:</strong> Hybrid Claude + Gemini Orchestration Layer</p>
+  <p><strong>Phase:</strong> Deep Investigation (NOT Implementation)</p>
+  <p><strong>The Problem:</strong> You hit 85% of weekly Claude Max rate limits in 1-2 days</p>
+  <p><strong>The Question:</strong> Is the ~40% gap between existing tools and the full vision worth building for?</p>
+</div>
+
+<nav class="nav-toc">
+  <h3>Table of Contents</h3>
+  <ul>
+    <li><a href="#executive-summary">Executive Summary</a></li>
+    <li><a href="#competitive-landscape">The 8-Tool Competitive Landscape</a></li>
+    <li><a href="#the-gap">The ~40% Gap Analysis</a></li>
+    <li><a href="#recommendations">My Recommendations</a></li>
+    <li><a href="#decision-tree">Decision Tree</a></li>
+    <li><a href="#next-steps">Next Steps</a></li>
+  </ul>
+</nav>
+
+<div class="divider-procedure"></div>
+
+<h2 id="executive-summary">Executive Summary</h2>
+
+<div class="checkpoint">
+  <div class="checkpoint-header">Key Finding</div>
+  <p>Existing tools (CCProxy + PAL MCP + CodexBar) provide <strong>~55-60%</strong> of the vision with zero custom code. The genuine gap is <strong>~40%</strong>: semantic task routing, persistent memory, proactive rate prediction, and mid-task context handoff.</p>
+</div>
+
+<p><strong>The gap is REAL but whether it matters depends on one thing:</strong></p>
+<p style="font-size: 1.2rem; text-align: center; padding: 1rem; background: var(--bg-code); border-radius: 8px;">
+  How often does mid-task exhaustion happen in your actual workflow?
+</p>
+
+<table>
+  <tr>
+    <th>Frequency</th>
+    <th>Recommendation</th>
+  </tr>
+  <tr>
+    <td>0-1x per week</td>
+    <td><span class="gap-filled">Don't build. Use baseline.</span></td>
+  </tr>
+  <tr>
+    <td>2-3x per week</td>
+    <td><span style="color: var(--warning-amber);">Build minimal harness (context handoff only)</span></td>
+  </tr>
+  <tr>
+    <td>4+ per week</td>
+    <td><span class="gap-exists">Build full harness</span></td>
+  </tr>
+</table>
+
+<div class="divider-procedure"></div>
+
+<h2 id="competitive-landscape">The 8-Tool Competitive Landscape</h2>
+
+<p>Each tool analyzed for: what it does well, what breaks, and what the harness would add.</p>
+
+<!-- Tool 1: CCProxy -->
+<div class="tool-card">
+  <div class="tool-header">
+    <span class="tool-name">1. CCProxy</span>
+    <span class="coverage-badge high">~65% coverage</span>
+  </div>
+  <p><strong>What it is:</strong> Python-based proxy using LiteLLM. Routes based on token count, model name, thinking parameter, and tool invocation.</p>
+
+  <details>
+    <summary>What it does well</summary>
+    <div>
+      <div class="code-block">
+SCENARIO: Large codebase analysis
+
+You: "Analyze all 150 files in src/ for security vulnerabilities"
+
+CCProxy sees: ~180K tokens in context
+TokenCountRule: if tokens > 100000 → route to Gemini
+
+Result: Request seamlessly routes to Gemini (1M context window).
+        You never know it happened.
+
+This works because: Token count is MEASURABLE.
+      </div>
+    </div>
+  </details>
+
+  <details>
+    <summary>What breaks</summary>
+    <div>
+      <div class="code-block">
+SCENARIO: Research vs coding task
+
+You: "Research the history of JWT security vulnerabilities"
+
+CCProxy sees:
+- 12 tokens (not >100K threshold)
+- No tools being used
+- Default model name
+
+CCProxy decision: Route to Claude (default)
+
+PROBLEM: This is a RESEARCH task. Gemini has web search.
+         But CCProxy can't tell "research" from "debug".
+         12 tokens look the same either way.
+      </div>
+      <p><strong>Why:</strong> Semantic routing requires understanding INTENT. That needs either an LLM call (50-200ms, costs tokens) or a trained classifier (needs labeled data). CCProxy's philosophy is zero overhead.</p>
+    </div>
+  </details>
+
+  <table>
+    <tr><th>Gap</th><th>CCProxy Today</th><th>With Harness</th></tr>
+    <tr><td>Semantic routing</td><td class="gap-exists">None</td><td class="gap-filled">Auto-classifies intent</td></tr>
+    <tr><td>Rate awareness</td><td class="gap-exists">None</td><td class="gap-filled">Proactive at 80%</td></tr>
+    <tr><td>Failover</td><td class="gap-exists">Request fails</td><td class="gap-filled">Retry with backup</td></tr>
+  </table>
+</div>
+
+<!-- Tool 2: claude-code-mux -->
+<div class="tool-card">
+  <div class="tool-header">
+    <span class="tool-name">2. claude-code-mux</span>
+    <span class="coverage-badge high">~60% coverage</span>
+  </div>
+  <p><strong>What it is:</strong> Rust-based HTTP proxy with automatic failover. When Anthropic returns 429, it tries backup providers.</p>
+
+  <details>
+    <summary>What it does well</summary>
+    <div>
+      <div class="code-block">
+SCENARIO: Rate limit hit during normal request
+
+Turn 6: You send a message to Claude
+Anthropic returns: 429 Too Many Requests
+
+claude-code-mux catches this:
+  - Tries Priority 2: OpenRouter
+  - OpenRouter succeeds
+  - Returns response to Claude Code
+
+You see: Normal response. Session continues.
+You never knew Anthropic was rate-limited.
+      </div>
+    </div>
+  </details>
+
+  <details>
+    <summary>What breaks (CRITICAL)</summary>
+    <div>
+      <div class="code-block">
+SCENARIO: Mid-debugging 429 error
+
+Turn 1-5: Debugging a race condition with Claude
+  - Claude identified 3 potential causes
+  - Eliminated hypothesis A (timing issue)
+  - Eliminated hypothesis B (lock scope)
+  - Currently testing hypothesis C
+
+Turn 6: Anthropic returns 429
+
+claude-code-mux:
+  - Switches to OpenRouter
+  - Forwards MESSAGE HISTORY
+
+OpenRouter Claude receives messages BUT:
+  - This is a FRESH instance
+  - No "memory" of the reasoning process
+  - Only sees TEXT of conversation
+  - Doesn't know hypotheses A and B were eliminated
+  - Might re-investigate them (wasting time)
+
+Result: You lose 5-10 minutes of debugging progress
+      </div>
+      <p><strong>Why:</strong> claude-code-mux is a STATELESS PROXY by design. Each request is independent. Adding memory would change it from "proxy" to "orchestration layer."</p>
+    </div>
+  </details>
+
+  <table>
+    <tr><th>Gap</th><th>claude-code-mux Today</th><th>With Harness</th></tr>
+    <tr><td>Context continuity</td><td class="gap-exists">Messages only, reasoning lost</td><td class="gap-filled">Full reasoning state</td></tr>
+    <tr><td>Rate awareness</td><td class="gap-exists">Reacts to 429</td><td class="gap-filled">Proactive at 80%</td></tr>
+    <tr><td>Semantic routing</td><td class="gap-exists">None</td><td class="gap-filled">Routes by task type</td></tr>
+  </table>
+</div>
+
+<!-- Tool 3: PAL MCP -->
+<div class="tool-card">
+  <div class="tool-header">
+    <span class="tool-name">3. PAL MCP</span>
+    <span class="coverage-badge medium">~45% coverage</span>
+  </div>
+  <p><strong>What it is:</strong> MCP server (10K+ GitHub stars) with <code>clink</code> tool that spawns external CLI processes (Gemini, Codex).</p>
+
+  <details>
+    <summary>How clink works</summary>
+    <div>
+      <div class="code-block">
+1. You're in Claude Code session
+2. Claude calls: clink(cli_name="gemini", role="security-analyzer", prompt="...")
+3. PAL MCP:
+   - Loads config from conf/cli_clients/gemini.json
+   - Loads role prompt from systemprompts/clink/security-analyzer.md
+   - Spawns: gemini -p "combined prompt" --output-format json --yolo
+4. Gemini runs in isolation, produces output
+5. PAL returns result to Claude's conversation
+      </div>
+    </div>
+  </details>
+
+  <details>
+    <summary>What breaks: Multi-day analysis</summary>
+    <div>
+      <div class="code-block">
+Day 1:
+  You: "Use Gemini to analyze the auth module"
+  Claude calls clink → Gemini finds: JWT bug, rate limiting gap
+  Session ends.
+
+Day 2:
+  You: "Continue the auth analysis"
+  Claude calls clink again
+  PAL spawns a NEW Gemini process
+
+PROBLEM:
+  - This Gemini has ZERO memory of Day 1
+  - Doesn't know about the JWT bug
+  - Re-analyzes from scratch
+  - Might produce DIFFERENT findings
+
+Why: clink spawns FRESH processes. No persistence.
+      </div>
+    </div>
+  </details>
+</div>
+
+<!-- Tool 4: hcom -->
+<div class="tool-card">
+  <div class="tool-header">
+    <span class="tool-name">4. hcom</span>
+    <span class="coverage-badge low">~35% coverage</span>
+  </div>
+  <p><strong>What it is:</strong> Hook-based messaging using SQLite. Enables real-time inter-agent awareness.</p>
+
+  <details>
+    <summary>How messaging works</summary>
+    <div>
+      <div class="code-block">
+Claude Code ←→ Hooks ←→ SQLite ←→ Hooks ←→ Gemini CLI
+
+When Claude writes a file:
+1. PostToolUse hook fires
+2. Hook INSERTs to SQLite: {agent: "claude", event: "file_write"}
+3. Gemini's hook POLLs SQLite every 500ms-2sec
+4. Gemini sees event, can react
+      </div>
+    </div>
+  </details>
+
+  <div class="warning">
+    <div class="warning-header">Key Limitation</div>
+    <p>hcom is MESSAGING, not ROUTING. It tells agents what happened, not what SHOULD happen. No semantic understanding of task types.</p>
+  </div>
+</div>
+
+<!-- Tool 5: Portkey -->
+<div class="tool-card">
+  <div class="tool-header">
+    <span class="tool-name">5. Portkey</span>
+    <span class="coverage-badge low">~30% coverage</span>
+  </div>
+  <p><strong>What it is:</strong> Cloud AI gateway for enterprise. Routes based on metadata YOU provide.</p>
+
+  <div class="warning">
+    <div class="warning-header">Critical Limitation</div>
+    <p><strong>Cannot use Claude Max subscriptions.</strong> Anthropic banned third-party OAuth access in Jan 2026. Portkey requires API keys (pay-per-token). You'd pay for Max AND API credits.</p>
+  </div>
+
+  <p><strong>The "upstream logic" problem:</strong> Portkey routes based on metadata you attach. YOU must classify the task first, then tell Portkey. The classification is YOUR responsibility.</p>
+</div>
+
+<!-- Tool 6: OpenRouter -->
+<div class="tool-card">
+  <div class="tool-header">
+    <span class="tool-name">6. OpenRouter</span>
+    <span class="coverage-badge low">~25% coverage</span>
+  </div>
+  <p><strong>What it is:</strong> API gateway for 300+ models. Single endpoint, all providers.</p>
+
+  <p><strong>Same subscription problem as Portkey:</strong> Cannot use Max through OpenRouter. API keys only.</p>
+
+  <p><strong>OpenRouter vs Cursor:</strong></p>
+  <ul>
+    <li><strong>Cursor:</strong> IDE (code editor). Visual app. You type code, AI assists.</li>
+    <li><strong>OpenRouter:</strong> API gateway (infrastructure). You call from code.</li>
+    <li>Cursor is the restaurant. OpenRouter is the food distributor.</li>
+  </ul>
+</div>
+
+<!-- Tool 7: Conductor Build -->
+<div class="tool-card">
+  <div class="tool-header">
+    <span class="tool-name">7. Conductor Build</span>
+    <span class="coverage-badge low">~15% coverage</span>
+  </div>
+  <p><strong>What it is:</strong> macOS Electron app (YC-backed) running multiple Claude instances in parallel git worktrees.</p>
+
+  <div class="warning">
+    <div class="warning-header">Rate Limit Math</div>
+    <div class="code-block">
+Claude Max: ~240-480 hours/week of Sonnet 4
+
+With Conductor (5 agents):
+  - 5 agents = 5x rate limit burn
+  - What lasts a week now lasts 1-2 days
+
+Your profile: Already hit 85% in 1-2 days
+Conductor: Would hit 100% in ~8 hours
+
+Conductor solves: "5 tasks, 48-hour sprint"
+Your problem: "Continuous work across a week"
+    </div>
+  </div>
+</div>
+
+<!-- Tool 8: CLIProxyAPI -->
+<div class="tool-card">
+  <div class="tool-header">
+    <span class="tool-name">8. CLIProxyAPI</span>
+    <span class="coverage-badge high">~60% coverage</span>
+  </div>
+  <p><strong>What it is:</strong> Local proxy with macOS menu bar widget showing quota. Round-robin load balancing.</p>
+
+  <div class="warning">
+    <div class="warning-header">Visibility vs Action Gap</div>
+    <div class="code-block">
+10:00 AM - Menu bar: Claude 72%
+  You see it. Think "I'll switch later."
+
+10:45 AM - Menu bar: Claude 85%
+  Still debugging. Don't want to break flow.
+
+11:15 AM - Request fails: 429
+  Session interrupted. Manual restart needed.
+
+The gap: CLIProxyAPI SHOWS data but doesn't ACT on it.
+    </div>
+  </div>
+</div>
+
+<div class="divider-procedure"></div>
+
+<h2 id="the-gap">The ~40% Gap Analysis</h2>
+
+<h3>What NO Existing Tool Provides</h3>
+
+<table>
+  <tr>
+    <th>Capability</th>
+    <th>Why Novel</th>
+    <th>Why It Matters</th>
+  </tr>
+  <tr>
+    <td><strong>Semantic task routing</strong></td>
+    <td>All tools route by metadata. NONE understand intent.</td>
+    <td>Route research→Gemini, coding→Claude, automatically</td>
+  </tr>
+  <tr>
+    <td><strong>Persistent memory</strong></td>
+    <td>PAL spawns fresh processes. claude-code-mux is stateless.</td>
+    <td>Day 2 knows what Day 1 discovered</td>
+  </tr>
+  <tr>
+    <td><strong>Proactive rate prediction</strong></td>
+    <td>CLIProxyAPI shows quota but doesn't act. Mux reacts to 429.</td>
+    <td>Route at 80%, never hit 429</td>
+  </tr>
+  <tr>
+    <td><strong>Mid-task context handoff</strong></td>
+    <td>Mux preserves messages but loses reasoning state</td>
+    <td>Gemini continues from exact hypothesis</td>
+  </tr>
+  <tr>
+    <td><strong>Subscription auth routing</strong></td>
+    <td>Portkey/OpenRouter need API keys. Max uses OAuth.</td>
+    <td>Use Max through routing layer</td>
+  </tr>
+</table>
+
+<h3>What Existing Tools Already Do Well</h3>
+
+<table>
+  <tr>
+    <th>Capability</th>
+    <th>Best Tool</th>
+    <th>Coverage</th>
+  </tr>
+  <tr>
+    <td>Token-count routing</td>
+    <td>CCProxy</td>
+    <td><span class="gap-filled">Excellent</span></td>
+  </tr>
+  <tr>
+    <td>Manual delegation</td>
+    <td>PAL MCP (clink)</td>
+    <td><span class="gap-filled">Good</span></td>
+  </tr>
+  <tr>
+    <td>Rate limit visibility</td>
+    <td>CodexBar, CLIProxyAPI</td>
+    <td><span class="gap-filled">Excellent</span></td>
+  </tr>
+  <tr>
+    <td>Auto-failover on 429</td>
+    <td>claude-code-mux</td>
+    <td><span style="color: var(--warning-amber);">Good (loses reasoning)</span></td>
+  </tr>
+  <tr>
+    <td>Inter-agent messaging</td>
+    <td>hcom</td>
+    <td><span class="gap-filled">Good</span></td>
+  </tr>
+</table>
+
+<div class="divider-checkpoint"></div>
+
+<h2 id="recommendations">My Recommendations</h2>
+
+<div class="recommendation">
+  <h3>The Honest Assessment</h3>
+  <p><strong>Is the 40% gap worth building for?</strong></p>
+  <p>It depends on ONE thing: <strong>How often do you hit rate limits mid-task?</strong></p>
+  <p>The ONLY capability you can't replicate with existing tools is <strong>context handoff</strong>. Everything else can be approximated:</p>
+  <ul>
+    <li>Semantic routing → CLAUDE.md instructions</li>
+    <li>Memory → Manual AGENTS.md files</li>
+    <li>Rate visibility → CodexBar</li>
+  </ul>
+  <p>But when Claude dies mid-debug? <strong>Nothing helps. That's the gap.</strong></p>
+</div>
+
+<h3>Phased Approach</h3>
+
+<div class="milestone">Phase 0: Baseline Test (2-4 weeks) — DO THIS FIRST</div>
+
+<p>Don't build anything. Install and use:</p>
+<ol>
+  <li><strong>PAL MCP</strong> — Manual Gemini delegation via clink</li>
+  <li><strong>CodexBar</strong> — Menu bar rate limit visibility</li>
+  <li><strong>(Optional) CCProxy</strong> — Token-count routing</li>
+</ol>
+
+<p>Track every friction point:</p>
+<div class="code-block">
+2026-01-29: Hit 429 mid-debugging auth issue. Lost 10 min re-explaining.
+2026-02-01: Wished Gemini remembered yesterday's findings. Spent 5 min copy-pasting.
+2026-02-03: Manually routed research to Gemini. Worked fine.
+</div>
+
+<div class="milestone">Phase 1: CLAUDE.md Heuristics (If Baseline Isn't Enough)</div>
+
+<p>Before writing code, try instruction-based routing:</p>
+<div class="code-block">
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+# CLAUDE.md addition
+
+## Delegation Strategy
+- Research tasks (keywords: "research", "find", "what is"): Use clink → Gemini
+- Large file analysis (>50 files): Use clink → Gemini
+- Precision debugging: Handle locally
+- At end of session: Write findings to AGENTS.md for tomorrow
+</div>
+
+<p>This gets you <strong>~40-50%</strong> of the harness value with 2-3 hours of work.</p>
+
+<div class="milestone">Phase 2: Minimal MCP (If Instructions Aren't Enough)</div>
+
+<p>Build only 3 tools:</p>
+<ol>
+  <li><code>check_rate_limits</code> — Query Claude/Gemini quota</li>
+  <li><code>delegate_with_context</code> — Send task + reasoning state to Gemini</li>
+  <li><code>shared_memory</code> — Read/write cross-session findings</li>
+</ol>
+
+<p>This is <strong>1-2 weeks</strong> of work for ~75% of full harness value.</p>
+
+<div class="milestone">Phase 3: Full Harness (Only If Absolutely Necessary)</div>
+
+<p>Only build this if Phases 0-2 all fail. This is <strong>2-3 months</strong> of work.</p>
+
+<div class="divider-procedure"></div>
+
+<h2 id="decision-tree">Decision Tree</h2>
+
+<div class="decision-tree">
+START: Install baseline (PAL MCP + CodexBar)
+  │
+  ├─ Use for 2-4 weeks
+  │
+  ▼
+Did you hit mid-task 429 errors?
+  │
+  ├─ No (0-1x/week) → STOP. Baseline is sufficient.
+  │
+  ├─ Yes, but manual context-passing was fine → STOP.
+  │
+  └─ Yes, and it was painful (lost work, wasted time)
+       │
+       ▼
+     Try CLAUDE.md heuristics for 1-2 weeks
+       │
+       ├─ Problem solved → STOP.
+       │
+       └─ Still painful
+            │
+            ▼
+          Build minimal MCP (Phase 2)
+            │
+            ├─ Problem solved → STOP.
+            │
+            └─ Still painful → Build full harness (rare)
+</div>
+
+<div class="divider-checkpoint"></div>
+
+<h2 id="next-steps">What I Would Do In Your Position</h2>
+
+<div class="checkpoint">
+  <div class="checkpoint-header">Recommended Action Plan</div>
+  <ol>
+    <li><strong>This week:</strong> Install PAL MCP + CodexBar</li>
+    <li><strong>Next 3 weeks:</strong> Use them on real work, log friction</li>
+    <li><strong>Week 4:</strong> Review logs. If mid-task exhaustion happened 3+ times with pain, proceed to Phase 1</li>
+    <li><strong>Week 5-6:</strong> Try CLAUDE.md heuristics</li>
+    <li><strong>Week 7+:</strong> Only if still painful, build minimal MCP</li>
+  </ol>
+  <p style="margin-bottom: 0;"><strong>Do NOT skip to building.</strong> The baseline might be enough. You won't know until you try.</p>
+</div>
+
+<div class="divider-warning"></div>
+
+<h2>Investigation Status</h2>
+
+<table>
+  <tr>
+    <th>Question</th>
+    <th>Status</th>
+    <th>Key Finding</th>
+  </tr>
+  <tr>
+    <td>Q0: Worth building?</td>
+    <td><span class="gap-filled">Answered</span></td>
+    <td>Depends on mid-task exhaustion frequency</td>
+  </tr>
+  <tr>
+    <td>Q1: How do gateways route?</td>
+    <td><span class="gap-filled">Answered</span></td>
+    <td>Rule-based, not semantic</td>
+  </tr>
+  <tr>
+    <td>Q2: Who invokes agents?</td>
+    <td><span class="gap-filled">Answered</span></td>
+    <td>GUIs are controllers, not viewers</td>
+  </tr>
+  <tr>
+    <td>Q3: What do you lose?</td>
+    <td><span class="gap-filled">Answered</span></td>
+    <td>Context continuity, memory, proactive awareness</td>
+  </tr>
+  <tr>
+    <td>Q4: Does/doesn't analysis</td>
+    <td><span class="gap-filled">Answered</span></td>
+    <td>Full analysis for all 8 tools</td>
+  </tr>
+  <tr>
+    <td>Q5-Q9</td>
+    <td><span class="gap-filled">Answered</span></td>
+    <td>See full report</td>
+  </tr>
+</table>
+
+<div class="milestone">Investigation Phase Complete. Baseline Testing Recommended.</div>
+
+<script>
+function copyCode(btn) {
+  const codeBlock = btn.parentElement;
+  const code = codeBlock.textContent.replace('Copy', '').trim();
+  navigator.clipboard.writeText(code);
+  btn.textContent = 'Copied!';
+  setTimeout(() => btn.textContent = 'Copy', 2000);
+}
+</script>
+
+</body>
+</html>
