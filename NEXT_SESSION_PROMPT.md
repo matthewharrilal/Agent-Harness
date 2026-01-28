@@ -61,19 +61,28 @@ Go deep. Use sub-agents for research. Give honest assessments, not hand-waves.
 ### 0. THE MOST IMPORTANT QUESTION: Is This Worth Building?
 End-of-session research found the competitive landscape is closer than expected. CCProxy does rule-based routing with Max subscription support (~65% coverage). claude-code-mux does auto-failover with OAuth (~60%). PAL MCP + CCProxy + CodexBar combined gets ~55-60% of the vision for zero custom code. The genuinely novel gap is ~40%: semantic task routing, persistent cross-provider memory, proactive rate prediction, cross-model critique. **Is that 40% worth building for? Or should I just install the existing tools?** See docs/RESEARCH.md § "COMPETITIVE LANDSCAPE DEEP-DIVE" for the full tool-by-tool analysis. This is the question everything else hangs on.
 
-### 1. MCP Server vs. Bash + File I/O
+### 1. How Do API Gateways Actually Do "Intelligent Routing"?
+OpenRouter, Portkey, LiteLLM — I'm told they do "intelligent routing." How, concretely? What's the mechanism? Is it keyword matching, embeddings, learned routing, or just rule-based fallback? And is Cursor an example of this kind of tool — where you pick from a list of models — or is it something different? Where does Cursor land in the 5 tool categories listed at the bottom of this document? Answering this helps me understand what "routing" even means in practice and whether what exists is close to what we're describing.
+
+### 2. Multi-Agent Managers: Who Invokes What?
+Claude Squad and Conductor Build show multiple instances in a visual interface. But what's the source of truth? Does the GUI invoke and control the instances (it's the creator), or does it read state from somewhere underneath (it's a viewer)? Is there a stack trace or process state that these GUIs tap into, or is the visual interface the thing that spawns and manages the agents? This matters because it tells me whether "multi-agent management" is fundamentally a UI concern or an infrastructure concern — and whether a harness needs to provide that infrastructure layer for any UI to read from.
+
+### 3. Provider Abstraction Layers: What Do You Actually Lose?
+PAL MCP's `clink` tool lets Claude Code delegate to Gemini from inside a conversation. But it has no shared memory, no routing intelligence, no rate limit awareness — I manually decide what to delegate. Paint me concrete user journey scenarios showing what that actually looks like day-to-day. What breaks? What's friction? What do I lose by NOT having shared memory, routing intelligence, and rate limit awareness? And then contrast: what would those same scenarios look like WITH a full harness? I need to feel the gap, not just be told it exists.
+
+### 4. MCP Server vs. Bash + File I/O
 "Why is an MCP server better than `gemini -p 'task' > result.md` followed by a Read?" Claude can already run Bash commands and read files. What specifically does an MCP server provide that Bash + file I/O does not? Be concrete — not "better integration" but actual capabilities gained and lost. This is the single most impactful architectural question.
 
-### 2. What Does a Visual Interface Actually Provide on Top of CLI?
+### 5. What Does a Visual Interface Actually Provide on Top of CLI?
 The docs describe 5 dashboard panels and a CodexBar widget. But I'm a terminal-native power user. What specific information or capability would a visual interface give me that `cat .harness/status.json` or a well-formatted CLI output cannot? What is genuinely worth the context-switching cost of a browser tab?
 
-### 3. How Does This Differ From PAL MCP + CCProxy + CodexBar?
+### 6. How Does This Differ From PAL MCP + CCProxy + CodexBar?
 Today, right now, you can: install PAL MCP for Gemini delegation, CCProxy for rule-based routing with subscription auth, and CodexBar for rate limit monitoring. That gets ~55-60% of the vision. What specific workflows fail? What's the 40% gap in practice, and does it matter day-to-day? Be ruthlessly honest.
 
-### 4. The Single-Provider Exhaustion Scenario
+### 7. The Single-Provider Exhaustion Scenario
 Both-providers-exhausted is handled (notify and stop). But the common case is: Claude is rate-limited, Gemini still has capacity. What happens? Does the harness auto-route everything to Gemini? Does it ask me? Can Gemini even handle Claude's typical workload given its gaps (no mature subagents, no production plan mode, 4x more control-flow errors)? Walk through this scenario concretely.
 
-### 5. Are We Investigating or Designing?
+### 8. Are We Investigating or Designing?
 SESSION_BRIDGE.md says "deep investigation, NOT implementation." But ARCHITECTURE.md contains a full MCP server code example, a dashboard ASCII diagram with 5 named panels, a routing decision JSON schema, and a 21-item compensation list. Is the project actually past investigation? Should I acknowledge we're in design phase? Or should the design specs be treated as hypothetical sketches?
 
 ## After the Questions: Map the Research Path
@@ -105,6 +114,29 @@ End-of-session competitive research suggests: **PAL MCP + CCProxy + CodexBar** d
 - Do not go broad. We have breadth. We need depth.
 - Do not conflate "I researched this" with "this is true." Many findings are single-source.
 - Do not summarize the docs back to me — I wrote them. Give your OWN perspective.
+
+## The 5 Tool Categories (Reference for Questions 1-3)
+
+Previous session research identified 5 distinct categories of tools in this space. They do different things. Understanding where each tool lands — and where our harness sits — is critical context for the open questions above.
+
+**1. API Gateways (OpenRouter, LiteLLM, Portkey)**
+Route API requests to different models. You send a prompt, they pick the best model or failover. They DO intelligent routing. They DO let you use Claude AND Gemini AND GPT together. But — they work with API keys and pay-per-token pricing. They do NOT work with your Claude Max subscription. You can't send your $200/mo subscription credits through OpenRouter. The OAuth crackdown killed that.
+
+**2. Multi-Agent Managers (Claude Squad, Conductor Build)**
+Run multiple instances of the SAME provider. Claude Squad = multiple Claude Code sessions in tmux. Conductor Build = multiple Claude Code instances in parallel git worktrees. They parallelize work. They do NOT route between different providers. They're multipliers, not routers.
+
+**3. Model Switchers (claude-code-proxy, claude-code-router)**
+Let you swap which model powers Claude Code. Point Claude Code at Gemini via OpenRouter. But you're using ONE model at a time — substituting, not combining.
+
+**4. Provider Abstraction Layers (PAL MCP)**
+The closest thing to what you want. PAL's `clink` tool lets Claude Code delegate to Gemini from inside a conversation. But it's a delegation tool, not a system — no shared memory, no routing intelligence, no rate limit awareness. You manually decide what to delegate.
+
+**5. Orchestration Frameworks (LangGraph, CrewAI, Google ADK)**
+Build custom multi-agent applications that CAN use multiple providers with shared memory. But they REPLACE Claude Code entirely — you build your own app. You lose the interactive Claude Code experience you use every day.
+
+**Where the harness sits:** The intersection of subscription-based Claude Code + intelligent routing to Gemini + shared memory + invisible middleware + rate limit awareness. Each individual piece exists somewhere in these 5 categories. The specific combination — invisible, inside Claude Code, with all pieces working together — does not.
+
+**Where does Cursor fit?** This is an open question for the next session to answer. Cursor lets you choose models (GPT-4, Claude, etc.) from a dropdown. Is it a model switcher? An API gateway? Something else? Understanding Cursor's architecture illuminates what "model selection" means in practice.
 
 ## Start
 
