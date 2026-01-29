@@ -1,5 +1,18 @@
 # Claude Agent Harness: Comprehensive Handoff Document
 
+> **⚠️ ARCHIVED — January 29, 2026**
+>
+> **This document has been superseded by SESSION_3_SYNTHESIS.md**
+>
+> This was the original handoff document from a claude.ai conversation. It has been archived because:
+> - The dual-Claude architecture (Part 3) was abandoned after the device keychain bug discovery
+> - The hybrid Claude+Gemini architecture is now documented in ARCHITECTURE.md
+> - Key insights from Parts 1 and 5 have been extracted into SESSION_3_SYNTHESIS.md
+>
+> **For current project state, start with:** `/docs/SESSION_3_SYNTHESIS.md`
+
+---
+
 > **STATUS: PARTIALLY SUPERSEDED (Updated Jan 27, 2026 — End of Session 1)**
 >
 > This was the original handoff document from a claude.ai conversation. Key changes since:

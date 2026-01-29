@@ -40,12 +40,16 @@ A hybrid Claude + Gemini orchestration layer. The user hits 85% of their weekly 
 - MVP scope
 - Whether we're investigating or already designing
 
-## Document Reading Order
+## Document Reading Order (Updated Jan 29, 2026)
 
-1. **docs/SESSION_BRIDGE.md** — Primary orientation. Confidence registry, narrative, open questions, conduct guide.
-2. **docs/ARCHITECTURE.md** — Technical decisions. MCP design, compensation list, gap analysis, competitive landscape reality check. Living draft, not settled.
-3. **docs/RESEARCH.md** — Evidence base. 90+ sources. Competitive landscape deep-dive (30+ tools). Use as reference.
-4. **docs/HANDOFF.md** — Original vision. Part 3 (architecture) is superseded. Parts 1 and 5 still valid.
+1. **docs/SESSION_3_SYNTHESIS.md** — **START HERE.** Current state after 5-agent deep research. All locked decisions, open questions, and build order.
+2. **docs/ARCHITECTURE.md** — Technical decisions and 21-item compensation list. Living draft.
+3. **docs/SESSION_BRIDGE.md** — Meta-layer with confidence registry and session logs.
+4. **docs/RESEARCH.md** — Evidence base (90+ sources). Use as reference when you need to verify or challenge findings.
+
+**Archived (do not start here):**
+- `docs/archive/HANDOFF.md` — Historical. Dual-Claude architecture superseded.
+- `docs/archive/SESSION_2_SYNTHESIS.md` — Merged into SESSION_3_SYNTHESIS.md.
 
 ## How to Start a New Session
 

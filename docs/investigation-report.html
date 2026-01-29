@@ -1191,6 +1191,537 @@
     </p>
   </div>
 
+  <hr class="divider">
+
+  <!-- 5-LAYER ORCHESTRATION MODEL -->
+  <div class="category">
+    <div class="category-name">The 5-Layer Orchestration Model</div>
+    <div class="category-desc">Where the harness sits in the stack — and why that matters</div>
+  </div>
+
+  <div class="tool" style="border-color: var(--purple); margin-bottom: 2rem;">
+    <div class="tool-title">
+      <span class="tool-name">The Layering Insight</span>
+    </div>
+    <p class="tool-desc">
+      Research clarified WHERE the harness fits. It's not competing with PAL MCP or CCProxy — it sits <strong>above</strong> them at the Control Plane layer. The stack has 5 distinct layers, each with different market density.
+    </p>
+
+    <div class="scenario" style="font-size: 0.75rem; line-height: 1.5;">┌─────────────────────────────────────────────────────────────────┐
+│ CONTROL PLANE (Who/Why/When)              ← THE HARNESS LIVES HERE
+│ ├─ Semantic task-type routing             ← NOBODY does this yet
+│ ├─ Cost optimization logic                ← NOBODY does this yet
+│ ├─ Cross-model critique orchestration     ← NOBODY does this yet
+│ ├─ Proactive rate limit prediction        ← NOBODY does this yet
+│ └─ Unified approval policies              ← NOBODY does this yet
+├─────────────────────────────────────────────────────────────────┤
+│ ROUTING/DISPATCH PLANE                    ← CROWDED (PAL MCP, CCProxy)
+│ ├─ Provider selection (which API)
+│ ├─ Context serialization for hand-off
+│ └─ Concurrent invocation / spawning
+├─────────────────────────────────────────────────────────────────┤
+│ PERSISTENCE PLANE                         ← SPARSE
+│ ├─ Conductor (.md files) — single-provider only
+│ └─ Cross-session memory — EMPTY
+├─────────────────────────────────────────────────────────────────┤
+│ OBSERVATION PLANE                         ← PARTIAL
+│ ├─ CodexBar (rate limits)
+│ └─ Routing analytics — EMPTY
+├─────────────────────────────────────────────────────────────────┤
+│ CLI/EXECUTION LAYER
+│ ├─ Claude Code + PAL MCP
+│ ├─ Gemini CLI + Conductor
+│ └─ CCProxy interception
+└─────────────────────────────────────────────────────────────────┘</div>
+
+    <div class="section-label why">Key Insight: Conductor vs Harness</div>
+    <div class="section-content why">
+      <p style="margin-bottom: 0.75rem;"><strong>Gemini Conductor</strong> sits at the Persistence + Planning layer for a <strong>single provider</strong>:</p>
+      <ul>
+        <li>Context-as-code (specs, plans in markdown)</li>
+        <li>Workflow structure (Spec → Plan → Implement)</li>
+        <li>Brownfield project support</li>
+      </ul>
+      <p style="margin-top: 0.75rem;"><strong>The Harness</strong> sits at the <strong>Control Plane — above Conductor</strong>:</p>
+      <ul>
+        <li>Decides Claude vs Gemini for each task</li>
+        <li>Manages persistent memory across BOTH providers</li>
+        <li>Orchestrates cross-model critique</li>
+        <li>Predicts rate limit exhaustion</li>
+      </ul>
+      <p style="margin-top: 0.75rem; color: var(--yellow);"><strong>They don't conflict. They stack.</strong> Conductor could be a component the harness uses when delegating to Gemini.</p>
+    </div>
+  </div>
+
+  <!-- LAYER 1: CONTROL PLANE -->
+  <div class="tool">
+    <div class="tool-title">
+      <span class="tool-name">Layer 1: Control Plane</span>
+      <span class="tool-badge" style="background: rgba(248,81,73,0.15); color: var(--red);">EMPTY</span>
+    </div>
+    <p class="tool-desc">
+      The harness brain. Makes strategic routing decisions <strong>before</strong> execution begins. Checks rate limits, analyzes task type, consults memory. Decides: Claude handles this? Delegate to Gemini? Trigger critique?
+    </p>
+
+    <div class="section-label journey">In The Journey (9:00 AM)</div>
+    <div class="section-content journey">
+      <div class="journey-scenario">
+        <p><span class="action">Jane asks: "Add GitHub OAuth to our Express API. Our auth uses username/password with PostgreSQL. Don't break existing auth."</span></p>
+        <p style="margin-top: 0.75rem;"><strong>Control Plane thinks:</strong></p>
+        <p><span class="time">Rate check:</span> <span class="action">Claude 68%, Gemini 12%</span></p>
+        <p><span class="time">Task type:</span> <span class="action">FEATURE_WITH_SECURITY, complexity 0.78</span></p>
+        <p><span class="time">Token estimate:</span> <span class="action">70K (fits Claude's window)</span></p>
+        <p style="margin-top: 0.5rem;"><span class="time">Decision:</span> <span class="action">CLAUDE_PRIMARY + GEMINI_CRITIQUE</span></p>
+        <p><span class="time">Confidence:</span> <span class="action">92%</span></p>
+        <p><span class="time">Logged:</span> <span class="action">route-001, reasoning captured</span></p>
+      </div>
+    </div>
+
+    <div class="section-label gap">Contrast: Today vs With Harness</div>
+    <div class="section-content gap">
+      <div class="journey-contrast">
+        <div class="journey-contrast-item current">
+          <div class="label">Today</div>
+          <ul style="margin: 0; padding-left: 1rem; color: var(--text-dim); font-size: 0.85rem;">
+            <li>Manual: "Do I have quota left?"</li>
+            <li>Guess: "Maybe use Gemini for research?"</li>
+            <li>No record of why you chose</li>
+          </ul>
+        </div>
+        <div class="journey-contrast-item hypothetical">
+          <div class="label">With Harness</div>
+          <ul style="margin: 0; padding-left: 1rem; color: var(--text-dim); font-size: 0.85rem;">
+            <li>Ambient: Menu bar shows 68%</li>
+            <li>FSM: "Task C ideal for Gemini (0.92 confidence)"</li>
+            <li>Logged: route-001, reasoning captured</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label" style="color: var(--yellow);">Why This Matters</div>
+    <div class="section-content" style="border-color: rgba(210,153,34,0.4);">
+      <p><strong>Control Plane is where the 40% gap lives.</strong> Nobody does semantic routing, proactive rate prediction, or automated critique orchestration. This layer is <strong>EMPTY</strong> in the market. The routing/dispatch tools (CCProxy, PAL MCP) execute decisions — they don't make them.</p>
+    </div>
+  </div>
+
+  <!-- LAYER 2: ROUTING/DISPATCH -->
+  <div class="tool">
+    <div class="tool-title">
+      <span class="tool-name">Layer 2: Routing/Dispatch</span>
+      <span class="tool-badge high">CROWDED</span>
+    </div>
+    <p class="tool-desc">
+      The hands. Executes the Control Plane's decision. Spawns Gemini subprocess via MCP tool, serializes context for hand-off, captures streaming output. This is what PAL MCP and CCProxy do.
+    </p>
+
+    <div class="section-label journey">In The Journey (9:28 AM)</div>
+    <div class="section-content journey">
+      <div class="journey-scenario">
+        <p><span class="action">Control Plane decided: "Delegate testing to Gemini"</span></p>
+        <p style="margin-top: 0.75rem;"><strong>Routing executes:</strong></p>
+        <p><span class="time">MCP Tool:</span> <span class="action">delegate_to_gemini</span></p>
+        <p style="padding-left: 1rem; color: var(--text-muted);">task: "Write tests for OAuth flow"</p>
+        <p style="padding-left: 1rem; color: var(--text-muted);">context: [file list, requirements, style guide]</p>
+        <p style="margin-top: 0.5rem;"><span class="time">Spawns:</span> <span class="action"><code>gemini -p "..." --output-format stream-json</code></span></p>
+        <p><span class="time">Captures:</span> <span class="action">Streaming JSON events</span></p>
+        <p><span class="time">Returns:</span> <span class="action">tests/oauth.test.js to Claude</span></p>
+      </div>
+    </div>
+
+    <div class="section-label gap">Contrast: Today vs With Harness</div>
+    <div class="section-content gap">
+      <div class="journey-contrast">
+        <div class="journey-contrast-item current">
+          <div class="label">Today</div>
+          <ul style="margin: 0; padding-left: 1rem; color: var(--text-dim); font-size: 0.85rem;">
+            <li>Manual: Open second terminal, run <code>gemini -p</code></li>
+            <li>Manual: Copy Gemini output, paste to Claude</li>
+            <li>User is the coordinator</li>
+          </ul>
+        </div>
+        <div class="journey-contrast-item hypothetical">
+          <div class="label">With Harness</div>
+          <ul style="margin: 0; padding-left: 1rem; color: var(--text-dim); font-size: 0.85rem;">
+            <li>Automatic: MCP tool handles subprocess</li>
+            <li>Automatic: Context flows back via MCP</li>
+            <li>Harness is the coordinator</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label" style="color: var(--yellow);">Why This Matters</div>
+    <div class="section-content" style="border-color: rgba(210,153,34,0.4);">
+      <p>This layer is <strong>CROWDED</strong> (PAL MCP, CCProxy). The routing/dispatch problem is mostly solved. <strong>The gap is in the layer ABOVE</strong> — deciding WHAT to route, not HOW to route it.</p>
+    </div>
+  </div>
+
+  <!-- LAYER 3: EXECUTION -->
+  <div class="tool">
+    <div class="tool-title">
+      <span class="tool-name">Layer 3: Execution</span>
+      <span class="tool-badge" style="background: rgba(88,166,255,0.15); color: var(--blue);">SOLID</span>
+    </div>
+    <p class="tool-desc">
+      Actually runs the task — reads files, writes code, runs commands. Claude uses native tools (Read, Edit, Bash). Gemini runs as headless subprocess, returns structured output.
+    </p>
+
+    <div class="section-label journey">In The Journey (9:05 - 9:30 AM)</div>
+    <div class="section-content journey">
+      <div class="journey-scenario">
+        <p><strong>Claude Execution:</strong></p>
+        <p><span class="time">9:05</span> <span class="action">— Reads auth.js, User.js, authRoutes.js (8K tokens)</span></p>
+        <p><span class="time">9:10</span> <span class="action">— Creates OAUTH_DESIGN.md</span></p>
+        <p><span class="time">9:15</span> <span class="action">— Writes src/oauth/github.js (280 lines)</span></p>
+        <p><span class="time">9:25</span> <span class="action">— Writes src/routes/oauthRoutes.js (120 lines)</span></p>
+        <p><span class="time">9:28</span> <span class="action">— Context window 77% → Warning triggered</span></p>
+        <p style="margin-top: 0.75rem;"><strong>Gemini Execution (delegated):</strong></p>
+        <p><span class="time">9:30</span> <span class="action">— Receives test requirements from Claude</span></p>
+        <p><span class="time">9:32</span> <span class="action">— Generates tests/oauth.test.js (12K Gemini tokens)</span></p>
+        <p><span class="time">9:32</span> <span class="action">— Returns via stream-json to Claude</span></p>
+      </div>
+    </div>
+
+    <div class="section-label gap">Contrast: Today vs With Harness</div>
+    <div class="section-content gap">
+      <div class="journey-contrast">
+        <div class="journey-contrast-item current">
+          <div class="label">Today</div>
+          <ul style="margin: 0; padding-left: 1rem; color: var(--text-dim); font-size: 0.85rem;">
+            <li>Claude alone until it runs out</li>
+            <li>Hit 429 → stop and wait</li>
+            <li>Context window fills → stuck</li>
+          </ul>
+        </div>
+        <div class="journey-contrast-item hypothetical">
+          <div class="label">With Harness</div>
+          <ul style="margin: 0; padding-left: 1rem; color: var(--text-dim); font-size: 0.85rem;">
+            <li>Claude + Gemini seamlessly</li>
+            <li>Approach limit → auto-delegate</li>
+            <li>Context fills → Gemini continues</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label" style="color: var(--yellow);">Why This Matters</div>
+    <div class="section-content" style="border-color: rgba(210,153,34,0.4);">
+      <p><strong>Conductor sits HERE</strong> — it makes Gemini smarter about existing codebases via spec/plan workflow. The harness sits ABOVE, deciding <strong>when to USE Conductor</strong> vs other execution patterns.</p>
+    </div>
+  </div>
+
+  <!-- LAYER 4: PERSISTENCE -->
+  <div class="tool">
+    <div class="tool-title">
+      <span class="tool-name">Layer 4: Persistence (Memory)</span>
+      <span class="tool-badge" style="background: rgba(248,81,73,0.15); color: var(--red);">SPARSE</span>
+    </div>
+    <p class="tool-desc">
+      Stores what happened so future sessions know. Session memory tracks routing decisions and token usage. Cross-session memory captures key learnings, security notes, architectural decisions.
+    </p>
+
+    <div class="section-label journey">In The Journey (After Completion)</div>
+    <div class="section-content journey">
+      <div class="journey-scenario">
+        <p><strong>Session Memory saved:</strong></p>
+        <p style="padding-left: 1rem; color: var(--text-dim);">• Routing: 2 decisions (primary + delegation)</p>
+        <p style="padding-left: 1rem; color: var(--text-dim);">• Tokens: Claude 72K, Gemini 12K</p>
+        <p style="padding-left: 1rem; color: var(--text-dim);">• Files: 3 created</p>
+        <p style="padding-left: 1rem; color: var(--text-dim);">• Issues: 1 HIGH fixed, 2 MEDIUM deferred</p>
+        <p style="margin-top: 0.75rem;"><strong>Cross-Session Memory updated:</strong></p>
+        <p style="padding-left: 1rem; color: var(--text-dim);">• PKCE flow implemented in this codebase</p>
+        <p style="padding-left: 1rem; color: var(--text-dim);">• Rate limiting critical for OAuth callbacks (S001)</p>
+        <p style="padding-left: 1rem; color: var(--text-dim);">• GitHub API needs 10s timeout (S003)</p>
+      </div>
+    </div>
+
+    <div class="section-label gap">Contrast: Today vs With Harness</div>
+    <div class="section-content gap">
+      <div class="journey-contrast">
+        <div class="journey-contrast-item current">
+          <div class="label">Today</div>
+          <ul style="margin: 0; padding-left: 1rem; color: var(--text-dim); font-size: 0.85rem;">
+            <li>User remembers (or forgets)</li>
+            <li>Tell Claude same thing twice</li>
+            <li>Gemini doesn't know Claude's decisions</li>
+          </ul>
+        </div>
+        <div class="journey-contrast-item hypothetical">
+          <div class="label">With Harness</div>
+          <ul style="margin: 0; padding-left: 1rem; color: var(--text-dim); font-size: 0.85rem;">
+            <li>System remembers for you</li>
+            <li>Claude reads from shared memory</li>
+            <li>Both providers read/write same store</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label" style="color: var(--yellow);">Why This Matters</div>
+    <div class="section-content" style="border-color: rgba(210,153,34,0.4);">
+      <p>This layer is <strong>SPARSE</strong>. Conductor stores specs/plans in files (single provider). Nobody has <strong>cross-provider semantic memory</strong>. This is part of the 40% gap — work discovered by Gemini should be available to Claude tomorrow without copy-paste.</p>
+    </div>
+  </div>
+
+  <!-- LAYER 5: OBSERVATION -->
+  <div class="tool">
+    <div class="tool-title">
+      <span class="tool-name">Layer 5: Observation (Dashboard)</span>
+      <span class="tool-badge medium">PARTIAL</span>
+    </div>
+    <p class="tool-desc">
+      Shows what happened and why. Rate limit gauges, cost tracking, routing analytics, activity timeline, critique history. CodexBar does part of this — nobody does routing analytics.
+    </p>
+
+    <div class="section-label journey">In The Journey (Always Visible)</div>
+    <div class="section-content journey">
+      <div class="scenario" style="font-size: 0.75rem; line-height: 1.4;">Menu Bar Widget:
+  Claude: 76% │ Gemini: 22% │ Cost: $0.035
+
+Dashboard (localhost:3200):
+┌─ Activity ─────────────────────┐
+│ 9:00  Session start            │
+│ 9:03  Task → Claude (code)     │
+│ 9:28  Task → Gemini (tests)    │
+│ 9:33  Critique requested       │
+│ 9:36  APPROVED                 │
+└────────────────────────────────┘
+
+┌─ Routing Analytics ────────────┐
+│ Why Claude primary?            │
+│ • Task type: code (95% match)  │
+│ • Context: 70K (fits window)   │
+│ • Rate limit: 68% (safe)       │
+│ Confidence: 92%                │
+└────────────────────────────────┘</div>
+    </div>
+
+    <div class="section-label gap">Contrast: Today vs With Harness</div>
+    <div class="section-content gap">
+      <div class="journey-contrast">
+        <div class="journey-contrast-item current">
+          <div class="label">Today</div>
+          <ul style="margin: 0; padding-left: 1rem; color: var(--text-dim); font-size: 0.85rem;">
+            <li>Check CodexBar for rate limits</li>
+            <li>No idea why decisions happened</li>
+            <li>Cost scattered across providers</li>
+          </ul>
+        </div>
+        <div class="journey-contrast-item hypothetical">
+          <div class="label">With Harness</div>
+          <ul style="margin: 0; padding-left: 1rem; color: var(--text-dim); font-size: 0.85rem;">
+            <li>Rate limits + routing + cost in one view</li>
+            <li>Full routing rationale logged</li>
+            <li>Unified cost + "would have cost"</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label" style="color: var(--yellow);">Why This Matters</div>
+    <div class="section-content" style="border-color: rgba(210,153,34,0.4);">
+      <p>CodexBar shows rate limits. Nobody shows <strong>routing analytics</strong> or "this cost $0.45 on Claude, would have cost $0.12 on Gemini." Understanding WHY decisions were made is part of the 40% gap.</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- CROSS-MODEL CRITIQUE -->
+  <div class="category">
+    <div class="category-name">Cross-Model Critique: Team of Rivals</div>
+    <div class="category-desc">The pattern that turns 60% accuracy into 90%</div>
+  </div>
+
+  <div class="tool">
+    <div class="tool-title">
+      <span class="tool-name">Critique Orchestration</span>
+      <span class="tool-badge" style="background: rgba(248,81,73,0.15); color: var(--red);">NOBODY DOES THIS</span>
+    </div>
+    <p class="tool-desc">
+      arxiv 2601.14351 demonstrates that cross-model critique (having a different model review work) improves accuracy from 60% to 90% on critical tasks. The harness would automate this — security tasks trigger Gemini review, architecture decisions trigger second-opinion.
+    </p>
+
+    <div class="section-label journey">In The Journey (9:33 AM - Security Review)</div>
+    <div class="section-content journey">
+      <div class="journey-scenario">
+        <p><span class="action">Claude finished implementing OAuth. Control Plane triggers critique based on task type.</span></p>
+        <p style="margin-top: 0.75rem;"><span class="time">MCP Tool:</span> <span class="action">delegate_to_gemini_for_critique</span></p>
+        <p style="padding-left: 1rem; color: var(--text-muted);">mode: SECURITY_REVIEW</p>
+        <p style="padding-left: 1rem; color: var(--text-muted);">files: [github.js, oauthRoutes.js]</p>
+        <p style="margin-top: 0.75rem;"><strong>Gemini finds 4 issues:</strong></p>
+        <p style="padding-left: 1rem;"><span style="color: var(--red);">S001 (HIGH):</span> <span class="action">Missing rate limiting on callback endpoint</span></p>
+        <p style="padding-left: 1rem;"><span style="color: var(--yellow);">S002 (MEDIUM):</span> <span class="action">Session storage not durable</span></p>
+        <p style="padding-left: 1rem;"><span style="color: var(--yellow);">S003 (MEDIUM):</span> <span class="action">No timeout on GitHub API calls</span></p>
+        <p style="padding-left: 1rem;"><span style="color: var(--text-muted);">S004 (LOW):</span> <span class="action">Missing error logging</span></p>
+        <p style="margin-top: 0.75rem;"><span class="time">9:35 AM</span> <span class="action">— Claude fixes S001 + S003 (HIGH + easy MEDIUM)</span></p>
+        <p><span class="time">9:36 AM</span> <span class="action">— Gemini re-reviews: <span style="color: var(--green);">APPROVED</span></span></p>
+      </div>
+    </div>
+
+    <div class="section-label gap">Contrast: Today vs With Harness</div>
+    <div class="section-content gap">
+      <div class="journey-contrast">
+        <div class="journey-contrast-item current">
+          <div class="label">Today</div>
+          <ul style="margin: 0; padding-left: 1rem; color: var(--text-dim); font-size: 0.85rem;">
+            <li>Manual: "Can you review for security?"</li>
+            <li>Self-review: Same model misses same bugs</li>
+            <li>60% accuracy on critical issues</li>
+          </ul>
+        </div>
+        <div class="journey-contrast-item hypothetical">
+          <div class="label">With Harness</div>
+          <ul style="margin: 0; padding-left: 1rem; color: var(--text-dim); font-size: 0.85rem;">
+            <li>Automatic: Security tasks trigger cross-review</li>
+            <li>Different model = different blind spots</li>
+            <li>90% accuracy (arxiv 2601.14351)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label" style="color: var(--yellow);">Why This Matters</div>
+    <div class="section-content" style="border-color: rgba(210,153,34,0.4);">
+      <p><strong>Nobody automates cross-model critique.</strong> You can do it manually (ask Gemini to review Claude's work), but the harness would: (1) detect security-sensitive tasks, (2) automatically trigger critique, (3) feed findings back for fixes, (4) re-validate. The 60%→90% accuracy gain is real but currently requires manual coordination.</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- FAILURE SCENARIOS -->
+  <div class="category">
+    <div class="category-name">Failure Scenarios</div>
+    <div class="category-desc">What breaks and how recovery works</div>
+  </div>
+
+  <div class="tool">
+    <div class="tool-title">
+      <span class="tool-name">Failure Mode Playbook</span>
+    </div>
+    <p class="tool-desc">
+      The harness must handle failures gracefully. These are the scenarios the journey accounts for.
+    </p>
+
+    <div style="margin: 1rem 0;">
+      <div class="capability-row">
+        <span class="capability-name">Context window full</span>
+        <span class="capability-exists" style="color: var(--yellow); min-width: 120px;">93% utilization</span>
+        <span class="capability-who">Auto-delegate mid-phase to Gemini</span>
+      </div>
+
+      <div class="capability-row">
+        <span class="capability-name">Gemini subprocess timeout</span>
+        <span class="capability-exists" style="color: var(--yellow); min-width: 120px;">MCP 60s limit</span>
+        <span class="capability-who">Kill + retry with smaller context</span>
+      </div>
+
+      <div class="capability-row">
+        <span class="capability-name">Security critique rejects</span>
+        <span class="capability-exists" style="color: var(--red); min-width: 120px;">CRITICAL issue</span>
+        <span class="capability-who">Escalate to user, get design decision</span>
+      </div>
+
+      <div class="capability-row">
+        <span class="capability-name">Both providers exhausted</span>
+        <span class="capability-exists" style="color: var(--red); min-width: 120px;">95% + 100%</span>
+        <span class="capability-who">Checkpoint work, notify, pause</span>
+      </div>
+
+      <div class="capability-row">
+        <span class="capability-name">Memory stale/conflicting</span>
+        <span class="capability-exists" style="color: var(--yellow); min-width: 120px;">Old data</span>
+        <span class="capability-who">Flag to user, ask for refresh</span>
+      </div>
+
+      <div class="capability-row">
+        <span class="capability-name">Routing confidence low</span>
+        <span class="capability-exists" style="color: var(--text-muted); min-width: 120px;">&lt;70%</span>
+        <span class="capability-who">Ask user which provider to use</span>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 40% GAP SUMMARY -->
+  <div class="summary-section">
+    <div class="summary-title">The 40% Gap: Final Synthesis</div>
+
+    <p style="color: var(--text-dim); margin-bottom: 1.5rem;">
+      Existing tools get 55-60%. The remaining 40% is genuine and multiplicative — each gap compounds the others.
+    </p>
+
+    <div class="capability-row" style="background: var(--bg-card); padding: 0.75rem; border-radius: 6px;">
+      <span class="capability-name"><strong>Gap</strong></span>
+      <span class="capability-exists" style="color: var(--text); font-weight: 600; min-width: 140px;">Today</span>
+      <span class="capability-who"><strong>What Harness Adds</strong></span>
+    </div>
+
+    <div class="capability-row">
+      <span class="capability-name">Semantic Routing</span>
+      <span class="capability-exists" style="color: var(--text-muted); min-width: 140px;">Rule-based (tokens)</span>
+      <span class="capability-who">Task-type classification (code/research/architecture)</span>
+    </div>
+
+    <div class="capability-row">
+      <span class="capability-name">Cross-Provider Memory</span>
+      <span class="capability-exists" style="color: var(--text-muted); min-width: 140px;">None (user is memory)</span>
+      <span class="capability-who">Shared AGENTS.md + optional Mem0</span>
+    </div>
+
+    <div class="capability-row">
+      <span class="capability-name">Rate Prediction</span>
+      <span class="capability-exists" style="color: var(--text-muted); min-width: 140px;">Reactive (429 → notice)</span>
+      <span class="capability-who">Proactive (approaching → auto-route)</span>
+    </div>
+
+    <div class="capability-row">
+      <span class="capability-name">Critique Orchestration</span>
+      <span class="capability-exists" style="color: var(--text-muted); min-width: 140px;">Manual (ask both)</span>
+      <span class="capability-who">Automated (security → auto-trigger)</span>
+    </div>
+
+    <div class="capability-row">
+      <span class="capability-name">Integration</span>
+      <span class="capability-exists" style="color: var(--text-muted); min-width: 140px;">4 separate tools</span>
+      <span class="capability-who">One invisible system</span>
+    </div>
+  </div>
+
+  <div class="assessment">
+    <div class="assessment-title">The Honest Question</div>
+    <p style="color: var(--text-dim); margin-bottom: 1rem;">
+      Is the 40% gap worth months of building? The answer depends on how often you hit the friction:
+    </p>
+
+    <div class="assessment-item" data-num="→">
+      <strong>If rate limits rarely interrupt mid-task:</strong> The baseline (PAL MCP + CCProxy + CodexBar) is probably enough.
+    </div>
+
+    <div class="assessment-item" data-num="→">
+      <strong>If you lose context 2-3x/week to 429s:</strong> The harness pays for itself in recovered time.
+    </div>
+
+    <div class="assessment-item" data-num="→">
+      <strong>If security bugs slip through:</strong> Cross-model critique (60%→90%) is the highest-ROI feature.
+    </div>
+
+    <div class="assessment-item" data-num="→">
+      <strong>If you re-explain context constantly:</strong> Persistent memory is the highest-ROI feature.
+    </div>
+
+    <p style="color: var(--yellow); margin-top: 1.5rem; font-weight: 500;">
+      Two paths forward:
+    </p>
+    <p style="color: var(--text-dim); margin-top: 0.5rem;">
+      <strong>Path A:</strong> Validate with zero-code baseline first. Install existing tools, use for 1 week of real work. Does the 40% gap matter in practice?
+    </p>
+    <p style="color: var(--text-dim); margin-top: 0.5rem;">
+      <strong>Path B:</strong> Design the Control Plane layer. What does semantic routing actually look like? What triggers cross-model critique? How does memory unify across providers?
+    </p>
+  </div>
+
 </div>
 
 </body>

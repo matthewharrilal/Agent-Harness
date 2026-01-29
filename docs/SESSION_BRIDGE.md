@@ -1,9 +1,9 @@
 # SESSION BRIDGE — Hybrid Claude+Gemini Agent Harness
 > **Project Phase:** Deep Investigation (NOT implementation. NOT planning. Investigating.)
-> **Last Updated:** January 27, 2026 (end of Session 1)
+> **Last Updated:** January 29, 2026 (end of Session 3)
 > **Documents:** 4 total — HANDOFF.md, RESEARCH.md, ARCHITECTURE.md, this file
-> **Reading Order:** This file → ARCHITECTURE.md → RESEARCH.md (as reference) → HANDOFF.md (original vision, partially superseded)
-> **Session Count:** 1 completed (ran across 2 context compacts, ~19 research agents deployed)
+> **Reading Order:** SESSION_3_SYNTHESIS.md (start here) → This file → ARCHITECTURE.md → RESEARCH.md (as reference)
+> **Session Count:** 3 completed (Sessions 1-2: ~19 research agents, Session 3: 5 parallel deep-dive agents)
 
 ---
 
@@ -221,6 +221,28 @@ Each significant direction has a confidence level. Use this to know what to trus
 **Rate limit exhaustion: notify and stop**
 - Why high: User confirmed. Matches native behavior. No automatic spend.
 - What would change it: User changes preference.
+
+### Level 4 — High Confidence (Added Session 3)
+
+**Semantic routing approach (RouteLLM or Aurelio)**
+- Why high: Research confirmed pre-trained routers achieve 90-95% accuracy without custom training. RouteLLM generalizes to new model pairs. Aurelio provides control via user-defined routes.
+- What would change it: Testing reveals these don't work for Claude+Gemini routing in practice.
+- See: SESSION_3_SYNTHESIS.md § "Decision 4: Semantic Routing Without Training"
+
+**Communication pattern (Hub-and-spoke + shared state)**
+- Why high: Framework comparison (LangGraph, CrewAI, ADK, Swarm) ALL use this pattern. AgentMail was a red herring. The "sinew" question is answered.
+- What would change it: Discovery that shared state creates race conditions or data corruption.
+- See: SESSION_3_SYNTHESIS.md § "Decision 3: Inter-Agent Communication"
+
+**Critique pattern (Veto, not consensus)**
+- Why high: arxiv 2601.14351 explicitly found veto > democratic consensus. Implementation is simpler. Token cost is lower.
+- What would change it: Evidence that consensus produces better outcomes for coding tasks specifically.
+- See: SESSION_3_SYNTHESIS.md § "Decision 5: Critique Pattern"
+
+**Visibility model (Silent CLI + dashboard)**
+- Why high: User explicitly clarified "baked in" means MCP server inside interactive Claude Code. Dashboard is for when you WANT visibility.
+- What would change it: User testing reveals they want MORE or LESS visibility than designed.
+- See: SESSION_3_SYNTHESIS.md § "Decision 6: Visibility Model"
 
 ### Level 3 — Working Hypothesis (Challenge These)
 
@@ -674,6 +696,63 @@ End-of-session research (3 deep agents, 30+ tools evaluated) revealed:
 - Full competitive analysis documented in RESEARCH.md
 
 **User's parting priority:** "Focus on the continuity document. Make sure everything is documented. My usage is about to run out."
+
+### Session 2 — January 29, 2026 (Early)
+
+**Context:** Continued investigation. Focused on "sinew" (connective tissue) and Conductor research.
+
+**What happened:**
+- Clarified Conductor's role (single-provider harness, stacks with our harness)
+- Researched "sinew" / connective tissue → answer is Blackboard pattern (shared state, not messaging)
+- Deep-dived intelligent LLM routing (4 paradigms, unsolved problems)
+- Explored "genuine domain understanding" vs surface research
+- User clarified direction: MCP server for routing + memory, solves own friction, others adopt
+
+**Key insights:**
+- Conductor IS a harness for Gemini — ours sits above
+- AgentMail was a red herring (email for humans)
+- FSM routing without LLM is an open gap
+- Memory and routing are not separate — routing USES memory
+
+**User's success criteria:**
+1. Solves MY friction elegantly
+2. Others adopt it
+
+### Session 3 — January 29, 2026 (Full)
+
+**Context:** Deep research session with 5 parallel agents.
+
+**What happened:**
+- Launched 5 parallel research agents investigating:
+  1. Task decomposition patterns
+  2. Inter-agent communication (sinew)
+  3. LLM routing without training
+  4. Adversarial/council patterns (critique)
+  5. Hidden assumptions and tunnel vision
+- Deep-dived each dimension with web search and codebase analysis
+- Surfaced 10 hidden assumptions challenging the approach
+- Clarified user friction: all 4 problems compound each other
+- Resolved visibility contradiction: silent CLI + optional dashboard
+
+**Key decisions locked:**
+- Routing: RouteLLM or Aurelio (no training, 90-95% accuracy)
+- Communication: Hub-and-spoke + shared state (Blackboard pattern)
+- Critique: Veto pattern, user-triggered first, not consensus
+- Visibility: Silent CLI + dashboard when wanted
+
+**What moved forward:**
+- Memory system selection needs comparison (Mem0 vs files vs sqlite-vec)
+- MCP vs Bash+files needs prototype
+- Zero-code baseline test still not done
+
+**Documentation reorganization:**
+- Created SESSION_3_SYNTHESIS.md as new primary entry point
+- Archived HANDOFF.md and SESSION_2_SYNTHESIS.md to docs/archive/
+- Updated confidence registry with Session 3 findings
+
+**Next session should:**
+- Consider zero-code baseline test first
+- OR proceed to Phase 1: semantic router integration
 
 ---
 
