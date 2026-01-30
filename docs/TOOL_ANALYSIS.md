@@ -1118,148 +1118,161 @@ With the harness:
 
 ---
 
-## The ~40% Gap Summary
+## How These Tools Map to the 5-Layer Architecture
 
-### What EXISTS in current tools:
-- Token-count routing (CCProxy)
-- Auto-failover on 429 (claude-code-mux)
-- Manual delegation (PAL MCP)
-- Real-time messaging (hcom)
-- Parallel instances (Conductor)
-- Quota visibility (CLIProxyAPI)
+> **Full architecture diagrams:** See [`docs/ARCHITECTURE_VISION.md`](ARCHITECTURE_VISION.md) for the complete 5-layer breakdown and [`docs/START_HERE.md`](START_HERE.md) for investigation status.
 
-### What NOBODY provides:
-1. **Semantic task routing** — Understanding "this is research" vs "this is coding"
-2. **Persistent cross-session memory** — Yesterday's findings available today
-3. **Proactive rate prediction** — Act at 80%, not react to 429
-4. **Automatic mid-task context handoff** — Preserve reasoning state during failover
-5. **Cross-model critique orchestration** — Claude generates, Gemini reviews, loop back
+### Where Each Tool Lives (and Where the Gaps Are)
 
----
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  THE 8 TOOLS vs THE 5 LAYERS                                    │
+│                                                                  │
+│  LAYER 1: SEMANTIC ROUTER                                        │
+│  ┌────────────────────────────────────────────────────────────┐  │
+│  │  CCProxy: token count only (no intent understanding)       │  │
+│  │  Portkey: metadata only (YOU classify, it routes)          │  │
+│  │  OpenRouter: Auto Router (needs 15+ training examples)     │  │
+│  │                                                            │  │
+│  │  GAP: Nobody classifies task INTENT without LLM overhead   │  │
+│  └────────────────────────────────────────────────────────────┘  │
+│                                                                  │
+│  LAYER 2: DECISION ENGINE                                        │
+│  ┌────────────────────────────────────────────────────────────┐  │
+│  │  claude-code-mux: priority-based failover (reactive)       │  │
+│  │  CCProxy: rule-based routing (4 static rules)              │  │
+│  │  CLIProxyAPI: round-robin rotation (no intelligence)       │  │
+│  │                                                            │  │
+│  │  GAP: Nobody combines route + rate limits + memory +       │  │
+│  │       subtask context into a single decision               │  │
+│  └────────────────────────────────────────────────────────────┘  │
+│                                                                  │
+│  LAYER 3: CROSS-PROVIDER MEMORY                                  │
+│  ┌────────────────────────────────────────────────────────────┐  │
+│  │  PAL MCP: stateless (each clink call is fresh)             │  │
+│  │  claude-code-mux: stateless (messages preserved, not       │  │
+│  │                   reasoning state)                         │  │
+│  │  hcom: event log only (not synthesized context)            │  │
+│  │  Conductor: fully isolated agents (no shared memory)       │  │
+│  │                                                            │  │
+│  │  GAP: Nobody persists cross-provider, cross-session        │  │
+│  │       memory that informs routing                          │  │
+│  └────────────────────────────────────────────────────────────┘  │
+│                                                                  │
+│  LAYER 4: VISUAL INTERFACE                                       │
+│  ┌────────────────────────────────────────────────────────────┐  │
+│  │  CLIProxyAPI/CodexBar: quota visibility (display only)     │  │
+│  │  Conductor Build: agent dashboard (Claude-only, creates    │  │
+│  │                   not discovers)                           │  │
+│  │                                                            │  │
+│  │  GAP: Visibility without agency — shows data but doesn't   │  │
+│  │       act on it. No routing analytics or decision traces.  │  │
+│  └────────────────────────────────────────────────────────────┘  │
+│                                                                  │
+│  LAYER 5: CLI EXPERIENCE                                         │
+│  ┌────────────────────────────────────────────────────────────┐  │
+│  │  PAL MCP: MCP delegation via clink (manual triggering)     │  │
+│  │  hcom: hook-based event capture (observation only)         │  │
+│  │                                                            │  │
+│  │  GAP: No invisible integration that combines routing +     │  │
+│  │       memory + delegation + monitoring automatically       │  │
+│  └────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-## Terminology: Is "Harness" the Right Word?
+### The Integrated System These Tools Can't Build
 
-An **agent harness** is infrastructure that wraps an LLM and manages what the model can't do itself:
-- Execute tool calls
-- Manage memory
-- Structure workflows
-- Handle long-running tasks
+```
+ USER types: claude
+  │
+  ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ CLAUDE CODE (interactive, normal experience)          LAYER 5   │
+│ Reads CLAUDE.md → knows when to use harness tools               │
+│ Reads .mcp.json → spawns harness MCP server                     │
+│ Hooks fire on every event → captured by Layer 4                 │
+└────────────────────────┬────────────────────────────────────────┘
+                         │ user prompt arrives
+                         ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ SEMANTIC ROUTER                                       LAYER 1   │
+│ "refactor auth module" → { type: "code", conf: 0.91 }          │
+│                                                                  │
+│ CCProxy can't do this. Portkey can't do this. Nobody can.       │
+└────────────────────────┬────────────────────────────────────────┘
+                         │ classification
+                         ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ DECISION ENGINE                                       LAYER 2   │
+│                                                                  │
+│  route signal ──┐                                                │
+│  rate limits ───┤  ← CLIProxyAPI shows this but doesn't act     │
+│  memory ────────┼──► DECISION: Claude handles Task A + B         │
+│  subtask ctx ───┘              Gemini handles Task C             │
+│                                                                  │
+│  claude-code-mux only reacts to 429. This acts BEFORE 429.      │
+└──────────┬───────────────────────────────┬──────────────────────┘
+           │                               │
+           ▼                               ▼
+┌────────────────────┐          ┌────────────────────┐
+│ CLAUDE (local)     │          │ GEMINI (delegated)  │
+│ Task A: audit      │          │ Task C: 140K token  │
+│ Task B: refactor   │          │ codebase analysis   │
+│                    │          │                     │
+│ Uses native tools  │          │ PAL MCP's clink can │
+│ (Read, Edit, Bash) │          │ do this part only   │
+└────────┬───────────┘          └──────────┬──────────┘
+         │                                 │
+         │       writes findings           │
+         ▼                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ CROSS-PROVIDER MEMORY                                 LAYER 3   │
+│                                                                  │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │  Task A findings: "3 security issues in auth.ts"        │    │
+│  │  Task C findings: "47 call sites across 8 patterns"     │    │
+│  │  Session memory: "JWT decision: 3 formats"              │    │
+│  │  Routing history: "last time, Claude solved this in 1"  │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                  │
+│  No existing tool does this. Every tool is stateless.            │
+└─────────────────────────────────────────────────────────────────┘
+         │
+         │ events flow via hooks
+         ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ VISUAL INTERFACE                                      LAYER 4   │
+│                                                                  │
+│  Menu bar: ● Claude 42% │ Gemini 88% │ $0.50                    │
+│  CodexBar shows this ↑    but can't act on it                    │
+│                                                                  │
+│  Browser (optional):                                             │
+│  "Task C → Gemini. Reason: 140K tokens. Cost: $0.08 vs $0.32"  │
+│  Conductor shows agents ↑  but Claude-only, no routing traces   │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-**Your concept is a hybrid:**
-- Harness (memory, tool execution)
-- Orchestrator (routing decisions)
-- Proxy/Router (request interception)
+### The ~40% Gap (Visual)
 
-**Better terms might be:**
-- "Agent Orchestration Layer"
-- "Multi-Model Harness"
-- "Agentic Router"
+```
+EXISTING TOOLS COVER (~55-60%):
+  ✓ Manual delegation (PAL MCP clink tool)
+  ✓ Rule-based routing by token count/model (CCProxy)
+  ✓ Rate limit visibility (CodexBar menu bar widget)
+  ✓ Auto-failover on 429 (claude-code-mux)
+  ✓ Real-time inter-agent messaging (hcom)
+  ✓ Parallel Claude instances (Conductor Build)
+  ✓ Metadata-based conditional routing (Portkey)
+  ✓ Multi-model API access (OpenRouter)
 
----
+THE GENUINE GAP (~40%):
+  ✗ Semantic task-type routing (by what the task IS)
+  ✗ Persistent cross-provider memory (across sessions)
+  ✗ Proactive rate limit prediction (before 429)
+  ✗ Cross-model critique orchestration (veto pattern)
+  ✗ The integrated invisible experience (all above, together)
 
-## Key Clarifications (User Questions Answered)
-
-### "Why don't these tools do semantic routing?"
-
-**The short answer:** It requires an LLM call (expensive, adds latency) or a trained classifier (requires labeled data). Most tools prioritize simplicity and speed.
-
-**Technical requirement for semantic routing:**
-1. Parse the message content
-2. Either: Run an LLM call to classify (50-200ms, costs tokens)
-3. Or: Use embeddings + similarity search (requires pre-embedded examples)
-4. Or: Train a lightweight classifier (requires labeled training data)
-
-Most tools are designed as **transparent proxies** — they add minimal overhead. Semantic routing adds 50-200ms latency. That's a design tradeoff.
-
-### "Why doesn't claude-code-mux use Mem0 for context continuity?"
-
-claude-code-mux is a **stateless proxy** by design:
-- Each request is independent
-- No database, no storage, no persistence
-- Just forwards requests and catches errors
-
-Adding Mem0 would require:
-- Running a database/service
-- Extracting and storing reasoning state (hard problem)
-- Injecting that state into new provider's context
-- Significant architectural change from "proxy" to "orchestration layer"
-
-**Could they add it?** Yes. But it would change the tool's nature entirely.
-
-### "Is Cursor's pricing per-model?"
-
-**No.** Cursor Pro gives you 500 fast requests total, regardless of model. Opus 4.5 uses 1 request. GPT-4 uses 1 request. Same pool.
-
-### "What IS the clink tool?"
-
-`clink` = CLI Link. It's a tool in PAL MCP that spawns external CLI processes:
-- Claude calls `clink(cli_name="gemini", role="security-analyzer", prompt="...")`
-- PAL spawns: `gemini -p "your prompt" --output-format json --yolo`
-- Gemini runs, produces output
-- PAL returns result to Claude's conversation
-
-### "Who's messaging whom in hcom?"
-
-The **hook system** messages, not the agents directly. When Claude writes a file:
-1. Claude's `PostToolUse` hook fires automatically
-2. Hook script posts event to SQLite: "Claude wrote auth.ts"
-3. Gemini's hook polls SQLite, sees the event
-4. Gemini reacts (reads file, reviews, posts response)
-
-Agents don't explicitly "message" — the hooks capture events and broadcast them.
-
-### "Does Conductor create agents or discover them?"
-
-**Conductor creates them.** The UI is the control plane:
-- You click "Create 5 agents"
-- Conductor creates 5 git worktrees
-- Conductor spawns 5 Claude Code processes
-- Dashboard shows what Conductor created
-
-There's NO ambient detection. If you run `claude` manually in a terminal, Conductor won't see it.
-
----
-
-## Summary: The ~40% Gap
-
-### What EXISTS in current tools:
-| Capability | Tool(s) |
-|------------|---------|
-| Token-count routing | CCProxy |
-| Auto-failover on 429 | claude-code-mux |
-| Manual delegation | PAL MCP (clink tool) |
-| Real-time messaging | hcom |
-| Parallel instances | Conductor Build |
-| Quota visibility | CLIProxyAPI, CodexBar |
-| Metadata routing | Portkey |
-| Multi-model access | OpenRouter |
-
-### What NOBODY provides:
-| Capability | Why It Matters |
-|------------|----------------|
-| **Semantic task routing** | Route by intent (research vs coding), not just metadata |
-| **Persistent cross-session memory** | Yesterday's findings available today |
-| **Proactive rate prediction** | Act at 80%, not react to 429 |
-| **Automatic mid-task context handoff** | Preserve reasoning state during failover |
-| **Cross-model critique orchestration** | Claude generates, Gemini reviews, loop back |
-| **Subscription auth for routing** | Use Max subscription through routing layer |
-
----
-
-## Terminology: Is "Harness" the Right Word?
-
-An **agent harness** is infrastructure that wraps an LLM and manages what the model can't do itself:
-- Execute tool calls
-- Manage memory
-- Structure workflows
-- Handle long-running tasks
-
-**Your concept is a hybrid:**
-- Harness (memory, tool execution)
-- Orchestrator (routing decisions)
-- Proxy/Router (request interception)
-
-**Better terms might be:**
-- "Agent Orchestration Layer" — clearest
-- "Multi-Model Harness" — extends the harness definition
-- "Agentic Router" — if emphasizing routing
+OPEN QUESTION: Is the ~40% gap worth building for?
+  → Zero-code baseline test has NEVER been done
+  → Could invalidate or validate the entire project
+```

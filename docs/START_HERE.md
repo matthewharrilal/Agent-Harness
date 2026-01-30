@@ -7,6 +7,97 @@
 
 ---
 
+## Architecture at a Glance
+
+> **Full layer-by-layer detail:** See [`docs/ARCHITECTURE_VISION.md`](ARCHITECTURE_VISION.md) for all 5 individual layer boxes with candidates, unknowns, and dependencies.
+
+### The Integrated System (How Layers Connect)
+
+```
+ USER types: claude
+  │
+  ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ CLAUDE CODE (interactive, normal experience)          LAYER 5   │
+│ Reads CLAUDE.md → knows when to use harness tools               │
+│ Reads .mcp.json → spawns harness MCP server                     │
+│ Hooks fire on every event → captured by Layer 4                 │
+└────────────────────────┬────────────────────────────────────────┘
+                         │ user prompt arrives
+                         ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ SEMANTIC ROUTER                                       LAYER 1   │
+│ "refactor auth module" → { type: "code", conf: 0.91 }          │
+└────────────────────────┬────────────────────────────────────────┘
+                         │ classification
+                         ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ DECISION ENGINE                                       LAYER 2   │
+│                                                                  │
+│  route signal ──┐                                                │
+│  rate limits ───┤                                                │
+│  memory ────────┼──► DECISION: Claude handles Task A + B         │
+│  subtask ctx ───┘              Gemini handles Task C             │
+│                                                                  │
+└──────────┬───────────────────────────────┬──────────────────────┘
+           │                               │
+           ▼                               ▼
+┌────────────────────┐          ┌────────────────────┐
+│ CLAUDE (local)     │          │ GEMINI (delegated)  │
+│ Task A: audit      │          │ Task C: 140K token  │
+│ Task B: refactor   │          │ codebase analysis   │
+│                    │          │                     │
+│ Uses native tools  │          │ Spawned via MCP or  │
+│ (Read, Edit, Bash) │          │ Bash (TBD)          │
+└────────┬───────────┘          └──────────┬──────────┘
+         │                                 │
+         │       writes findings           │
+         ▼                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ CROSS-PROVIDER MEMORY                                 LAYER 3   │
+│                                                                  │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │  Task A findings: "3 security issues in auth.ts"        │    │
+│  │  Task C findings: "47 call sites across 8 patterns"     │    │
+│  │  Session memory: "JWT decision: 3 formats"              │    │
+│  │  Routing history: "last time, Claude solved this in 1"  │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                  │
+│  ◄─── Task B reads Task A's findings directly (mesh) ───►       │
+│  ◄─── Router reads past decisions (feedback loop) ───►           │
+│  ◄─── Next session reads today's learnings ───►                  │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+         │
+         │ events flow via hooks
+         ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ VISUAL INTERFACE                                      LAYER 4   │
+│                                                                  │
+│  Menu bar: ● Claude 42% │ Gemini 88% │ $0.50                    │
+│                                                                  │
+│  Browser (optional):                                             │
+│  "Task C → Gemini. Reason: 140K tokens. Cost: $0.08 vs $0.32"  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### What's Locked vs Open
+
+```
+██ LOCKED:
+  Hybrid Claude+Gemini │ Claude orchestrates │ Veto critique
+  Invisible experience │ Gemini free/$20 │ Exhaustion = stop
+
+░░ INVESTIGATION LANE:
+  Semantic routing │ Communication │ Visibility │ Memory tool │ MCP
+
+   OPEN:
+  Memory selection │ MCP vs Bash │ Zero-code baseline │ Decision engine
+  Visual design │ MVP scope │ Build order validation
+```
+
+---
+
 ## Part 1: Where We Are Now
 
 ### The Core Problem (Never Lose Sight)
