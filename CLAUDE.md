@@ -27,33 +27,37 @@ A hybrid Claude + Gemini orchestration layer. The user hits 85% of their weekly 
 - Gemini at free tier or AI Pro ($0-20/mo), NOT Ultra ($250/mo)
 - The harness is invisible — user types `claude` normally
 - Cross-model critique is user-triggered or complexity-triggered, not every task
+- Critique uses veto pattern, not consensus (Session 3)
 - Both providers exhausted = notify and stop
 
 ## What's Open (Your Thinking Is Needed)
 
 - **Is the 40% gap worth building for?** Existing tools (CCProxy, PAL MCP, CodexBar) cover ~55-60% of the vision. The genuine gap is semantic routing, persistent memory, proactive rate prediction, and cross-model critique. Is that gap worth months of building? Or should the user just install existing tools? This is THE question.
-- MCP server as mechanism (Level 3 confidence — "let's not double down on MCP yet")
-- Memory system (Mem0? ChromaDB? sqlite-vec? Files?)
-- Visual interface value for a terminal-native user
-- How Claude decides what to delegate
-- How this differs from PAL MCP + CCProxy + CodexBar (zero-code baseline)
+- **Communication pattern:** Evolved from Blackboard to hybrid hierarchical + mesh. Now exploring direct subagent messaging. Still open.
+- **Semantic routing approach:** Investigating RouteLLM and Aurelio. No choice made.
+- **Memory system:** Investigating Mem0, sqlite-vec, files. Architecturally central (double duty: cross-session + cross-subtask). No choice made.
+- **MCP vs Bash+files:** Level 3 confidence. Still investigating.
+- **5-layer structural vision:** High-level framework established. No layer has a concrete implementation decided.
+- **Zero-code baseline:** Still untested. Could change everything.
 - MVP scope
-- Whether we're investigating or already designing
+- Visual interface design
 
-## Document Reading Order (Updated Jan 29, 2026)
+## Document Reading Order (Updated Jan 30, 2026)
 
-1. **docs/SESSION_3_SYNTHESIS.md** — **START HERE.** Current state after 5-agent deep research. All locked decisions, open questions, and build order.
-2. **docs/ARCHITECTURE.md** — Technical decisions and 21-item compensation list. Living draft.
-3. **docs/SESSION_BRIDGE.md** — Meta-layer with confidence registry and session logs.
-4. **docs/RESEARCH.md** — Evidence base (90+ sources). Use as reference when you need to verify or challenge findings.
+1. **docs/START_HERE.md** — **START HERE.** Current state after 5-agent deep research. Locked decisions, refined investigation lanes, open questions, and proposed build order.
+2. **docs/ARCHITECTURE_VISION.md** — Canonical 5-layer architecture diagrams, dependency graph, and status map.
+3. **docs/ARCHITECTURE.md** — Technical deep-dive. MCP design, 21-item compensation list, gap analysis. Living draft.
+4. **docs/PROJECT_CONTEXT.md** — Confidence registry, session history, conduct guide.
+5. **docs/RESEARCH.md** — Evidence base (90+ sources). Use as reference when you need to verify or challenge findings.
 
 **Archived (do not start here):**
 - `docs/archive/HANDOFF.md` — Historical. Dual-Claude architecture superseded.
-- `docs/archive/SESSION_2_SYNTHESIS.md` — Merged into SESSION_3_SYNTHESIS.md.
+- `docs/archive/SESSION_2_SYNTHESIS.md` — Merged into START_HERE.md.
+- `docs/archive/NEXT_SESSION_PROMPT.md` — Superseded by START_HERE.md as entry point.
 
 ## How to Start a New Session
 
-The user will copy-paste the contents of `NEXT_SESSION_PROMPT.md` as their first message. It contains specific open questions, context, and marching orders. Follow its instructions — do not re-read it as a file since you already have the content.
+Read `docs/START_HERE.md` first — it's the primary entry point with all locked decisions, investigation lanes, and open questions. Then read `docs/ARCHITECTURE_VISION.md` for the canonical 5-layer architecture with dependency graph. Use other docs as reference when needed.
 
 ## Do NOT
 

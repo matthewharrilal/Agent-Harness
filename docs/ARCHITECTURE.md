@@ -5,7 +5,7 @@
 
 ## THE CORE REALIZATION (Updated Jan 27, 2026 - Late Session)
 
-> **Confidence: Level 3 — Working Hypothesis.** The MCP server approach is architecturally sound but the user explicitly said "let's not double down on MCP yet." Alternatives (hooks-only, Agent SDK, Bash+file I/O) are not fully investigated. See SESSION_BRIDGE.md § Decision Confidence Registry for the full confidence framework.
+> **Confidence: Level 3 — Working Hypothesis.** The MCP server approach is architecturally sound but the user explicitly said "let's not double down on MCP yet." Alternatives (hooks-only, Agent SDK, Bash+file I/O) are not fully investigated. See PROJECT_CONTEXT.md § Decision Confidence Registry for the full confidence framework.
 
 The harness is **not a CLI wrapper**. It is **not** a separate command you type. It is an MCP server + hooks system that runs inside your normal Claude Code experience. You type `claude` as you always do. The harness is baked in -- invisible, ambient, always present.
 
@@ -38,6 +38,22 @@ CLAUDE CODE starts normally
       Receives POSTed events from hooks
       Shows: rate limits, costs, agent activity, routing decisions
 ```
+
+### The 5-Layer Architecture (Session 3 Vision)
+
+| Layer | What | Investigation Status |
+|-------|------|---------------------|
+| **1. Semantic Router** | Aurelio or RouteLLM | Investigating — no choice made |
+| **2. State-Aware Decision Engine** | Custom | Conceptual — consumes route + rate limits + memory + subtask context |
+| **3. Cross-Provider Memory** | Mem0 / sqlite-vec / files | Investigating — no choice made. Architecturally central (double duty) |
+| **4. Visual Interface** | CodexBar + Conductor Build inspired | Conceptual — not designed |
+| **5. CLI Experience** | MCP server + hooks | Level 3 — "don't double down on MCP yet" |
+
+Layer 2 is where the "one system, not three features" insight lives — the integration point. No concrete implementation decided for any layer.
+
+> **Canonical architecture reference:** See [`docs/ARCHITECTURE_VISION.md`](ARCHITECTURE_VISION.md) for the definitive diagrams. This file contains technical deep-dive and implementation analysis.
+
+---
 
 ### Why MCP Server, Not CLI Wrapper
 
@@ -176,7 +192,7 @@ And the reverse for Gemini-generated work -- Claude catches Gemini's 4x higher c
 
 ### Design Principles from the Paper
 
-1. **FSM routing, not LLM routing.** Task routing is deterministic code (state machine), not prompts. Cheaper, faster, more reliable.
+1. **Routing approach under investigation.** Session 2 proposed FSM (deterministic state machine). Session 3 is investigating pre-trained semantic routers (RouteLLM, Aurelio) which may be more accurate for ambiguous tasks like "refactor auth module." No approach decided.
 2. **Hierarchical veto, not consensus voting.** Critic can reject (triggers retry), not negotiate. Paper found veto > democratic consensus.
 3. **Context isolation.** Raw data never crosses agent boundaries. Only structured summaries. Prevents context contamination.
 4. **Pre-declared acceptance criteria.** Before execution, the planner states what "success" looks like. Gives the critic concrete criteria to evaluate against.
@@ -235,6 +251,15 @@ Claude Code (interactive, orchestrator)
   └── Hooks (event capture to dashboard)
 ```
 Claude's native system handles Claude-to-Claude work. The harness MCP adds the Claude-to-Gemini bridge.
+
+### Communication Pattern Evolution (Session 3 Update)
+
+Session 2 proposed a Blackboard pattern (shared state, no direct messaging). Session 3 evolved this toward a **hybrid hierarchical + mesh** model:
+- **Hierarchical:** Orchestrator (Claude) controls task assignment, failure handling, and final synthesis
+- **Mesh:** Subtasks share context directly via a shared context layer — no orchestrator relay needed
+- **Under investigation:** The user is exploring direct subagent-to-subagent messaging through persistent messaging platforms, going beyond passive shared-state reads into active message passing
+
+Communication architecture is an active investigation area. Not locked.
 
 ---
 
@@ -489,13 +514,13 @@ Each routing decision should capture:
 
 ---
 
-## DECISION: INVOCATION MODEL (MCP Server, Not CLI Wrapper)
+## WORKING HYPOTHESIS: INVOCATION MODEL (MCP Server, Not CLI Wrapper) — Level 3 Confidence
 
 **Date:** January 27, 2026
 
 **User's requirement:** "I want to type `claude` normally. Not headless mode. The harness should be baked into my Claude experience."
 
-**Decision:** The harness is an MCP server + hooks, not a CLI wrapper.
+**Working hypothesis:** The harness is an MCP server + hooks, not a CLI wrapper. This is architecturally sound but the user explicitly said "let's not double down on MCP yet." Alternatives (hooks-only, Agent SDK, Bash+file I/O) are not fully investigated.
 
 **How it works:**
 1. User configures `.mcp.json` in project root to include the harness MCP server
@@ -543,6 +568,25 @@ Claude Code (always the orchestrator, always the "top turtle")
         → Gemini executes in headless mode
         → Result returned to Claude's conversation
         → Claude synthesizes and continues
+```
+
+**Session 3 Mesh Communication Diagram:**
+```
+           ┌──────────────────┐
+           │  ORCHESTRATOR    │
+           │  (Claude)        │
+           └────────┬─────────┘
+                    │ spawns subtasks, receives final results
+                    │
+      ┌─────────────┼─────────────┐
+      │             │             │
+  ┌───▼───┐   ┌────▼────┐   ┌────▼────┐
+  │Task A │◄─►│ Task B  │◄─►│ Task C  │
+  │(Claude)│   │(Gemini) │   │(Claude) │
+  └───────┘   └─────────┘   └─────────┘
+      │             │             │
+      └─────────────┴─────────────┘
+            shared context layer
 ```
 
 **Why not dynamic meta-orchestration (rotating who leads):**
@@ -676,6 +720,15 @@ The dashboard should have TWO forms:
 ## MEMORY SYSTEM: MEM0 DEEP-DIVE
 
 **Date:** January 27, 2026
+
+### Memory Is Architecturally Central (Session 3 Insight)
+
+Memory serves double duty in this architecture — it's not a secondary add-on:
+
+1. **Cross-subtask context:** Task B sees Task A's findings via shared memory, not orchestrator relay. This enables the mesh communication pattern.
+2. **Cross-session persistence:** Tomorrow's session knows what today's session learned. This enables continuity across rate limit resets.
+
+The router needs memory (past routing outcomes). Subtasks need memory (sibling findings). Sessions need memory (prior decisions). Memory is load-bearing from day one. Tool choice (Mem0 / sqlite-vec / files) is still open, but the architectural role is locked.
 
 ### What Mem0 Self-Hosted Actually Is
 
@@ -873,4 +926,4 @@ But Part 3 (Proposed Architecture) with the dual-account diagram is no longer ca
 
 *Architecture reflections last updated: January 27, 2026 (late session). This is a living document tracking thought process, design decisions, and research reflections. Raw research lives in RESEARCH.md. Original vision lives in HANDOFF.md (note: architecture section is superseded).*
 
-*If you are a new Claude or Gemini instance picking this up: read SESSION_BRIDGE.md first for orientation, confidence levels, and session conduct. Then this file for decisions and reflections. Then RESEARCH.md for evidence and sources. Then HANDOFF.md for original vision and requirements (note: Part 3 is superseded). The four together give full context.*
+*If you are a new Claude or Gemini instance picking this up: read PROJECT_CONTEXT.md first for orientation, confidence levels, and session conduct. Then this file for decisions and reflections. Then RESEARCH.md for evidence and sources. Then HANDOFF.md for original vision and requirements (note: Part 3 is superseded). The four together give full context.*

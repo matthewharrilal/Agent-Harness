@@ -15,26 +15,27 @@ Claude Max 20x ($200/mo) gives substantial inference capacity — but heavy user
 
 These compound: waste tokens → hit limits faster → switch providers → lose context → re-explain → waste more tokens.
 
-## The Solution (Architecture Locked)
+## The Solution (Investigation Phase)
 
 Combine Claude Code with Gemini CLI into a single invisible middleware layer. The user types `claude` normally. Behind the scenes:
 
-- **Semantic task routing** — Route by WHAT the task is using pre-trained routers (RouteLLM/Aurelio), not heuristics. 90-95% accuracy, no custom training required.
-- **Shared memory via Blackboard pattern** — Both providers read/write to shared state. Agents don't message each other; they read/write to common files or memory store.
-- **Hub-and-spoke orchestration** — Claude always orchestrates (fixed). Gemini is a dynamic worker (spoke). All major frameworks (LangGraph, CrewAI, ADK, Swarm) converge on this pattern.
-- **Veto-based critique** — Based on [arxiv 2601.14351](https://arxiv.org/abs/2601.14351): single-agent self-review degrades accuracy (<60%), cross-model veto critique achieves 90%. Critic rejects or approves; no consensus voting.
-- **Silent CLI + optional dashboard** — Invisible in terminal, visible when you want it (CodexBar-style widget or localhost:3200).
+- **Semantic task routing** — Route by WHAT the task is using pre-trained routers (investigating RouteLLM/Aurelio). No choice made yet; neither tested on Claude+Gemini pair.
+- **Cross-provider memory (architecturally central)** — Both providers read/write shared state. Memory serves double duty: cross-subtask context + cross-session persistence. Tool choice (Mem0 / sqlite-vec / files) still open.
+- **Hybrid hierarchical + mesh communication** — Claude always orchestrates (hierarchical, locked). Subtasks share context directly (mesh). Exploring direct subagent-to-subagent messaging. Still evolving.
+- **Veto-based critique** — Based on [arxiv 2601.14351](https://arxiv.org/abs/2601.14351): single-agent self-review degrades accuracy (<60%), cross-model veto critique achieves 90%. Critic rejects or approves; no consensus voting. (Locked.)
+- **Silent CLI + optional dashboard** — Invisible in terminal, visible when you want it (CodexBar-style widget or localhost:3200). Depends on MCP decision (Level 3 confidence).
 
 Claude always orchestrates. Gemini is the specialist. The harness is the sous chef that coordinates both kitchens.
 
-## Current Status: Implementation Ready (Session 3 Complete)
+## Current Status: Investigation Phase — Refined Lanes Established (Session 3 Complete)
 
-**No code has been written yet.** However, 3 sessions of deep research (24+ agents total) have produced:
+**No code has been written yet.** 3 sessions of deep research (24+ agents total) have produced:
 
-- **6 architectural decisions LOCKED** (confidence level 5)
-- **4 decisions at HIGH confidence** (level 4)
+- **7 decisions LOCKED** (confidence level 5 — see `docs/ARCHITECTURE_VISION.md` for full status map)
+- **3 investigation lanes refined** (confidence level 4 — direction established, no tool choices made)
+- **5-layer structural vision** established as framework for investigation
 - **10 hidden assumptions surfaced** and documented
-- **Proposed build order** for phased implementation
+- **Proposed build order** (contingent on tool selections still under investigation)
 
 ### What's Decided (Don't Re-Litigate)
 
@@ -42,10 +43,16 @@ Claude always orchestrates. Gemini is the specialist. The harness is the sous ch
 |----------|:----------:|---------|
 | Hybrid Claude+Gemini | LOCKED (5) | Device keychain bug makes dual-Claude broken. $200-220/mo vs $400/mo. |
 | Claude as orchestrator | LOCKED (5) | All production frameworks use fixed orchestrator. No dynamic rotation. |
-| Hub-and-spoke + shared state | LOCKED (5) | Blackboard pattern. AgentMail was a red herring (for humans, not agents). |
 | Veto pattern for critique | LOCKED (5) | arxiv paper: veto > consensus. Critic rejects, doesn't negotiate. |
-| Semantic routing (RouteLLM/Aurelio) | HIGH (4) | Pre-trained routers work without custom training. 90-95% accuracy. |
-| Silent CLI + dashboard | HIGH (4) | Invisible in terminal, observable via menu bar widget when wanted. |
+| Invisible experience | LOCKED (5) | User types `claude` normally. Harness baked in via .mcp.json + hooks. |
+| Gemini free/AI Pro tier | LOCKED (5) | $0-20/mo budget. NOT Ultra ($250/mo). |
+| Both exhausted = notify and stop | LOCKED (5) | No infinite retry loops. Surface the constraint. |
+| Critique: user-triggered or complexity-triggered | LOCKED (5) | Not every task gets 2x cost of cross-model review. |
+| Communication: hybrid hierarchical + mesh | INVESTIGATION LANE (4) | Evolved from Blackboard. Exploring direct subagent messaging. |
+| Semantic routing (RouteLLM/Aurelio) | INVESTIGATION LANE (4) | Pre-trained routers — neither tested on Claude+Gemini pair yet. |
+| Silent CLI + dashboard | INVESTIGATION LANE (4) | Depends on MCP decision (Level 3). Visual interface not designed. |
+| Memory is architecturally central | INVESTIGATION LANE (4) | Tool choice open (Mem0/sqlite-vec/files). |
+| MCP mechanism | INVESTIGATION LANE (3) | "Don't double down on MCP yet." |
 
 ### What's Still Open
 
@@ -60,7 +67,7 @@ Claude always orchestrates. Gemini is the specialist. The harness is the sous ch
 Session 3 surfaced critical challenges to the approach:
 
 1. **Zero-code baseline never tested** — Could invalidate entire project
-2. **FSM routing unsolved** — No algorithm for task classification without LLM
+2. **Routing approach under investigation** — RouteLLM/Aurelio identified but neither tested on Claude+Gemini pair
 3. **MCP vs alternatives not compared** — Bash + files might be simpler and better
 4. **"Invisible" and "observable" contradict** — Resolved: silent CLI + optional dashboard
 5. **Claude orchestrates even when exhausted?** — Single-provider exhaustion undesigned
@@ -106,26 +113,51 @@ What does NOT exist anywhere:
 
 **Phase 1 is the smallest testable unit.** If semantic classification works, the whole system becomes viable.
 
-## Documents
+## Document Hierarchy
 
+### Entry Point
 | Document | Purpose |
 |----------|---------|
-| `docs/SESSION_3_SYNTHESIS.md` | **START HERE.** Current state after 5-agent deep research. All locked decisions, open questions, build order. |
-| `docs/ARCHITECTURE.md` | Technical decisions. MCP design, 21-item compensation list, gap analysis. Living draft. |
-| `docs/SESSION_BRIDGE.md` | Meta-layer with confidence registry and session logs. |
-| `docs/RESEARCH.md` | Evidence base (90+ sources). Use as reference. |
-| `CLAUDE.md` | Instructions for Claude instances. Ground rules, reading order. |
+| `docs/START_HERE.md` | **START HERE.** Locked decisions, investigation lanes, open questions, build order. |
 
-**Archived:**
-- `docs/archive/HANDOFF.md` — Original vision. Dual-Claude architecture superseded.
-- `docs/archive/SESSION_2_SYNTHESIS.md` — Merged into SESSION_3_SYNTHESIS.md.
+### Architecture
+| Document | Purpose |
+|----------|---------|
+| `docs/ARCHITECTURE_VISION.md` | **Canonical 5-layer architecture.** All diagrams, dependency graph, status map. |
+| `docs/ARCHITECTURE.md` | Technical deep-dive. MCP design, compensation list, gap analysis. Living draft. |
+
+### Reference
+| Document | Purpose |
+|----------|---------|
+| `docs/PROJECT_CONTEXT.md` | Confidence registry, session history, conduct guide. |
+| `docs/RESEARCH.md` | Evidence base (90+ sources). Competitive landscape, device bug, Gemini gaps. |
+| `docs/TOOL_ANALYSIS.md` | Tool-by-tool analysis of 8 competing tools. |
+
+### Illustrative (User Journeys)
+| Document | Purpose |
+|----------|---------|
+| `docs/USER_JOURNEY.md` | Speculative Wednesday morning scenario — with vs without harness. |
+| `docs/USER_JOURNEYS.md` | 5 competing tool scenarios — mental models and trade-offs. |
+| `docs/CLAUDE_CODE_MUX_USER_JOURNEY.md` | Mid-session failover scenario with claude-code-mux. |
+
+### Meta
+| Document | Purpose |
+|----------|---------|
+| `CLAUDE.md` | Instructions for Claude instances. Ground rules, locked decisions, what's open. |
+
+### Archived
+| Document | Purpose |
+|----------|---------|
+| `docs/archive/HANDOFF.md` | Original vision. Parts 1 & 5 valid; Part 3 superseded. |
+| `docs/archive/SESSION_2_SYNTHESIS.md` | Merged into START_HERE.md. |
+| `docs/archive/NEXT_SESSION_PROMPT.md` | Superseded by START_HERE.md as entry point. |
 
 ## Research Highlights
 
 ### Session 3 Key Findings
 
 - **Semantic routing without training**: RouteLLM (95% of GPT-4 perf at 14% calls) and Aurelio (~90% accuracy, sub-penny per 10K queries) both work out-of-box
-- **All frameworks converge on shared state**: LangGraph, CrewAI, ADK, Swarm all use Blackboard pattern — agents read/write shared memory, not direct messaging
+- **Communication evolved to hybrid hierarchical + mesh**: Session 2's Blackboard pattern evolved — orchestrator controls flow (hierarchical), subtasks share context directly (mesh). Exploring direct subagent-to-subagent messaging.
 - **Veto > consensus**: arxiv 2601.14351 found hierarchical veto more reliable than democratic voting
 - **No production system rotates orchestrator**: Every framework uses fixed orchestrator + dynamic workers
 
@@ -136,31 +168,48 @@ What does NOT exist anywhere:
 - **21 Gemini gaps identified**: Plan mode (4), subagent/task (4), tool bridging (2), MCP compat (3), config/memory (3), headless integration (3), behavioral parity (2).
 - **61 architectural gaps cataloged**: 13 blockers, 38 complicators, 10 nice-to-have.
 
-## Architecture
+## Architecture (5-Layer Vision)
+
+> **Full architecture diagrams:** See [`docs/ARCHITECTURE_VISION.md`](docs/ARCHITECTURE_VISION.md) for the complete 5-layer breakdown, integrated system flow, dependency graph, and locked/open status map.
 
 ```
-YOU type: claude (normal interactive mode)
-  |
-  v
+USER types: claude (normal interactive mode)
+  │
+  ▼
 CLAUDE CODE starts normally
-  |
-  ├── Reads .mcp.json → spawns "agent-harness" MCP server
-  │   Tools: delegate_to_gemini, shared_memory_read/write,
-  │          check_rate_limits, route_task
   │
-  ├── Reads CLAUDE.md → behavioral instructions for delegation
+  ├── .mcp.json → spawns harness MCP server (Layer 5: CLI)
   │
-  ├── Semantic Router (RouteLLM or Aurelio)
-  │   Classifies task → routes to Claude or Gemini
+  ├── CLAUDE.md → behavioral steering for delegation
   │
-  ├── Shared State (Blackboard pattern)
-  │   Both providers read/write to common memory
+  ├── User prompt arrives
+  │       │
+  │       ▼
+  │   Layer 1: SEMANTIC ROUTER
+  │   "What kind of task is this?"
+  │   (RouteLLM / Aurelio — investigating)
+  │       │
+  │       ▼
+  │   Layer 2: DECISION ENGINE
+  │   Combines: task type + rate limits + memory + history
+  │   → Routes to Claude or Gemini
+  │       │
+  │   ┌───┴───┐
+  │   ▼       ▼
+  │  Claude  Gemini (via MCP delegation)
+  │   │       │
+  │   └───┬───┘
+  │       ▼
+  │   Layer 3: CROSS-PROVIDER MEMORY
+  │   Stores findings, informs next routing decision
+  │   (architecturally central — actual Layer 0)
   │
-  ├── Hooks → event capture to dashboard
+  ├── Hooks capture events → Layer 4 (dashboard/widget)
   │
-  └── Dashboard server (background process)
-      CodexBar-style menu bar widget or localhost:3200
+  └── Result returned to user in normal conversation
 ```
+
+**Dependency reality:** Memory (Layer 3) is labeled Layer 3 but is the actual foundation — routing needs memory, memory informs routing. See `docs/ARCHITECTURE_VISION.md` for the full dependency graph.
 
 ## Budget
 
@@ -176,4 +225,4 @@ $200 (Claude Max 20x) + $0-20 (Gemini free/AI Pro) = **$200-220/mo**
 
 ---
 
-*Last updated: January 29, 2026 (Session 3)*
+*Last updated: January 30, 2026 (Session 4 — documentation audit and restructure)*

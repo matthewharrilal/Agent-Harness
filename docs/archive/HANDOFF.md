@@ -2,14 +2,14 @@
 
 > **⚠️ ARCHIVED — January 29, 2026**
 >
-> **This document has been superseded by SESSION_3_SYNTHESIS.md**
+> **This document has been superseded by START_HERE.md** (formerly SESSION_3_SYNTHESIS.md)
 >
 > This was the original handoff document from a claude.ai conversation. It has been archived because:
 > - The dual-Claude architecture (Part 3) was abandoned after the device keychain bug discovery
 > - The hybrid Claude+Gemini architecture is now documented in ARCHITECTURE.md
-> - Key insights from Parts 1 and 5 have been extracted into SESSION_3_SYNTHESIS.md
+> - Key insights from Parts 1 and 5 have been extracted into START_HERE.md
 >
-> **For current project state, start with:** `/docs/SESSION_3_SYNTHESIS.md`
+> **For current project state, start with:** `/docs/START_HERE.md`
 
 ---
 

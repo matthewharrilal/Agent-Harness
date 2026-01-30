@@ -2,7 +2,7 @@
 > **Project Phase:** Deep Investigation (NOT implementation. NOT planning. Investigating.)
 > **Last Updated:** January 29, 2026 (end of Session 3)
 > **Documents:** 4 total — HANDOFF.md, RESEARCH.md, ARCHITECTURE.md, this file
-> **Reading Order:** SESSION_3_SYNTHESIS.md (start here) → This file → ARCHITECTURE.md → RESEARCH.md (as reference)
+> **Reading Order:** START_HERE.md (start here) → This file → ARCHITECTURE.md → RESEARCH.md (as reference)
 > **Session Count:** 3 completed (Sessions 1-2: ~19 research agents, Session 3: 5 parallel deep-dive agents)
 
 ---
@@ -37,7 +37,7 @@ In the user's own words: *"The only thing I'm really getting from two different 
 | Scope Creep (Deprioritize) | Why It Crept In |
 |----------------------------|-----------------|
 | Mobile portability, remote access | HANDOFF.md's original requirements, but not the core problem |
-| 23-vertical T-shape research agenda | Investigation expanded beyond the problem space |
+| Exhaustive research agenda (originally listed 23 investigation verticals) | Investigation expanded beyond the problem space |
 | Zero-code baseline testing protocol | Implementation detail, not problem understanding |
 | Dependency stack evaluation | Implementation detail |
 | Full notification system (push to phone) | Nice-to-have, not core |
@@ -49,7 +49,9 @@ In the user's own words: *"The only thing I'm really getting from two different 
 
 **What is this project?** A system that makes Claude Code and Gemini CLI work as one. The user types `claude` normally. Behind the scenes, a harness gives Claude the ability to delegate tasks to Gemini when Gemini is better suited, share memory across both, and monitor rate limits. The user never leaves their terminal. The harness is invisible.
 
-**What phase are we in?** Deep investigation. No code exists. We're understanding what we want to get out of this — the experience, the outcomes, the value — before deciding how to build it. Many findings feel solid but are working hypotheses. The continuing session should deepen, challenge, and explore.
+**Architecture at a glance:** See [`docs/ARCHITECTURE_VISION.md`](ARCHITECTURE_VISION.md) for all diagrams and the locked/investigation/open status map.
+
+**What phase are we in?** Deep investigation. No code exists. We're understanding what we want to get out of this — the experience, the outcomes, the value — before deciding how to build it. Session 3 established a **5-layer structural vision** (Semantic Router → Decision Engine → Memory → Visual → CLI) as the framework for investigation — no layer has a concrete implementation decided. Many findings feel solid but are working hypotheses. The continuing session should deepen, challenge, and explore.
 
 **What is your role?** You are a research partner, not an implementer. Challenge what you find. Push back on assumptions. The user values intellectual honesty, depth, and independent thinking. Keep the focus on what the user GETS from this system, not implementation mechanics.
 
@@ -172,7 +174,7 @@ The verticals needing depth (not exhaustive — part of the investigation is dis
 
 **HANDOFF.md** (~330 lines) — **The original vision.** Read this to check whether current architecture has drifted from user goals. Written at the start of the project. **Part 3 (Proposed Architecture) is SUPERSEDED** — it describes a dual-Claude architecture that was abandoned after the device bug discovery. Parts 1 (Vision), 5 (Requirements), and 6 (Phases) are still relevant but need updating to reflect the hybrid approach.
 
-**SESSION_BRIDGE.md (this file)** — **The meta-layer.** How to interpret the other three. Reading guide, narrative, confidence levels, and investigation roadmap. Read first, but don't treat as a substitute for the other documents.
+**PROJECT_CONTEXT.md (this file)** — **The meta-layer.** How to interpret the other three. Reading guide, narrative, confidence levels, and investigation roadmap. Read first, but don't treat as a substitute for the other documents.
 
 ### Known Contradictions Between Documents
 
@@ -227,22 +229,22 @@ Each significant direction has a confidence level. Use this to know what to trus
 **Semantic routing approach (RouteLLM or Aurelio)**
 - Why high: Research confirmed pre-trained routers achieve 90-95% accuracy without custom training. RouteLLM generalizes to new model pairs. Aurelio provides control via user-defined routes.
 - What would change it: Testing reveals these don't work for Claude+Gemini routing in practice.
-- See: SESSION_3_SYNTHESIS.md § "Decision 4: Semantic Routing Without Training"
+- See: START_HERE.md § "Decision 4: Semantic Routing Without Training"
 
-**Communication pattern (Hub-and-spoke + shared state)**
-- Why high: Framework comparison (LangGraph, CrewAI, ADK, Swarm) ALL use this pattern. AgentMail was a red herring. The "sinew" question is answered.
-- What would change it: Discovery that shared state creates race conditions or data corruption.
-- See: SESSION_3_SYNTHESIS.md § "Decision 3: Inter-Agent Communication"
+**Communication pattern (Hybrid hierarchical + mesh) — INVESTIGATION LANE**
+- Why investigation lane: Session 3 evolved from Blackboard to hybrid hierarchical + mesh. The user is now exploring direct subagent-to-subagent messaging through persistent messaging platforms (Jan 29). This is an active investigation area, not locked.
+- What would change it: Testing reveals shared state is sufficient (no direct messaging needed), or persistent messaging adds too much complexity.
+- See: START_HERE.md § "Decision 3: Inter-Agent Communication"
 
 **Critique pattern (Veto, not consensus)**
 - Why high: arxiv 2601.14351 explicitly found veto > democratic consensus. Implementation is simpler. Token cost is lower.
 - What would change it: Evidence that consensus produces better outcomes for coding tasks specifically.
-- See: SESSION_3_SYNTHESIS.md § "Decision 5: Critique Pattern"
+- See: START_HERE.md § "Decision 5: Critique Pattern"
 
 **Visibility model (Silent CLI + dashboard)**
 - Why high: User explicitly clarified "baked in" means MCP server inside interactive Claude Code. Dashboard is for when you WANT visibility.
 - What would change it: User testing reveals they want MORE or LESS visibility than designed.
-- See: SESSION_3_SYNTHESIS.md § "Decision 6: Visibility Model"
+- See: START_HERE.md § "Decision 6: Visibility Model"
 
 ### Level 3 — Working Hypothesis (Challenge These)
 
@@ -282,7 +284,7 @@ Each significant direction has a confidence level. Use this to know what to trus
 
 ### Level 1 — Open (Needs Investigation)
 
-**Memory system** — Mem0, ChromaDB, sqlite-vec, or file-based? Deep research done on Mem0. Others need equal depth. User interested but uncommitted.
+**Memory system** — Mem0, ChromaDB, sqlite-vec, or file-based? Deep research done on Mem0. Others need equal depth. User interested but uncommitted. **BLOCKING:** Architecturally central (double duty: cross-session + cross-subtask). Blocks router design because the router needs memory to inform routing decisions.
 
 **Task decomposition strategy** — How does Claude decide what to delegate vs handle itself? No orchestrator system prompts researched yet. How granular is decomposition?
 
@@ -423,7 +425,7 @@ You trigger `/review` on security code. Claude delegates to Gemini for critique.
 
 ## THE MCP QUESTION: ALL SIX OPTIONS (Not Just MCP)
 
-SESSION_BRIDGE.md previously framed this as "MCP or not?" The real question is: "What does each mechanism do best, and how do they compose?"
+PROJECT_CONTEXT.md previously framed this as "MCP or not?" The real question is: "What does each mechanism do best, and how do they compose?"
 
 | Option | Mechanism | Returns results to Claude? | Sees all events? | Persists across sessions? | Preserves interactive UX? |
 |--------|-----------|---------------------------|-------------------|---------------------------|---------------------------|
@@ -443,6 +445,8 @@ SESSION_BRIDGE.md previously framed this as "MCP or not?" The real question is: 
 **The unexplored alternative:** Could hooks alone work? A hook could spawn Gemini, write results to a file, and CLAUDE.md could instruct Claude to "check `.harness/results/` after delegation." Clunky but no MCP server needed. This hasn't been investigated.
 
 **Key question for next session:** "What SPECIFICALLY does MCP provide over Bash + file I/O? When Claude delegates, it could just run `gemini -p 'task' > /tmp/result.md` via Bash and then Read the file. Why is an MCP server better than that?"
+
+**Session 3 update on MCP questions:** Session 3 surfaced the 5-layer vision where MCP is Layer 5 (CLI Experience). The MCP question remains Level 3 confidence. Session 3 did NOT resolve MCP vs Bash+files — it refined the framing (MCP is one layer in a 5-layer system, not the entire architecture) but the mechanism question is still open.
 
 ---
 
@@ -734,11 +738,18 @@ End-of-session research (3 deep agents, 30+ tools evaluated) revealed:
 - Clarified user friction: all 4 problems compound each other
 - Resolved visibility contradiction: silent CLI + optional dashboard
 
-**Key decisions locked:**
-- Routing: RouteLLM or Aurelio (no training, 90-95% accuracy)
-- Communication: Hub-and-spoke + shared state (Blackboard pattern)
-- Critique: Veto pattern, user-triggered first, not consensus
-- Visibility: Silent CLI + dashboard when wanted
+**Key investigation lanes refined:**
+- Routing: Pre-trained semantic routers (investigating RouteLLM, Aurelio)
+- Communication: Hybrid hierarchical + mesh (still evolving — exploring direct messaging)
+- Critique: Veto pattern, user-triggered first
+- Visibility: Silent CLI + opt-in dashboard
+
+**5-layer structural vision established:**
+1. Semantic Router (Aurelio / RouteLLM — investigating)
+2. State-Aware Decision Engine (conceptual)
+3. Cross-Provider Memory (Mem0 / sqlite-vec / files — investigating, architecturally central)
+4. Visual Interface (CodexBar + Conductor Build inspired — not designed)
+5. CLI Experience (MCP server + hooks — Level 3)
 
 **What moved forward:**
 - Memory system selection needs comparison (Mem0 vs files vs sqlite-vec)
@@ -746,7 +757,7 @@ End-of-session research (3 deep agents, 30+ tools evaluated) revealed:
 - Zero-code baseline test still not done
 
 **Documentation reorganization:**
-- Created SESSION_3_SYNTHESIS.md as new primary entry point
+- Created START_HERE.md as new primary entry point
 - Archived HANDOFF.md and SESSION_2_SYNTHESIS.md to docs/archive/
 - Updated confidence registry with Session 3 findings
 

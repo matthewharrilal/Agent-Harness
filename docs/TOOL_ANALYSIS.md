@@ -1,6 +1,11 @@
 # Competitive Landscape Deep Dive
 
+**Last updated:** January 2026 (Session 2-3 research). Tool versions and features may have drifted since analysis.
+
 ## Purpose
+
+> **Architecture context:** These tools map to specific gaps in the 5-layer architecture. See [`docs/ARCHITECTURE_VISION.md`](ARCHITECTURE_VISION.md) for the full vision and [`docs/START_HERE.md`](START_HERE.md) for "The Genuine Gap" analysis.
+
 This document captures deep research into each tool in the competitive landscape, answering specific questions about what they do, how they work, and where they fall short.
 
 ---

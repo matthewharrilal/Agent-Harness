@@ -1,4 +1,10 @@
-# Agent Harness — Session Handoff Briefing
+# ARCHIVED — January 30, 2026
+
+> **This file is archived.** Superseded by `docs/START_HERE.md` as the session entry point. The questions and context below predate Session 3's deep research and contain stale references to HANDOFF.md and SESSION_BRIDGE.md. Read `docs/START_HERE.md` instead.
+
+---
+
+# Agent Harness — Session Handoff Briefing (ARCHIVED)
 
 You are picking up an ongoing deep investigation. No code exists. Nothing is locked in. Your job is to think, challenge, and go deep — not to build.
 
@@ -42,13 +48,17 @@ Read all 4 files in parallel from `docs/`:
 
 **Working hypothesis (challenge these):**
 - MCP server as the harness mechanism (Level 3 confidence — I explicitly said "let's not double down on MCP yet")
+- Communication pattern: hybrid hierarchical + mesh (exploring direct subagent messaging)
+- Semantic routing: investigating RouteLLM and Aurelio (no choice made)
+- 5-layer structural vision: Semantic Router → Decision Engine → Memory → Visual → CLI (framework for investigation, not decisions)
 - TypeScript as implementation language
 - Dashboard as CodexBar-style widget + localhost browser page
 
 **Wide open:**
 - What the user experience actually looks and feels like
-- Memory system (Mem0? ChromaDB? sqlite-vec? Files?)
-- How Claude decides what to delegate
+- Memory system (Mem0? ChromaDB? sqlite-vec? Files?) — architecturally central, blocks router design
+- Direct subagent-to-subagent messaging — persistent platform vs shared context
+- Memory system's integration with router (blocking dependency)
 - What a visual interface provides beyond CLI
 - How this concretely differs from existing tools
 - MVP scope

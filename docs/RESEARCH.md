@@ -498,7 +498,11 @@ Google Antigravity (launched Nov 2025) provides free access to Claude Opus 4.5 a
 
 ## UPDATED RECOMMENDED ARCHITECTURE
 
-Based on ALL research including the device rate limit deep-dive and hybrid feasibility study:
+Based on ALL research including the device rate limit deep-dive and hybrid feasibility study.
+
+> **Full architecture diagrams:** See [`docs/ARCHITECTURE_VISION.md`](ARCHITECTURE_VISION.md) for the canonical reference.
+
+**Session 3 5-Layer Mapping:** This diagram maps to the 5-layer vision as follows: Bridge Layer = Layer 1 (Semantic Router) + Layer 2 (Decision Engine). Shared Memory = Layer 3. Dashboard = Layer 4 (Visual Interface). Claude Code + `.mcp.json` + hooks = Layer 5 (CLI Experience). No layer has a concrete implementation decided.
 
 ```
 YOUR MACBOOK
@@ -699,6 +703,8 @@ YOUR MACBOOK
 ---
 
 ## MCP-BASED HARNESS INVOCATION (Round 3 Research)
+
+> **Note (Jan 29, Session 3):** This section documents the MCP approach which is currently favored but **not locked** (Level 3 confidence). The user explicitly said "let's not double down on MCP yet." The Bash+files alternative is still under investigation. See PROJECT_CONTEXT.md § "THE MCP QUESTION" for the full options matrix.
 
 ### The Architecture Shift
 
@@ -946,21 +952,23 @@ YC-backed, free Mac app by Melty Labs. Runs multiple Claude Code instances in pa
 
 ## KNOWN RESEARCH GAPS
 
-The following topics have been identified as needing investigation but have NOT been researched yet:
+The following topics have been identified as needing investigation but have NOT been researched yet. Session 3 status annotations added Jan 29, 2026.
 
-1. **Real-world MCP tool timeout behavior** — Has anyone run 5+ minute MCP tool calls in production Claude Code? What does the UX look like?
-2. **Token economics modeling** — How many tokens does meta-work (routing, memory, delegation) consume per task?
-3. **Conductor Build deep analysis** — Feature comparison, pricing, limitations vs our harness approach
-4. **PAL MCP first-hand evaluation** — Does `clink` actually work well? Configuration? Limitations in practice?
-5. **Gemini CLI headless output format** — No sample `stream-json` output documented
-6. **Claude Code MCP output handling at >25K tokens** — What happens? Truncation? Error?
-7. **Orchestrator system prompts** — What do Manus, Devin, Claude Code's own planner prompts look like?
-8. **AGENTS.md spec** — What's actually in the format? What fields? Is there a formal spec?
-9. **Latency benchmarks** — How long does `gemini -p` actually take for typical tasks?
-10. **Anthropic rate limit query API** — Can you programmatically check current usage?
+1. **Real-world MCP tool timeout behavior** — Has anyone run 5+ minute MCP tool calls in production Claude Code? What does the UX look like? *(Untouched — still open)*
+2. **Token economics modeling** — How many tokens does meta-work (routing, memory, delegation) consume per task? *(Untouched — still open)*
+3. **Conductor Build deep analysis** — Feature comparison, pricing, limitations vs our harness approach *(Session 3 partially addressed — Conductor confirmed as single-provider parallelizer, ~15% overlap)*
+4. **PAL MCP first-hand evaluation** — Does `clink` actually work well? Configuration? Limitations in practice? *(Untouched — still open, critical for zero-code baseline)*
+5. **Gemini CLI headless output format** — No sample `stream-json` output documented *(Untouched — still open)*
+6. **Claude Code MCP output handling at >25K tokens** — What happens? Truncation? Error? *(Untouched — still open)*
+7. **Orchestrator system prompts** — What do Manus, Devin, Claude Code's own planner prompts look like? *(Untouched — still open)*
+8. **AGENTS.md spec** — What's actually in the format? What fields? Is there a formal spec? *(Untouched — still open)*
+9. **Latency benchmarks** — How long does `gemini -p` actually take for typical tasks? *(Untouched — still open)*
+10. **Anthropic rate limit query API** — Can you programmatically check current usage? *(Untouched — still open)*
+
+**Session 3 addressed (not in original list):** Routing approach (RouteLLM/Aurelio investigated), communication pattern (evolved from Blackboard to hybrid hierarchical + mesh), critique pattern (veto confirmed), visibility model (silent CLI + dashboard).
 
 ---
 
 *Research conducted January 27, 2026 via 19 research agents across three rounds. Round 1 (9 agents): ecosystem survey, memory systems, multi-account routing, agent SDK comparison, dashboard interfaces, frontier research, device-level rate limits, Claude+Gemini hybrid feasibility, Gemini CLI capabilities. Round 2 (6 agents): Ultra vs Pro limits, Gemini CLI gap audit, fork vs build evaluation, arxiv paper analysis, CLI-first dashboard patterns, critical gap analysis. Round 3 (4 agents): MCP-based invocation, visual orchestration interfaces, meta-orchestration patterns, dependency stack research, Mem0 deep-dive.*
 
-*If you are a new Claude or Gemini instance: read SESSION_BRIDGE.md first for orientation and confidence levels, then ARCHITECTURE.md for decisions and reflections, then this file for evidence, then HANDOFF.md for original vision (note: its architecture section is superseded by the Claude+Gemini hybrid approach).*
+*If you are a new Claude or Gemini instance: read PROJECT_CONTEXT.md first for orientation and confidence levels, then ARCHITECTURE.md for decisions and reflections, then this file for evidence, then HANDOFF.md for original vision (note: its architecture section is superseded by the Claude+Gemini hybrid approach).*

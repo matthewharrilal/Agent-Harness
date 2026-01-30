@@ -2,12 +2,12 @@
 
 > **⚠️ ARCHIVED — January 29, 2026**
 >
-> **This document has been merged into SESSION_3_SYNTHESIS.md**
+> **This document has been merged into START_HERE.md** (formerly SESSION_3_SYNTHESIS.md)
 >
-> Session 2 findings are now incorporated into the comprehensive Session 3 synthesis document.
+> Session 2 findings are now incorporated into the comprehensive synthesis document.
 > All key insights, confidence levels, and open questions have been preserved.
 >
-> **For current project state, start with:** `/docs/SESSION_3_SYNTHESIS.md`
+> **For current project state, start with:** `/docs/START_HERE.md`
 
 ---
 
