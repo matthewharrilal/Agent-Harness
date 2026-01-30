@@ -300,11 +300,108 @@
       white-space: pre-wrap;
       overflow-x: auto;
     }
+    /* Tab Navigation */
+    .tab-nav {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2.5rem;
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 100;
+      padding-top: 1rem;
+    }
+    .tab-btn {
+      padding: 0.75rem 1.5rem;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active {
+      color: var(--purple);
+      border-bottom-color: var(--purple);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* Investigation card section types */
+    .section-label.tension { color: var(--purple); }
+    .section-content.tension { border-color: rgba(163,113,247,0.4); }
+    .section-label.realize { color: #56d4dd; }
+    .section-content.realize { border-color: rgba(86,212,221,0.4); }
+    .section-label.threads { color: var(--text-muted); }
+    .section-content.threads { border-color: var(--border); }
+
+    /* Wave badges */
+    .wave-badge {
+      font-size: 0.7rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+      background: rgba(163,113,247,0.15);
+      color: var(--purple);
+    }
+    .layer-badge {
+      font-size: 0.7rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 500;
+      background: rgba(88,166,255,0.1);
+      color: var(--blue);
+    }
+
+    /* Investigation header */
+    .iq-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+    .iq-status .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    /* Dependency graph box */
+    .dep-graph {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+      overflow-x: auto;
+    }
+    .dep-graph pre {
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 0.75rem;
+      line-height: 1.5;
+      color: var(--text-dim);
+      margin: 0;
+    }
   </style>
 </head>
 <body>
 
 <div class="container">
+
+  <nav class="tab-nav">
+    <button class="tab-btn active" data-tab="landscape">Competitive Landscape</button>
+    <button class="tab-btn" data-tab="investigation">Investigation Questions</button>
+  </nav>
+
+  <div id="tab-landscape" class="tab-panel active">
 
   <h1>Competitive Landscape Analysis</h1>
   <p class="subtitle">8 tools analyzed for hybrid Claude + Gemini orchestration</p>
@@ -1722,7 +1819,807 @@ Dashboard (localhost:3200):
     </p>
   </div>
 
+  </div><!-- end tab-landscape -->
+
+  <div id="tab-investigation" class="tab-panel">
+
+  <h1>Investigation Questions</h1>
+  <p class="subtitle">7 primary questions mapped to the 5-layer architecture, researched in parallel</p>
+
+  <div class="context">
+    <div class="context-row">
+      <span class="context-key">Questions</span>
+      <span class="context-value">7 primary (IQ-1 through IQ-7) + 4 auxiliary</span>
+    </div>
+    <div class="context-row">
+      <span class="context-key">Research</span>
+      <span class="context-value">7 parallel agents, 90+ sources across frameworks, papers, and production systems</span>
+    </div>
+    <div class="context-row">
+      <span class="context-key">Card Dimensions</span>
+      <span class="context-value">Core Tension / Research Findings / What Could Go Wrong / Design Implications / User Journey / What This Makes You Realize / Open Threads</span>
+    </div>
+  </div>
+
+  <!-- DEPENDENCY GRAPH -->
+  <div class="dep-graph">
+    <div style="font-weight: 600; color: var(--purple); margin-bottom: 1rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em;">Investigation Dependency Graph</div>
+    <pre>
+                    ┌─────────────┐
+                    │    IQ-1     │  DECOMPOSITION BEFORE CLASSIFICATION
+                    │ (Layer 1,2) │  [ROOT NODE — no dependencies]
+                    └──────┬──────┘
+                           │
+              ┌────────────┼────────────┐
+              │            │            │
+              ▼            ▼            ▼
+     ┌────────────┐  ┌──────────┐  ┌──────────┐
+     │   IQ-7     │  │   IQ-3   │  │   IQ-4   │
+     │ Semantic   │  │ Routing  │  │ LLM      │
+     │ vs Heur.   │  │ Nuance   │  │ Costs    │
+     └─────┬──────┘  └────┬─────┘  └─────▲────┘
+           │              │               │
+           │              ├───────────────┘
+           │              │
+           │         ┌────▼─────┐
+           └────────►│   IQ-5   │  VISUAL INTERFACE
+                     │ (Layer 4)│
+                     └──────────┘
+
+   PARALLEL TRACKS (independent):
+
+     ┌─────────────┐        ┌─────────────┐
+     │    IQ-2     │        │    IQ-6     │
+     │  Conductor  │        │  MCP Server │
+     └─────────────┘        └─────────────┘</pre>
+  </div>
+
+  <!-- WAVE 1 -->
+  <div class="category">
+    <div class="category-name">Wave 1 — Parallel Start</div>
+    <div class="category-desc">Root node + two independent tracks. No dependencies. Research these simultaneously.</div>
+  </div>
+
+  <!-- IQ-1 -->
+  <div class="tool">
+    <div class="tool-title">
+      <span class="tool-name">IQ-1: Task Decomposition Before Classification</span>
+      <span class="wave-badge">Wave 1</span>
+      <span class="layer-badge">Layer 1, 2</span>
+    </div>
+    <p class="tool-desc">
+      Should we decompose tasks into subtasks BEFORE classification and routing? <code>prompt → decompose → classify each → route each</code> instead of <code>prompt → classify → route</code>. Example: "refactor auth module to use JWT" contains research, architecture, code, bulk editing, and testing subtasks — each potentially routed to a different model. This is the root investigation node: the answer reshapes every other question.
+    </p>
+
+    <div class="section-label tension">The Core Tension</div>
+    <div class="section-content tension">
+      <p style="margin-bottom: 0.75rem;">A recursive paradox on three levels:</p>
+      <ul>
+        <li><strong>The meta-cognition cost:</strong> Decomposition itself requires intelligence (an LLM call). But the harness exists to SAVE LLM calls. You spend Claude tokens to decide how to save Claude tokens. A single decomposition costs 500-2,000 tokens — if it routes 3/5 subtasks to Gemini saving 30K-150K Claude tokens, ROI is positive. For "fix typo in README"? Catastrophically negative.</li>
+        <li><strong>The chicken-and-egg:</strong> You can't know whether to decompose without classifying complexity. But you can't accurately classify a compound task without decomposing it. "Refactor auth module" is classified as "code" by surface-level routing — but it CONTAINS research, architecture, code, bulk editing, and testing.</li>
+        <li><strong>The quality variance:</strong> A good decomposition produces 5 well-scoped subtasks. A bad one produces "understand auth, do JWT stuff, test it." Bad decomposition → bad routing → worse results than no decomposition. Who validates decomposition quality without triggering the same self-review trap (arxiv 2601.14351)?</li>
+      </ul>
+    </div>
+
+    <div class="section-label works">Research Findings</div>
+    <div class="section-content works">
+      <p style="margin-bottom: 0.75rem;"><strong>Decompose-before-execute is the dominant pattern in agent frameworks — but multi-model routing after decomposition is rare.</strong></p>
+      <ul>
+        <li><strong>LangGraph LLMCompiler (ICML 2024):</strong> Generates a DAG of tasks with dependencies. <strong>3.7x latency speedup, 6.7x cost savings, ~9% accuracy improvement</strong> over ReAct. Decomposes to parallelize within a single provider.</li>
+        <li><strong>Manus AI:</strong> The closest production system to the harness vision. Three agent types: planning → execution → verification. "Stitches multiple models for specialized roles, including Claude 3.5/3.7, Qwen, and dynamic routing to modern GPT/Gemini families." Decomposes AND routes across models.</li>
+        <li><strong>Google ADK:</strong> Treats decomposition and routing as independent choices. Does NOT prescribe "decompose before routing." Recommends: "Start with a sequential chain, debug it, then add complexity."</li>
+        <li><strong>RouteLLM / Aurelio:</strong> Do NOT decompose. Classify the whole prompt, route to one model. Designed for atomic queries, not compound tasks.</li>
+        <li><strong>The two-stage solution (AWS + vLLM):</strong> Lightweight complexity estimation (~20ms, no LLM) → if compound, decompose with LLM (~1-2s); if simple, route directly. This resolves the chicken-and-egg.</li>
+      </ul>
+      <div class="scenario">Framework         | Decompose First? | Multi-Model? | Dynamic Replan?
+LangGraph         | Yes (plan-exec)  | No           | Yes
+LLMCompiler       | Yes (DAG)        | No           | Yes (streaming)
+CrewAI            | Implicit (roles) | No           | No
+Manus AI          | Yes (explicit)   | YES          | Yes
+RouteLLM/Aurelio  | No               | Yes (route)  | No
+Google ADK        | Both available   | No           | Partial</div>
+    </div>
+
+    <div class="section-label breaks">What Could Go Wrong</div>
+    <div class="section-content breaks">
+      <ul>
+        <li><strong>Over-decomposition:</strong> "Fix typo in README" becomes 5 subtasks. Adds 500+ token overhead and 200ms+ latency for a 2-second task. If 70%+ of daily tasks are simple, constant unnecessary overhead.</li>
+        <li><strong>Error propagation (MAST study, 1,600+ traces):</strong> "A slightly off-target decomposition results in irrelevant search queries, feeding unusable data to a summarizer." One bad decomposition cascades through all subtasks.</li>
+        <li><strong>Deeply interdependent subtasks:</strong> "Debug why auth returns 403 for valid tokens" — answer to subtask 1 determines what subtasks 2 and 3 even mean. Forces sequential execution, negating parallelism benefit.</li>
+        <li><strong>Latency penalty:</strong> 1-2s decomposition delay before work starts. For a tool promising to be "invisible," a perceivable delay on every interaction is destructive.</li>
+        <li><strong>Category escalation:</strong> Adding decomposition transforms the harness from "intelligent router" to "agent orchestration framework." Competes with LangGraph, not just RouteLLM. Build timeline expands from weeks to months.</li>
+      </ul>
+    </div>
+
+    <div class="section-label gap">Design Implications</div>
+    <div class="section-content gap">
+      <ul>
+        <li><strong>Layer 1 becomes two-stage:</strong> <code>prompt → complexity_estimate (embedding, ~20ms) → simple? classify+route : decompose → classify each → route each</code>. No longer a single classification step — a conditional pipeline with a complexity gate.</li>
+        <li><strong>Layer 2 makes N decisions:</strong> For compound tasks, N routing decisions instead of 1. Needs subtask dependency tracking (DAG), cross-subtask routing optimization ("subtask 1 on Claude, should subtask 2 also stay on Claude for continuity?"), and parallel execution orchestration.</li>
+        <li><strong>Layer 3 needs richer schema:</strong> Decomposition templates, subtask dependency graphs, per-subtask routing outcomes. This argues for structured storage (SQLite) over flat files — can't efficiently query "what decomposition pattern worked for refactoring tasks?" from markdown.</li>
+        <li><strong>Layer 4 shows decomposition trees:</strong> Not "Task → Claude" but a tree showing each subtask's routing, progress, and outcomes. Significantly more informative but more complex to build.</li>
+        <li><strong>Layer 5 — invisible or approved?:</strong> Three options: fully invisible (risk: user doesn't understand delays), approval required (adds friction), or <strong>invisible by default, visible on demand</strong> (aligns with "silent in experience, visual for granularity").</li>
+      </ul>
+    </div>
+
+    <div class="section-label journey">User Journey Impact</div>
+    <div class="section-content journey">
+      <div class="journey-contrast">
+        <div class="journey-contrast-item current">
+          <div class="label">Classify-First (Current)</div>
+          <span style="color: var(--text-dim); font-size: 0.85rem;">"refactor auth to JWT" → classified as "code" (0.91) → Claude handles everything. ~100ms to first action. Claude may waste tokens on research subtasks Gemini could handle.</span>
+        </div>
+        <div class="journey-contrast-item hypothetical">
+          <div class="label">Decompose-First (Proposed)</div>
+          <span style="color: var(--text-dim); font-size: 0.85rem;">"refactor auth to JWT" → compound → decomposed into 5 subtasks → search→Gemini, design→Claude, modify→Claude, update→Gemini, test→Claude. ~1.5-2s to first action but better utilization.</span>
+        </div>
+      </div>
+      <p style="margin-top: 0.75rem; color: var(--text-muted);"><strong>Simple tasks are unaffected</strong> — the complexity gate routes them through the fast path (~100ms). The decomposition delay only applies to genuinely compound tasks. Power users can force decomposition (<code>/decompose</code>) or prevent it (<code>/simple</code>).</p>
+    </div>
+
+    <div class="section-label realize">What This Makes You Realize</div>
+    <div class="section-content realize">
+      <ul>
+        <li><strong>Recomposition is the harder problem:</strong> 5 subtask results from 2 models need synthesis. Who synthesizes? Claude. But Claude only has Gemini's summarized output, not full context. Synthesis quality depends on Layer 3 memory quality. Decomposition → recomposition → memory → schema standardization — cascading requirements.</li>
+        <li><strong>This makes the harness an agent framework:</strong> Decompose + track dependencies + parallel execute + handle per-subtask failures + synthesize = full agent runtime. Category shift from "intelligent proxy" to "agent orchestration." Competes with LangGraph/ADK, not RouteLLM. Build scope expands significantly.</li>
+        <li><strong>Emergent subtasks are unavoidable:</strong> During subtask 2 (design JWT), Claude discovers OAuth flows need updating → subtask 6 emerges. Static plans break. Need dynamic replanning (like Manus). More infrastructure complexity.</li>
+        <li><strong>The chicken-and-egg has a known solution:</strong> Two-stage hybrid routing. Embedding-based complexity estimation (fast, no LLM) → conditional decomposition. Only compound tasks pay the cost.</li>
+        <li><strong>Memory makes decomposition better over time:</strong> Store which decomposition patterns worked, which subtask types route well to which model. First week: conservative, occasionally wrong. Month two: calibrated to actual patterns. <strong>Decomposition should NOT be in MVP</strong> — it should come after memory has data.</li>
+        <li><strong>Option B may be simpler:</strong> Instead of harness-level decomposition, leverage Claude's native decomposition (Task tool/subagents). When Claude decides to delegate, the harness routes the delegation. Claude does what it already does; harness just gets smart about WHERE each piece runs.</li>
+      </ul>
+    </div>
+
+    <div class="section-label threads">Open Threads</div>
+    <div class="section-content threads">
+      <ul>
+        <li>Could a lighter model (Gemini Flash) handle decomposition, saving Claude tokens? Decomposition is planning, not execution — some research suggests lighter models suffice.</li>
+        <li>What is the complexity threshold for the two-stage gate? Confidence score? Token count? Keyword patterns? Empirical question needing real-world testing.</li>
+        <li>Does Claude's native decomposition (Option B) make harness-level decomposition unnecessary? Test the zero-code baseline first.</li>
+        <li>How does decomposition interact with the veto pattern? Per-subtask critique? Or whole-task only?</li>
+        <li>How deep should decomposition go? One level for routing, let executing model handle further decomposition internally.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- IQ-6 -->
+  <div class="tool">
+    <div class="tool-title">
+      <span class="tool-name">IQ-6: MCP Server Reliability, Tools & Robustness</span>
+      <span class="wave-badge">Wave 1</span>
+      <span class="layer-badge">Layer 5</span>
+    </div>
+    <p class="tool-desc">
+      The delivery mechanism for the entire 5-layer architecture. LLM-based tool selection is unreliable — Claude DECIDES whether to call MCP tools, with 12-50% failure rates depending on conditions. How do you make an invisible harness that's also reliable? Research uncovered a critical hooks + MCP hybrid approach that reframes the entire delivery architecture.
+    </p>
+
+    <div class="section-label tension">The Core Tension</div>
+    <div class="section-content tension">
+      <ul>
+        <li><strong>Inference-based invocation is inherently unreliable.</strong> MCP tools are suggestions, not guarantees. Claude decides whether to call <code>delegate_to_gemini</code> based on its reasoning. If Claude doesn't think to call your tool, the harness doesn't activate. Native tools (Read, Edit, Bash) always win in discoverability because they're hardcoded.</li>
+        <li><strong>Tool Search compounds the problem.</strong> When context contains >10% tool definitions, Claude uses a discovery step (Tool Search) that further reduces reliability. More harness tools = less reliable invocation of any individual tool.</li>
+        <li><strong>Invisibility requires reliability.</strong> If the harness is invisible but unreliable, it's worse than no harness — the user doesn't know when it's working vs when it silently failed. An invisible system that works 70% of the time is an invisible system you can't trust.</li>
+      </ul>
+    </div>
+
+    <div class="section-label works">Research Findings</div>
+    <div class="section-content works">
+      <p style="margin-bottom: 0.75rem;"><strong>The breakthrough: Hooks (guaranteed) + MCP tools (optional) = reliability without fragility.</strong></p>
+      <ul>
+        <li><strong>Claude Code hooks</strong> fire on lifecycle events — always, deterministically, regardless of what Claude decides to do. They are shell commands executed by the runtime, not LLM-chosen tool calls.</li>
+        <li><strong>UserPromptSubmit</strong> is the linchpin — fires on EVERY prompt. Can inject context that shapes Claude's reasoning: "You are at 80% Claude usage. Consider delegating research tasks to Gemini." Claude's natural reasoning then aligns with what the harness needs. No tool invocation required.</li>
+        <li><strong>PreToolUse</strong> can block tool calls — if Claude tries to use a tool when rate-limited, the hook can intercept and prevent it. Hard enforcement.</li>
+        <li><strong>PostToolUse</strong> records every tool call — tracking, counters, telemetry. Zero LLM cost.</li>
+        <li><strong>Stop hook</strong> fires at session end — write session summary to memory. Guaranteed persistence.</li>
+      </ul>
+
+      <div class="scenario">RELIABILITY MODEL: THREE TIERS
+
+Tier 1 — CLAUDE.md (Soft Steering)
+  "When task > 100K tokens, use delegate_to_gemini"
+  Always read. Claude decides whether to follow.
+  Reliability: ~60-80%
+
+Tier 2 — Hooks (Hard Enforcement)
+  UserPromptSubmit: inject rate state + memory
+  PreToolUse: block if rate-limited
+  PostToolUse: track usage
+  Stop: persist session to memory
+  Reliability: 100% (they always fire)
+
+Tier 3 — MCP Tools (Capability Extension)
+  delegate_to_gemini, request_critique, query_memory
+  Claude chooses when to invoke.
+  Reliability: ~50-88% (depends on context)
+
+CRITICAL PATH = Tier 2. Optional enhancements = Tier 3.
+System doesn't break if MCP tools aren't called.</div>
+    </div>
+
+    <div class="section-label breaks">What Could Go Wrong</div>
+    <div class="section-content breaks">
+      <ul>
+        <li><strong>Claude never calls <code>delegate_to_gemini</code></strong> — even with CLAUDE.md instructions, native tool preference wins. Mitigation: hooks inject context that makes Claude want to delegate naturally.</li>
+        <li><strong>Hook injection changes reasoning unexpectedly</strong> — injecting "You're at 80% usage" might make Claude overly conservative, refusing to do work it should handle. The injection must be informational, not directive.</li>
+        <li><strong>Too many MCP tools trigger Tool Search</strong> — exposing 8+ harness tools alongside other MCP servers pushes past the threshold. Keep harness tools minimal (3-5 max).</li>
+        <li><strong>MCP server crashes mid-session</strong> — hooks are separate from MCP; they keep working. But MCP-dependent features (delegation, critique) stop. Need graceful degradation.</li>
+        <li><strong>Hook latency</strong> — UserPromptSubmit adds processing time before Claude sees the prompt. If hook script takes 500ms (reading memory, checking rates), the user feels it on every interaction.</li>
+      </ul>
+    </div>
+
+    <div class="section-label gap">Design Implications</div>
+    <div class="section-content gap">
+      <p style="margin-bottom: 0.75rem;"><strong>The hooks + MCP split for each harness function:</strong></p>
+      <div class="scenario">FUNCTION              │ HOOK (guaranteed)              │ MCP TOOL (optional)
+──────────────────────┼────────────────────────────────┼──────────────────────
+Rate checking         │ UserPromptSubmit: inject state  │ check_rate_status
+Memory injection      │ UserPromptSubmit: inject context│ query_memory (deep)
+Rate enforcement      │ PreToolUse: block if exhausted  │ —
+Usage tracking        │ PostToolUse: update counters    │ —
+Delegation            │ —                               │ delegate_to_gemini
+Critique              │ —                               │ request_critique
+Session persistence   │ Stop: write session to memory   │ —</div>
+      <ul>
+        <li><strong>Hooks handle the critical path.</strong> Rate awareness, memory injection, usage tracking, and session persistence are ALL guaranteed via hooks. The harness works even if Claude never calls a single MCP tool.</li>
+        <li><strong>MCP tools handle optional capabilities.</strong> Active delegation and critique are enhancements Claude can choose when appropriate. If Claude doesn't call them, the system degrades gracefully — tasks run on Claude (the default) instead of being routed.</li>
+        <li><strong>CLAUDE.md provides behavioral context.</strong> Not enforcement, but guidance: "You have these tools available. Here's when they're useful." Keeps Claude informed without constraining.</li>
+      </ul>
+    </div>
+
+    <div class="section-label journey">User Journey Impact</div>
+    <div class="section-content journey">
+      <div class="journey-scenario">
+        <p><span class="time">9:00 AM</span> <span class="action">— User types <code>claude</code>. MCP server spawns from .mcp.json. Hooks register from settings.json. User sees nothing different.</span></p>
+        <p><span class="time">9:01 AM</span> <span class="action">— User types: "Research latest OAuth 2.1 spec changes." UserPromptSubmit hook fires → checks rate state (Claude at 72%), injects: "[Harness: Claude 72% weekly usage. Research tasks can be delegated to Gemini.]" → Claude reads injected context, decides to call <code>delegate_to_gemini</code>.</span></p>
+        <p><span class="time">9:15 AM</span> <span class="action">— User types: "Now implement the changes in auth.ts." UserPromptSubmit fires → injects rate state + memory: "[Harness: Claude 73%. Previous task found 3 spec changes relevant to auth.ts.]" → Claude handles directly (coding task, memory context).</span></p>
+        <p><span class="time">12:00 PM</span> <span class="action">— Session ends. Stop hook fires → writes session summary to memory. Tomorrow's session will have today's context automatically.</span></p>
+      </div>
+      <p style="margin-top: 0.75rem; color: var(--text-muted);"><strong>Key:</strong> The user never explicitly invoked the harness. Hooks injected context invisibly. Claude made routing decisions based on that context. The system worked even though MCP tool invocation was optional — hooks guaranteed the critical path.</p>
+    </div>
+
+    <div class="section-label realize">What This Makes You Realize</div>
+    <div class="section-content realize">
+      <ul>
+        <li><strong>Hooks ARE the harness.</strong> MCP tools are optional power-ups. The entire critical path (rate awareness, memory injection, tracking, persistence) runs on hooks. This reframes the architecture: the harness is a hooks system with an optional MCP enhancement layer.</li>
+        <li><strong>UserPromptSubmit rewrites the invisible routing problem.</strong> Instead of hoping Claude calls <code>route_task</code>, you inject the routing context directly. Claude's natural reasoning handles the rest. This is how you make routing invisible: not by building a router Claude must invoke, but by shaping the information Claude reasons with.</li>
+        <li><strong>Could the entire harness be hooks-only?</strong> If hooks inject rate state + memory + routing suggestion on every prompt, and Claude's natural reasoning handles delegation (using PAL MCP's existing <code>clink</code> tool), do we need a custom MCP server at all? The harness might be: hooks + CLAUDE.md + PAL MCP. Zero custom MCP code.</li>
+        <li><strong>The 3-tier model maps to failure tolerance:</strong> CLAUDE.md fails silently (Claude ignores instruction), MCP fails visibly (tool call fails), hooks can't fail silently (they either fire or error). Design for: hooks handle must-work, MCP handles nice-to-have, CLAUDE.md handles behavioral nudges.</li>
+        <li><strong>Hook limitations matter:</strong> Can hooks see conversation history? Can they make HTTP calls? What's their latency budget? If UserPromptSubmit can't read a SQLite database in <100ms, the memory injection strategy breaks. These are implementation questions that determine feasibility.</li>
+      </ul>
+    </div>
+
+    <div class="section-label threads">Open Threads</div>
+    <div class="section-content threads">
+      <ul>
+        <li>What exactly can UserPromptSubmit inject? Plain text? JSON? System-level messages? This determines how sophisticated the context injection can be.</li>
+        <li>What happens if a hook script crashes? Does Claude Code hang? Error gracefully? This determines how defensive hook implementations need to be.</li>
+        <li>Hook latency budget: if every prompt adds 100-500ms from hook processing, is that acceptable? Can hooks run async?</li>
+        <li>Could the harness be ENTIRELY hooks + CLAUDE.md + PAL MCP, with zero custom MCP server? This would massively simplify implementation.</li>
+        <li>How many MCP tools is the sweet spot? Research suggests <5 for reliable invocation. The harness should expose the minimum viable tool set.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- IQ-2 -->
+  <div class="tool">
+    <div class="tool-title">
+      <span class="tool-name">IQ-2: Gemini Conductor Layer Mapping</span>
+      <span class="wave-badge">Wave 1</span>
+      <span class="layer-badge">All 5 Layers</span>
+    </div>
+    <p class="tool-desc">
+      If Gemini Conductor wasn't limited to Gemini CLI, what parts of the 5 layers does it tackle? Conductor is NOT what it sounds like — it is a context-driven development workflow extension, not a multi-model orchestrator. Understanding what it actually does (and doesn't do) clarifies where the genuine gap lives.
+    </p>
+
+    <div class="section-label tension">The Core Tension</div>
+    <div class="section-content tension">
+      <ul>
+        <li><strong>Conductor is narrower than the name suggests.</strong> It manages markdown-based specs, plans, and tracks. It does NOT route between models, select providers, persist semantic memory, or provide dashboards. It's structured project management for Gemini CLI.</li>
+        <li><strong>"Unbounding" is a thought experiment, not a product comparison.</strong> The real question isn't "what if Conductor could use Claude?" — it's "what if Conductor's workflow philosophy were extended to a multi-provider world?" Those are very different questions.</li>
+        <li><strong>As-is, Conductor covers ~15-20% of the harness vision.</strong> Almost all in Layer 3 (markdown persistence) and Layer 5 (CLI extension pattern). Zero coverage of Layers 1, 2, or 4.</li>
+      </ul>
+    </div>
+
+    <div class="section-label works">Research Findings</div>
+    <div class="section-content works">
+      <p style="margin-bottom: 0.75rem;"><strong>Conductor (Dec 2025 preview) provides 6 commands:</strong> <code>/conductor:setup</code>, <code>newTrack</code>, <code>implement</code>, <code>status</code>, <code>revert</code>, <code>review</code>. Context → Spec & Plan → Implement lifecycle. Persistent markdown in <code>conductor/</code> directory. Git-aware rollback. Parallel tracks.</p>
+      <div class="scenario">LAYER-BY-LAYER MAPPING:
+
+Layer 1 (Router):     Conductor: 0%.  Gemini CLI Auto mode: ~15% (Flash/Pro intra-family)
+Layer 2 (Decision):   Conductor: 0%.  Nothing makes cross-provider decisions.
+Layer 3 (Memory):     Conductor: ~30%. Markdown files persist across sessions. No semantic search.
+Layer 4 (Visual):     Conductor: 0%.  Text-only /status command.
+Layer 5 (CLI):        Conductor: ~20%. Demonstrates CLI extension pattern. Not invisible — requires /conductor: prefix.</div>
+      <ul>
+        <li><strong>Gemini CLI Auto mode (separate from Conductor):</strong> Lightweight classifier (~1.6s) scores complexity 0-100. Below 50% → Flash, above → Pro. Keyword analysis. Intra-family only — no cross-provider awareness.</li>
+        <li><strong>Google explicitly rejected multi-provider PR</strong> for Gemini CLI. Cross-provider support is outside Google's product incentive. The harness is structurally protected from Google shipping a "Claude+Gemini" solution.</li>
+        <li><strong>The real competitive threats are NOT Conductor:</strong> Conductor Build (goforgeit.com) covers Layer 4 at ~60-70%. CCProxy covers Layers 1-2 (rule-based). Claude-Flow covers cross-provider orchestration. These are the actual competitors.</li>
+      </ul>
+    </div>
+
+    <div class="section-label breaks">What Could Go Wrong</div>
+    <div class="section-content breaks">
+      <ul>
+        <li><strong>Google ecosystem convergence (12-18 month risk):</strong> Conductor + Auto mode + monitoring dashboards + save_memory + ADK = maybe 60-70% of the vision for Gemini-only. Not a 3-month threat, but a trajectory to watch.</li>
+        <li><strong>Third-party cross-provider tools are already shipping:</strong> Conductor Build (multi-engine visual dashboard, macOS app), CCProxy (Claude-to-Gemini routing), Claude-Flow (multi-provider orchestration). The gap is narrowing from below.</li>
+        <li><strong>MCP as the great equalizer:</strong> The Agentic AI Foundation (AAIF, Dec 2025) makes MCP universal — adopted by Claude, Gemini, Cursor, VS Code, ChatGPT. Any MCP-based tool is inherently cross-provider. Competitors can build MCP-based harnesses just as easily.</li>
+      </ul>
+    </div>
+
+    <div class="section-label gap">Design Implications</div>
+    <div class="section-content gap">
+      <p style="margin-bottom: 0.75rem;"><strong>Clear build-vs-adopt split emerges from the mapping:</strong></p>
+      <ul>
+        <li><strong>ADOPT Layer 4 (dashboard):</strong> Conductor Build already ships multi-engine visual dashboard. Don't build from scratch.</li>
+        <li><strong>ADOPT/EXTEND Layer 5 (CLI proxy):</strong> CCProxy already ships Claude-to-Gemini routing. Extend, don't rebuild.</li>
+        <li><strong>BUILD Layer 1 (semantic router):</strong> Nothing ships semantic cross-provider task classification.</li>
+        <li><strong>BUILD Layer 2 (decision engine):</strong> Nothing ships the 4-signal fusion (route + rate + memory + subtask context). Most novel and hardest layer.</li>
+        <li><strong>BUILD or EXTEND Layer 3 (memory):</strong> Conductor's markdown approach validates Phase 1 (files). Add semantic capabilities later.</li>
+      </ul>
+    </div>
+
+    <div class="section-label journey">User Journey Impact</div>
+    <div class="section-content journey">
+      <div class="journey-contrast">
+        <div class="journey-contrast-item current">
+          <div class="label">Conductor-Only Experience</div>
+          <span style="color: var(--text-dim); font-size: 0.85rem;">Gemini only. Structured planning. Persistent context. BUT: no Claude, no rate management, no semantic routing, explicit /conductor: commands, no dashboard. User abandons their most capable tool.</span>
+        </div>
+        <div class="journey-contrast-item hypothetical">
+          <div class="label">Harness Experience</div>
+          <span style="color: var(--text-dim); font-size: 0.85rem;">Claude + Gemini. Invisible routing. Semantic memory. Rate prediction. Type <code>claude</code> normally. "What did we learn about auth?" works. Cross-model critique for security.</span>
+        </div>
+      </div>
+      <p style="margin-top: 0.75rem; color: var(--text-muted);"><strong>The experience gap:</strong> Conductor forces full Gemini commitment. The harness preserves Claude as the primary tool while adding Gemini as intelligent overflow. The user's $200/mo Claude Max investment is leveraged, not abandoned.</p>
+    </div>
+
+    <div class="section-label realize">What This Makes You Realize</div>
+    <div class="section-content realize">
+      <ul>
+        <li><strong>The value prop is cross-provider orchestration, not technical novelty.</strong> Even if Conductor covered Layers 1-2 for Gemini-only, the harness's value is intact because no single vendor will ship Claude+Gemini integration. Google won't add Claude. Anthropic won't add Gemini. The cross-provider gap is structurally permanent.</li>
+        <li><strong>The real moat might be "works with Claude Max subscription."</strong> Not a technical advantage, but a distribution one. Users don't want $200/mo for Claude Max AND separate API fees. The harness works within existing economics.</li>
+        <li><strong>Conductor's markdown approach validates Phase 1 memory.</strong> Persistent markdown files in the repo, committed to git, readable by both humans and AI. Not sophisticated, but production-proven for context persistence. Start here, add semantic capabilities in Phase 2-3.</li>
+        <li><strong>The 40% gap might shrink to 30-35%.</strong> If Conductor Build (goforgeit.com) is adopted for Layer 4, existing tool coverage rises from ~60% to ~65-70%. The remaining gap is smaller but harder and more valuable: semantic routing + decision engine + semantic memory.</li>
+        <li><strong>Zero-code baseline should include Conductor.</strong> Expand the baseline test to: PAL MCP + CCProxy + CodexBar + Gemini CLI with Conductor. Test the full available ecosystem before deciding what to build.</li>
+      </ul>
+    </div>
+
+    <div class="section-label threads">Open Threads</div>
+    <div class="section-content threads">
+      <ul>
+        <li>Could Conductor Build (goforgeit.com) evolve into the harness? They already wrap Claude + Gemini + Codex. If they add semantic routing and memory, they become a commercial version of this project. Monitor their roadmap.</li>
+        <li>Gemini 3's "Dynamic View" (generative UI from prompts) — could it partially address Layer 4 without building anything? Speculative but worth watching.</li>
+        <li>If Google merges Conductor into Gemini CLI core, the bar for "better than just using Gemini" rises. Doesn't threaten the harness (still single-provider) but raises expectations.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- WAVE 2 -->
+  <div class="category">
+    <div class="category-name">Wave 2 — After IQ-1</div>
+    <div class="category-desc">Depends on decomposition answer. If decomposition changes what the router receives, these questions must account for that.</div>
+  </div>
+
+  <!-- IQ-7 -->
+  <div class="tool">
+    <div class="tool-title">
+      <span class="tool-name">IQ-7: Semantic Routing vs Heuristics Consistency</span>
+      <span class="wave-badge">Wave 2</span>
+      <span class="layer-badge">Layer 1, 2</span>
+    </div>
+    <p class="tool-desc">
+      The architecture says "semantic routing" (RouteLLM, Aurelio) but the diagrams show heuristic-style examples: "audit → Claude, 140K tokens → Gemini." Is this a consistency bug or the correct end state? Maybe heuristics are enough — and maybe decomposition (IQ-1) makes them even more sufficient.
+    </p>
+
+    <div class="section-label tension">The Core Tension</div>
+    <div class="section-content tension">
+      <ul>
+        <li><strong>This might be a false dichotomy.</strong> RouteLLM's "pre-trained routers" ARE learned heuristics — just more sophisticated ones. The real question isn't "semantic vs heuristic" but how COMPLEX the heuristics need to be. Simple keyword rules? Embedding similarity? Trained classifiers?</li>
+        <li><strong>The user's task distribution may be simpler than assumed.</strong> If 80% of tasks fall into obvious categories ("fix this bug" → code → Claude, "analyze this 150K codebase" → large context → Gemini), keyword matching gets 80% accuracy at zero cost. Is the 15% accuracy improvement from semantic routing worth 50-100ms + embedding costs per request?</li>
+        <li><strong>The diagrams might be correct.</strong> Heuristic examples in diagrams because those ARE the common cases. Semantic routing exists only for the 10-15% ambiguous edge cases. The diagram inconsistency might reflect reality, not a documentation bug.</li>
+      </ul>
+    </div>
+
+    <div class="section-label works">Research Findings</div>
+    <div class="section-content works">
+      <ul>
+        <li><strong>RouteLLM is learned heuristics at scale.</strong> Trained on GPT-4 vs Mixtral routing decisions. The "pre-trained routers" are statistical models that learned complexity signals from millions of examples. They ARE heuristics — just far more nuanced than keyword matching.</li>
+        <li><strong>CCProxy's pure heuristic approach (token count, tool match, model name):</strong> Works perfectly for "large analysis → Gemini" but cannot distinguish "research JWT vulnerabilities" from "debug auth.ts" — both look like ~10 tokens with no tools, route identically.</li>
+        <li><strong>Hybrid approach exists:</strong> Fast path (heuristics for obvious cases: token count > 100K → Gemini, explicit delegation → PAL MCP) + slow path (semantic classification for ambiguous cases). How to decide which path? The complexity gate from IQ-1.</li>
+        <li><strong>If IQ-1 decomposition happens first:</strong> Decomposed subtasks like "search codebase for auth patterns" are easily classified by keyword heuristics ("search" → research → Gemini). Decomposition may ELIMINATE the need for semantic routing by making routing inputs simple enough for rules.</li>
+      </ul>
+    </div>
+
+    <div class="section-label breaks">What Could Go Wrong</div>
+    <div class="section-content breaks">
+      <ul>
+        <li><strong>Semantic routing = over-engineering</strong> if heuristics work 90% of the time. Added cost and latency for marginal improvement. The user doesn't notice 5% more accuracy; they DO notice 100ms more latency.</li>
+        <li><strong>Heuristics = under-engineering</strong> if the user frequently has ambiguous tasks ("research JWT vulnerabilities then implement fixes"). Misrouting research to Claude wastes tokens. Misrouting coding to Gemini produces lower quality.</li>
+        <li><strong>Building semantic routing before measuring heuristic accuracy:</strong> Assumption-driven, not data-driven. The zero-code baseline test would reveal how often heuristic routing actually misroutes.</li>
+      </ul>
+    </div>
+
+    <div class="section-label gap">Design Implications</div>
+    <div class="section-content gap">
+      <ul>
+        <li><strong>If heuristics suffice:</strong> Layer 1 is a simple rule engine. Fast, free, deterministic. The diagrams accurately represent the production system.</li>
+        <li><strong>If semantic needed:</strong> Layer 1 is a probabilistic classifier. 50-100ms, embedding cost, requires evaluation. Diagrams need to show classification output, not task-type labels.</li>
+        <li><strong>Minimum Viable Router:</strong> Start with heuristics (token count, keyword matching, explicit delegation commands). Measure misroute rate. Add semantic classification only for task types that consistently misroute. Data-driven, not assumption-driven.</li>
+        <li><strong>The diagrams should evolve:</strong> Phase 1 diagrams show heuristic routing (accurate for that phase). Phase 2 diagrams show semantic routing (if needed). The inconsistency resolves when the implementation exists.</li>
+      </ul>
+    </div>
+
+    <div class="section-label journey">User Journey Impact</div>
+    <div class="section-content journey">
+      <p style="margin-bottom: 0.75rem;"><strong>The user doesn't care HOW routing happens — only that it's accurate and fast.</strong></p>
+      <ul>
+        <li>If heuristics misroute 1 in 10 tasks: the user corrects occasionally, barely notices.</li>
+        <li>If heuristics misroute 3 in 10 tasks: the user learns not to trust routing, starts manually delegating. Harness becomes useless overhead.</li>
+        <li>The threshold is somewhere around 85% accuracy. Below that, the user's manual routing judgment is better and faster.</li>
+      </ul>
+      <p style="margin-top: 0.75rem; color: var(--text-muted);">The zero-code baseline test answers this empirically: use heuristic routing for a week, measure how often the user disagrees with routing decisions.</p>
+    </div>
+
+    <div class="section-label realize">What This Makes You Realize</div>
+    <div class="section-content realize">
+      <ul>
+        <li><strong>Adaptive routing is the actual answer.</strong> Start with heuristics. Log every routing decision and outcome. Identify task types that consistently misroute. Add semantic classification ONLY for those types. The system improves based on data, not assumptions.</li>
+        <li><strong>Decomposition (IQ-1) may make this question moot.</strong> If compound tasks are decomposed into clear subtasks ("search codebase" → research, "modify auth.ts" → code), heuristics handle the decomposed inputs easily. The need for semantic routing depends on the answer to IQ-1.</li>
+        <li><strong>The user's workflow distribution determines the answer.</strong> If 90% of tasks are obviously code/research/analysis, heuristics win. If 50% are ambiguous compound tasks, semantic routing wins. This isn't a technical question — it's an empirical one about THIS user's task patterns.</li>
+        <li><strong>RouteLLM/Aurelio evaluation should wait.</strong> No point evaluating semantic routers before knowing whether heuristics are sufficient. Test heuristics first → measure → decide. This saves research time and implementation effort.</li>
+      </ul>
+    </div>
+
+    <div class="section-label threads">Open Threads</div>
+    <div class="section-content threads">
+      <ul>
+        <li>What's the actual misroute rate for heuristic routing on this user's task distribution? Only the zero-code baseline test can answer this.</li>
+        <li>If decomposition (IQ-1) happens, does it simplify routing inputs enough to make semantic routing unnecessary?</li>
+        <li>Can the harness log routing decisions from day one (even with heuristics) to build the dataset needed for future semantic routing evaluation?</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- IQ-3 -->
+  <div class="tool">
+    <div class="tool-title">
+      <span class="tool-name">IQ-3: Layer 2 Routing Nuance — Forward-Thinking Conservation</span>
+      <span class="wave-badge">Wave 2</span>
+      <span class="layer-badge">Layer 2, 3</span>
+    </div>
+    <p class="tool-desc">
+      Beyond task classification and current rate limits: if task classification says "Claude is best," but you're burning through capacity and have a complex architecture review Friday, should the system conserve Claude and route to Gemini now? This is <strong>predictive resource management</strong> — the hardest dimension of the hardest layer.
+    </p>
+
+    <div class="section-label tension">The Core Tension</div>
+    <div class="section-content tension">
+      <ul>
+        <li><strong>Conservation implies value judgment.</strong> "This task is less important than a hypothetical future task." Who decides? The harness is an AI making resource allocation decisions on behalf of the user. That is a significant autonomy question.</li>
+        <li><strong>Prediction requires data the system doesn't have.</strong> The user doesn't announce their schedule. How do you predict Friday's architecture review? Historical patterns ("Fridays are architecture-heavy")? Statistical burn rate projection? Or just: ask the user?</li>
+        <li><strong>Quality degradation compounds invisibly.</strong> Routing a research task to Gemini when Claude would have been better is a single quality loss. But if conservation routes 10 tasks to Gemini over two days, the accumulated quality gap becomes noticeable — and the user can't pinpoint when or why things got worse.</li>
+      </ul>
+    </div>
+
+    <div class="section-label works">Research Findings</div>
+    <div class="section-content works">
+      <ul>
+        <li><strong>Cloud autoscaler analogy:</strong> Kubernetes uses predictive autoscaling with historical patterns (HPA + VPA). Reserves capacity for expected peak. Applicable concept: track weekly usage curves, predict remaining capacity, adjust routing aggressiveness.</li>
+        <li><strong>RouteLLM's cost-quality trade-off:</strong> RouteLLM achieves 95% of GPT-4 quality using only 14% of GPT-4 calls by routing easy tasks to cheaper models. The mechanism: a learned threshold that balances quality vs cost. Directly applicable to conservation.</li>
+        <li><strong>Burn rate is more useful than current state.</strong> "Claude at 60%" means nothing without context. "Claude at 60% on Wednesday, burning 30%/day, 2 days remaining" means conservation is critical. "Claude at 60% on Friday afternoon" means spend freely.</li>
+        <li><strong>User-declared priorities exist in many systems:</strong> Kubernetes allows priority classes for pods. The harness equivalent: user says "/priority high" for critical tasks or "/conserve" to enable aggressive conservation mode.</li>
+      </ul>
+    </div>
+
+    <div class="section-label breaks">What Could Go Wrong</div>
+    <div class="section-content breaks">
+      <ul>
+        <li><strong>Conserving when not needed = unnecessary quality degradation.</strong> If the user doesn't have a Friday review, conservation wasted Claude capacity that expires unused at week reset.</li>
+        <li><strong>NOT conserving when needed = hitting the wall.</strong> The exact problem the harness exists to solve.</li>
+        <li><strong>"Rationing" feeling erodes trust.</strong> User: "Why is the system giving me Gemini when I need Claude?" If the answer is "because we're saving Claude for later" and the user disagrees, trust breaks.</li>
+        <li><strong>Gaming:</strong> User learns "if I want Claude, phrase it as architecture" to bypass conservation. The system becomes adversarial.</li>
+        <li><strong>Novel weeks break predictions.</strong> Historical patterns fail when the user works on something new. Monday-Thursday pattern doesn't predict a surprise Friday deadline.</li>
+      </ul>
+    </div>
+
+    <div class="section-label gap">Design Implications</div>
+    <div class="section-content gap">
+      <p style="margin-bottom: 0.75rem;"><strong>Signals beyond the current 4 that Layer 2 should consume:</strong></p>
+      <ul>
+        <li><strong>Burn rate trajectory:</strong> Not just "Claude at 60%" but "burning 30%/day, 2 days to reset." This is the single most important conservation signal.</li>
+        <li><strong>Day-of-week patterns:</strong> Historical task distribution. If Fridays are architecture-heavy, conserve Thursday afternoon.</li>
+        <li><strong>Quality sensitivity:</strong> Some tasks tolerate B-tier model (research, bulk analysis). Others demand A-tier (security audit, architecture). Route by sensitivity, not just type.</li>
+        <li><strong>User overrides and frequency:</strong> If the user overrides conservation 5x this week, reduce conservation aggressiveness. The system learns from disagreement.</li>
+        <li><strong>Explicit declarations:</strong> <code>/conserve</code> and <code>/spend</code> modes. <code>/priority high</code> for specific tasks. User retains final authority.</li>
+      </ul>
+    </div>
+
+    <div class="section-label journey">User Journey Impact</div>
+    <div class="section-content journey">
+      <div class="journey-scenario">
+        <p><span class="time">Wednesday 2 PM</span> <span class="action">— Claude at 58%. Burn rate: 28%/day. Dashboard shows: "At current rate, Claude exhausts by Thursday evening." UserPromptSubmit injects: "[Harness: Conservation mode active. Research/analysis tasks routing to Gemini.]"</span></p>
+        <p><span class="time">Wednesday 3 PM</span> <span class="action">— User: "Research JWT best practices." System routes to Gemini (research + conservation). User doesn't notice — research quality is comparable.</span></p>
+        <p><span class="time">Thursday 9 AM</span> <span class="action">— User: "Review the auth security implementation." System routes to Claude (security-critical, high quality sensitivity). Conservation preserved capacity for this.</span></p>
+      </div>
+      <p style="margin-top: 0.75rem; color: var(--text-muted);"><strong>Override mechanism:</strong> User can type <code>/spend</code> to disable conservation for the current session, or <code>/priority high</code> to force Claude for a specific task. The system respects overrides and learns from them.</p>
+    </div>
+
+    <div class="section-label realize">What This Makes You Realize</div>
+    <div class="section-content realize">
+      <ul>
+        <li><strong>There may be a simpler framing:</strong> "Always route to the cheapest model that meets a quality threshold." No prediction needed. Just: if Gemini can handle this at acceptable quality, use Gemini. If not, use Claude. Quality threshold is the only parameter, not capacity prediction.</li>
+        <li><strong>This turns the harness into a planning tool.</strong> Predictive conservation means the harness thinks about the user's week, not just the current task. That's planning, not routing. Scope expansion.</li>
+        <li><strong>The inverse is also valid:</strong> SPENDING aggressively early because models improve over time. Today's hard task is tomorrow's easy task as model capabilities advance. Conservation might be wrong if next week's models are better.</li>
+        <li><strong>User-declared priorities are probably sufficient for MVP.</strong> Instead of predictive conservation: let the user say "I have a big review Friday." System notes it, adjusts routing. Simple, transparent, no prediction needed. Add automatic prediction in Phase 2 once patterns accumulate.</li>
+        <li><strong>The quality threshold approach subsumes conservation:</strong> If you define "quality threshold per task type" (security: Claude only, research: either, bulk edit: either), conservation happens naturally. You never route security to Gemini regardless of capacity. You always route research to Gemini when it's cheaper. No prediction needed.</li>
+      </ul>
+    </div>
+
+    <div class="section-label threads">Open Threads</div>
+    <div class="section-content threads">
+      <ul>
+        <li>Is the "quality threshold per task type" approach sufficient, or does the user genuinely need predictive conservation?</li>
+        <li>How many task-cycles before weekly patterns become reliable? If the user works differently every week, pattern-based prediction never converges.</li>
+        <li>What does the override UX look like? CLI commands? Dashboard toggle? CLAUDE.md declarations?</li>
+        <li>Break-even analysis: how accurate does prediction need to be to be worth the complexity? If random conservation performs 70% as well as perfect prediction, just use the simpler approach.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- WAVE 3 -->
+  <div class="category">
+    <div class="category-name">Wave 3 — After IQ-1 + IQ-3</div>
+    <div class="category-desc">Requires knowing pipeline shape (IQ-1) and routing factors (IQ-3) to map the complete cost surface.</div>
+  </div>
+
+  <!-- IQ-4 -->
+  <div class="tool">
+    <div class="tool-title">
+      <span class="tool-name">IQ-4: Overarching LLM Costs Across All Layers</span>
+      <span class="wave-badge">Wave 3</span>
+      <span class="layer-badge">All Layers</span>
+    </div>
+    <p class="tool-desc">
+      The harness exists to SAVE model usage. But it consumes LLM tokens for its own operations: classification, decomposition, memory reads/writes, confidence scoring. If the overhead is 15% per task, the harness needs to save MORE than 15% to break even. This is the ROI question for the entire project.
+    </p>
+
+    <div class="section-label tension">The Core Tension</div>
+    <div class="section-content tension">
+      <ul>
+        <li><strong>The harness is a tax on every interaction.</strong> CLAUDE.md instructions consume context window tokens on every turn. Classification (if LLM-based) costs tokens per prompt. Memory operations (Mem0) cost tokens per read/write. The question isn't whether there's overhead — it's whether the overhead is acceptable.</li>
+        <li><strong>The ROI equation:</strong> (Claude tokens saved by routing to Gemini) minus (harness overhead tokens) = net savings. If the harness saves 40% of Claude usage but consumes 20% in overhead, net savings is 20%. If overhead is 45%, the harness is net negative.</li>
+        <li><strong>Cold start is the worst case.</strong> Day one: maximum overhead (classification, memory initialization, CLAUDE.md processing) with zero benefit (no memory data, no routing history). The harness must justify itself from the beginning or the user won't trust it.</li>
+      </ul>
+    </div>
+
+    <div class="section-label works">Research Findings</div>
+    <div class="section-content works">
+      <p style="margin-bottom: 0.75rem;"><strong>Cost map by layer and frequency:</strong></p>
+      <div class="scenario">PER-PROMPT COSTS (every interaction):
+  CLAUDE.md context injection:  ~500-2,000 tokens (fixed tax per turn)
+  UserPromptSubmit hook:        0 tokens (process execution, not LLM)
+  Hooks (Pre/PostToolUse):      0 tokens (process execution)
+
+PER-TASK COSTS (when task is routed):
+  RouteLLM classification:      ~0 tokens (pre-trained classifier, local inference)
+  Aurelio classification:       ~minimal (embedding comparison, not LLM call)
+  Task decomposition (if IQ-1): ~500-2,000 tokens (LLM call for decomposition)
+  Memory read (Mem0):           ~200-500 tokens (LLM extracts relevant memories)
+  Memory read (files):          0 LLM tokens (Claude reads .md file naturally)
+  Memory write (Mem0):          ~300-800 tokens (LLM extracts + stores)
+  Memory write (files):         0 LLM tokens (file append)
+
+TRIGGERED COSTS (occasional):
+  Cross-model critique:         1.5-2x task cost (Gemini reviews Claude's work)
+  Deep memory query:            ~500-1,000 tokens (semantic search + retrieval)
+  Session summary (Stop hook):  ~500-1,500 tokens (if LLM summarizes)
+
+NON-LLM COSTS:
+  MCP server process:           ~10-50MB RAM, negligible CPU
+  Hook execution:               ~1-10ms per hook
+  Dashboard/widget:             ~20-50MB RAM for Electron/web process</div>
+    </div>
+
+    <div class="section-label breaks">What Could Go Wrong</div>
+    <div class="section-content breaks">
+      <ul>
+        <li><strong>CLAUDE.md bloat:</strong> Harness instructions in CLAUDE.md eat context window on EVERY turn. At 200K context limit, 2,000 tokens of harness instructions is 1% — small but compounding over long sessions where context fills up.</li>
+        <li><strong>Mem0 LLM calls on every interaction:</strong> If memory reads use an LLM for extraction, that's a cost per prompt. Over a day of heavy use (50-100 prompts), that's 10K-50K tokens just for memory operations.</li>
+        <li><strong>Decomposition overhead on compound tasks:</strong> If IQ-1 says "yes, decompose," each compound task adds 500-2,000 tokens of decomposition cost. Plus per-subtask classification. The overhead scales with task complexity.</li>
+        <li><strong>Critique is expensive when triggered:</strong> Cross-model critique (1.5-2x task cost) is justified for security-critical work but devastating for routine tasks if triggered incorrectly.</li>
+      </ul>
+    </div>
+
+    <div class="section-label gap">Design Implications</div>
+    <div class="section-content gap">
+      <ul>
+        <li><strong>File-based memory has ZERO LLM cost.</strong> Vs Mem0 which uses LLM calls for extraction. For overhead-sensitive design, files win. The trade-off is semantic search capability — but maybe that's a Phase 2 addition.</li>
+        <li><strong>Hooks have ZERO LLM cost.</strong> This is why the hooks-first architecture (IQ-6) is critical. Every function moved from "MCP tool Claude must invoke" to "hook that fires automatically" reduces both reliability risk AND LLM overhead.</li>
+        <li><strong>RouteLLM has near-zero cost.</strong> Pre-trained classifiers run local inference. No API call. This favors RouteLLM over an LLM-based classification approach.</li>
+        <li><strong>Keep CLAUDE.md minimal.</strong> Every token in harness instructions is a tax on every turn. Write tight, not comprehensive. 500 tokens of well-crafted instructions beats 2,000 tokens of verbose ones.</li>
+        <li><strong>Use the cheapest model for harness operations.</strong> If memory extraction uses an LLM, use Gemini Flash or Haiku — not Claude Opus. Harness overhead should use the cheapest capable model.</li>
+      </ul>
+    </div>
+
+    <div class="section-label journey">User Journey Impact</div>
+    <div class="section-content journey">
+      <p style="margin-bottom: 0.75rem;"><strong>The invisible tax:</strong> The user doesn't see overhead, but they feel it in two ways:</p>
+      <ul>
+        <li><strong>Context window pressure:</strong> CLAUDE.md instructions + injected memory reduce available context. In a long session, the user hits context limits slightly earlier than without the harness.</li>
+        <li><strong>Latency:</strong> Classification (50-100ms) + memory read (100-500ms) + decomposition (1-2s for compound) adds up. Simple tasks should feel instant; the harness should add <200ms to simple interactions.</li>
+      </ul>
+      <p style="margin-top: 0.75rem; color: var(--text-muted);"><strong>The dashboard should show ROI:</strong> "This week: harness overhead 8,500 tokens. Claude tokens saved by routing: 142,000. Net savings: 133,500 tokens (94% efficiency)." This builds trust that the overhead is worth it.</p>
+    </div>
+
+    <div class="section-label realize">What This Makes You Realize</div>
+    <div class="section-content realize">
+      <ul>
+        <li><strong>The zero-cost architecture is: hooks + files + CLAUDE.md + PAL MCP.</strong> Hooks fire for free. File reads are free (Claude reads .md natively). CLAUDE.md is a fixed cost. PAL MCP is existing infrastructure. Total LLM overhead: ~500-2,000 tokens for CLAUDE.md per session. Everything else is zero.</li>
+        <li><strong>There's a "break-even tasks per day" number.</strong> Below some threshold, the harness isn't worth running. If the user processes 5 tasks/day, overhead might exceed savings. At 20+ tasks/day, the math is clearly positive. Understanding this number is critical for the zero-code baseline test.</li>
+        <li><strong>The cheapest harness is the best harness.</strong> Every design decision should minimize overhead. Prefer file-based memory over Mem0 (until semantic search proves necessary). Prefer hooks over MCP tools. Prefer RouteLLM over LLM-based classification. The overhead budget is tight.</li>
+        <li><strong>Critique is the luxury feature.</strong> At 1.5-2x task cost, cross-model critique should trigger rarely and deliberately. The current design (user-triggered or complexity-triggered) is correct — never auto-trigger for routine work.</li>
+      </ul>
+    </div>
+
+    <div class="section-label threads">Open Threads</div>
+    <div class="section-content threads">
+      <ul>
+        <li>What's the actual CLAUDE.md token count for harness instructions? Measure against different instruction verbosity levels.</li>
+        <li>What's Mem0's per-operation LLM cost in practice? Benchmark with real tasks before choosing between Mem0 and files.</li>
+        <li>Is there a break-even chart: tasks/day vs. net token savings? This would help the user decide when to enable/disable the harness.</li>
+        <li>Can the dashboard show real-time ROI? "Harness overhead this session: X tokens. Tokens saved: Y tokens. Net: Z."</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- WAVE 4 -->
+  <div class="category">
+    <div class="category-name">Wave 4 — After All Previous Waves</div>
+    <div class="category-desc">Downstream of everything. The visual interface displays what the system produces — must know what's worth showing.</div>
+  </div>
+
+  <!-- IQ-5 -->
+  <div class="tool">
+    <div class="tool-title">
+      <span class="tool-name">IQ-5: Visual Interface — What Should Actually Surface?</span>
+      <span class="wave-badge">Wave 4</span>
+      <span class="layer-badge">Layer 4</span>
+    </div>
+    <p class="tool-desc">
+      Beyond just "Claude 42% | Gemini 88%" — what would a power user actually want to see? The interface is downstream of all logic decisions. It's not an information display — it's a <strong>trust mechanism</strong>. The question is: what builds trust in automated routing decisions you didn't make?
+    </p>
+
+    <div class="section-label tension">The Core Tension</div>
+    <div class="section-content tension">
+      <ul>
+        <li><strong>Too much information = cognitive overload.</strong> Defeats the "invisible" goal. The user starts monitoring the dashboard instead of working.</li>
+        <li><strong>Too little information = CodexBar clone.</strong> Already exists. "Claude: 42%" is not worth building.</li>
+        <li><strong>The right amount shows what CodexBar CAN'T:</strong> WHY things were routed where they were, what the system learned, what it's predicting, what it would do differently if you changed parameters.</li>
+      </ul>
+    </div>
+
+    <div class="section-label works">Research Findings</div>
+    <div class="section-content works">
+      <p style="margin-bottom: 0.75rem;"><strong>Four tiers of information, from ambient to deep:</strong></p>
+      <ul>
+        <li><strong>Tier 1 — Ambient (menu bar, always visible):</strong> Rate limits both providers, burn rate arrow (trending up/down), conservation mode indicator, session cost. Glanceable in <1 second.</li>
+        <li><strong>Tier 2 — Activity (dashboard, recent):</strong> Last 10 routing decisions with 1-sentence justifications. Active tasks and which provider is handling them. Real-time token counts per provider.</li>
+        <li><strong>Tier 3 — Analytics (dashboard, historical):</strong> Routing accuracy over time. Model performance comparison for YOUR task types. Weekly token savings from routing. Task distribution charts. Patterns the system has learned.</li>
+        <li><strong>Tier 4 — Diagnostic (dashboard, rare):</strong> Full decision trace for any routing decision ("Route signal said Claude, rate limits said Gemini, memory said Gemini failed this last time, result: Claude with conservation note"). Memory contents browser. Signal weight visualization.</li>
+      </ul>
+      <p style="margin-top: 0.75rem;"><strong>From observability research (Langfuse, W&B):</strong> The most valued feature is trace visualization — seeing the chain of decisions that led to an outcome. Applied here: seeing the chain of signals that led to a routing decision.</p>
+    </div>
+
+    <div class="section-label breaks">What Could Go Wrong</div>
+    <div class="section-content breaks">
+      <ul>
+        <li><strong>Dashboard shows routing user disagrees with → trust erosion.</strong> "Why did it send my security audit to Gemini?!" If the explanation is "because Claude was at 78%," the user might not accept the trade-off. Override mechanism is essential.</li>
+        <li><strong>Predictions that are wrong are worse than no predictions.</strong> Showing "Claude exhausts by 3 PM Thursday" when it actually lasts until Friday evening makes the system feel unreliable.</li>
+        <li><strong>Information asymmetry:</strong> Dashboard shows things the user can't act on. "Memory has 47 stored patterns" — so what? If the user can't edit, validate, or understand these patterns, the information breeds anxiety, not trust.</li>
+        <li><strong>Dashboard addiction:</strong> The user compulsively checks routing decisions, losing the "invisible" benefit. The dashboard should be boring when things work — interesting only when things are unexpected.</li>
+      </ul>
+    </div>
+
+    <div class="section-label gap">Design Implications</div>
+    <div class="section-content gap">
+      <ul>
+        <li><strong>Data pipeline:</strong> Hooks → HTTP POST → SQLite → SSE → UI. Hooks capture events. SQLite stores them. Server-sent events push to browser. React/Svelte renders.</li>
+        <li><strong>Menu bar widget (Swift/Electron):</strong> Minimal footprint. Shows: <code>● Claude: 42% ↑ │ Gemini: 88% │ $0.50</code>. The ↑ arrow indicates burn rate direction. Click to open dashboard.</li>
+        <li><strong>Dashboard panels (informed by all IQs):</strong>
+          <ul>
+            <li>Activity Feed (from IQ-1): Shows decomposition trees if decomposition is used</li>
+            <li>Routing Analytics (from IQ-7): Heuristic vs semantic accuracy comparison</li>
+            <li>Cost Tracker (from IQ-4): Harness overhead vs savings, ROI visualization</li>
+            <li>Rate Limits (from IQ-3): Burn rate projection, conservation status</li>
+            <li>Memory Browser (from Layer 3): What the system has learned, pattern explorer</li>
+            <li>Decision Traces (from IQ-3/AQ-1): Full signal breakdown for any routing decision</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="section-label journey">User Journey Impact</div>
+    <div class="section-content journey">
+      <div class="journey-scenario">
+        <p><span class="time">Morning</span> <span class="action">— Glance at menu bar: "Claude: 87% | Gemini: 92%". Fresh week, full capacity. Start working normally.</span></p>
+        <p><span class="time">Mid-day</span> <span class="action">— Notice menu bar says "Claude: 52% ↓". Hmm, burning fast. Click to open dashboard. See: "15 tasks today, 9 routed to Claude, 6 to Gemini. Projected exhaustion: Thursday 2 PM." Decision: enable conservation mode.</span></p>
+        <p><span class="time">3 PM</span> <span class="action">— See a routing decision: "Security review → Gemini. Reason: conservation mode active." Disagree — override with <code>/priority high</code>. System notes the override and routes to Claude.</span></p>
+        <p><span class="time">End of day</span> <span class="action">— Open dashboard weekly view. "Harness saved 47,000 Claude tokens this week (12% of capacity). Overhead: 3,200 tokens (0.8%). Net efficiency: 94%." Trust increases.</span></p>
+      </div>
+    </div>
+
+    <div class="section-label realize">What This Makes You Realize</div>
+    <div class="section-content realize">
+      <ul>
+        <li><strong>The dashboard is a trust mechanism, not an information mechanism.</strong> The real question isn't "what to show" but "what builds trust in automated decisions." Trust grows from: (1) transparency about why decisions were made, (2) ability to override, (3) evidence the system is learning and improving, (4) ROI proof.</li>
+        <li><strong>The counterfactual is powerful:</strong> "If you'd used Claude for this task, it would have cost 4,200 tokens. Gemini handled it for $0. Quality difference: negligible." This shows the value of routing in concrete terms.</li>
+        <li><strong>"What would make you stop checking?" is the measure of trust.</strong> The dashboard succeeds when the user opens it weekly instead of hourly. Boring is good — it means the system is working.</li>
+        <li><strong>Notifications, not dashboards, for urgent events:</strong> "Claude at 90% — switching to conservation mode" as a macOS notification. "Gemini failed mid-task, retrying on Claude" as an inline CLI message. Critical events come to the user; the user goes to the dashboard for curiosity.</li>
+        <li><strong>The learning dashboard is unique:</strong> Show what the memory system has captured over time — patterns, routing effectiveness per task type, user override patterns. This is something no existing tool offers. It's a mirror showing the user their own workflow habits.</li>
+      </ul>
+    </div>
+
+    <div class="section-label threads">Open Threads</div>
+    <div class="section-content threads">
+      <ul>
+        <li>Is a macOS menu bar widget (Swift) worth building vs a Chrome extension or just the web dashboard?</li>
+        <li>How do you make the dashboard "boring when things work, interesting when things are unexpected"? Conditional highlighting? Alert-based UI?</li>
+        <li>What's the technical stack for the dashboard? Electron vs web? React vs Svelte? SQLite vs something else?</li>
+        <li>Should the dashboard show a "learning progress" indicator? ("Memory confidence: 34%. System is still learning your patterns. Improving by ~3% per week.")</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- AUXILIARY QUESTIONS -->
+  <div class="category">
+    <div class="category-name">Auxiliary Questions</div>
+    <div class="category-desc">Surfaced during research. Not primary focus, but tracked so they don't get lost. May become primary as investigation progresses.</div>
+  </div>
+
+  <div class="tool" style="border-color: var(--border); opacity: 0.85;">
+    <div class="tool-title">
+      <span class="tool-name">AQ-1: Signal Arbitration</span>
+      <span class="layer-badge">Layer 2</span>
+    </div>
+    <p class="tool-desc">When Layer 2's four signals disagree — route says Claude, rate limits say Gemini, memory says "Gemini failed last time," subtask context says "stay on Claude for continuity" — what wins? Priority ordering? Weighted scoring? User override? This IS Layer 2's core problem.</p>
+  </div>
+
+  <div class="tool" style="border-color: var(--border); opacity: 0.85;">
+    <div class="tool-title">
+      <span class="tool-name">AQ-2: Error Recovery & Partial Failure</span>
+      <span class="layer-badge">All Layers</span>
+    </div>
+    <p class="tool-desc">If Gemini fails mid-task: retry same model? Escalate to Claude? Roll back partial state? If 5 decomposed subtasks and subtask 4 fails, what's the contract? Decomposition (IQ-1) makes this more acute — more subtasks = more failure points.</p>
+  </div>
+
+  <div class="tool" style="border-color: var(--border); opacity: 0.85;">
+    <div class="tool-title">
+      <span class="tool-name">AQ-3: Cold Start & Bootstrap</span>
+      <span class="layer-badge">Layer 3, 2, 1</span>
+    </div>
+    <p class="tool-desc">Memory is "Layer 0" but empty on Day 1. System must work immediately. Hardcoded defaults? Starter knowledge? How many task-cycles before memory helps? Cold start is where overhead (IQ-4) is highest and benefit is lowest.</p>
+  </div>
+
+  <div class="tool" style="border-color: var(--border); opacity: 0.85;">
+    <div class="tool-title">
+      <span class="tool-name">AQ-4: Latency Budget</span>
+      <span class="layer-badge">All Layers</span>
+    </div>
+    <p class="tool-desc">Every layer adds latency. Classification (~50-100ms) + memory read (~100-500ms) + decomposition (~1-2s for compound) = 500ms-1.5s before work starts. For "fix this typo," that's noticeable. Per-layer budget? Fast path for trivial tasks? Parallelization?</p>
+  </div>
+
+  </div><!-- end tab-investigation -->
+
 </div>
+
+<script>
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+</script>
 
 </body>
 </html>

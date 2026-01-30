@@ -166,39 +166,54 @@ Here's how the whole thing looks structurally, layer by layer, then as an integr
 
 ┌─────────────────────────────────────────────────────────────────┐
 │  LAYER 5: CLI EXPERIENCE                                         │
-│  Status: Level 3 — "don't double down on MCP yet"               │
+│  Status: INVESTIGATION — three-tier reliability model emerging   │
 │                                                                  │
 │  The user types: claude                                          │
 │  Everything below is invisible.                                  │
 │                                                                  │
-│  Three mechanisms (probably composing, not competing):            │
+│  THREE-TIER RELIABILITY MODEL (Session 4 insight):               │
 │                                                                  │
-│  ┌─ MCP Server ──────────┐  ┌─ Hooks ──────────────────────┐   │
-│  │ .mcp.json spawns      │  │ .claude/settings.json         │   │
-│  │ harness as child proc │  │ 12 lifecycle events:          │   │
-│  │                       │  │ SessionStart, PreToolUse,     │   │
-│  │ Tools exposed:        │  │ PostToolUse, SubagentStart,   │   │
-│  │ • delegate_to_gemini  │  │ Stop, SessionEnd, etc.        │   │
-│  │ • shared_memory_rw    │  │                               │   │
-│  │ • check_rate_limits   │  │ CAN observe, CANNOT return    │   │
-│  │ • route_task          │  │ results to Claude's convo     │   │
-│  │                       │  │                               │   │
-│  │ CAN return results    │  │ Used for: dashboard events,   │   │
-│  │ CANNOT see convo hist │  │ monitoring, side-effects      │   │
-│  │ 25K output cap        │  │                               │   │
-│  │ 60-120s timeout       │  │                               │   │
-│  └───────────────────────┘  └───────────────────────────────┘   │
-│                                                                  │
-│  ┌─ CLAUDE.md ───────────────────────────────────────────────┐  │
-│  │ Behavioral steering. Tells Claude WHEN to use tools:      │  │
+│  ┌─ Tier 1: CLAUDE.md (Soft Steering, ~60-80% reliable) ────┐  │
 │  │ "When task >100K tokens, use delegate_to_gemini"          │  │
-│  │ "When researching broad topics, use delegate_to_gemini"   │  │
-│  │ No runtime capability — static instructions only.         │  │
+│  │ "When researching broad topics, consider Gemini"          │  │
+│  │ Always read by Claude. Claude decides whether to follow.  │  │
+│  │ Zero runtime cost beyond context window tokens.           │  │
 │  └───────────────────────────────────────────────────────────┘  │
 │                                                                  │
-│  ALTERNATIVE STILL OPEN: Could Bash + file I/O replace MCP?     │
-│  gemini -p 'task' > result.md → Claude reads file.              │
-│  Clunky but zero infrastructure. Not yet prototyped.             │
+│  ┌─ Tier 2: Hooks (Hard Enforcement, 100% reliable) ────────┐  │
+│  │ UserPromptSubmit: inject rate state + memory context       │  │
+│  │ PreToolUse:       block tool calls if rate-limited         │  │
+│  │ PostToolUse:      track usage, update counters             │  │
+│  │ Stop:             persist session summary to memory         │  │
+│  │                                                            │  │
+│  │ GUARANTEED — fires on every lifecycle event.               │  │
+│  │ Zero LLM cost. This is the harness's critical path.       │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                  │
+│  ┌─ Tier 3: MCP Tools (Capability Extension, ~50-88%) ──────┐  │
+│  │ delegate_to_gemini    (active delegation)                  │  │
+│  │ request_critique      (cross-model veto)                   │  │
+│  │ query_memory          (deep semantic lookup)               │  │
+│  │ check_rate_status     (explicit rate query)                │  │
+│  │                                                            │  │
+│  │ OPTIONAL — Claude chooses when to invoke.                  │  │
+│  │ System doesn't break if these aren't called.              │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                  │
+│  KEY INSIGHT: Hooks guarantee the floor (critical functions      │
+│  always execute). MCP tools raise the ceiling (optional          │
+│  enhancements). CLAUDE.md provides behavioral context.           │
+│  The system works even if Claude never calls an MCP tool.        │
+│                                                                  │
+│  HOOKS + MCP SPLIT:                                              │
+│  Function          │ Hook (guaranteed)    │ MCP (optional)       │
+│  Rate awareness    │ UserPromptSubmit     │ check_rate_status    │
+│  Memory injection  │ UserPromptSubmit     │ query_memory         │
+│  Rate enforcement  │ PreToolUse: block    │ —                    │
+│  Usage tracking    │ PostToolUse          │ —                    │
+│  Delegation        │ —                    │ delegate_to_gemini   │
+│  Critique          │ —                    │ request_critique     │
+│  Persistence       │ Stop: write memory   │ —                    │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -329,7 +344,7 @@ INVESTIGATION LANES:
   ░░░░░░ Communication (hybrid mesh — exploring direct messaging)
   ░░░░░░ Visibility (silent CLI + dashboard — not designed)
   ░░░░░░ Memory tool (Mem0 vs sqlite-vec vs files)
-  ░░░░░░ MCP vs Bash+files (Level 3 confidence)
+  ░░░░░░ CLI delivery (three-tier: hooks + MCP + CLAUDE.md emerging)
 
 OPEN:
          Decision Engine logic (how 4 signals combine)
@@ -369,7 +384,7 @@ OPEN:
 | Question | Why It Matters |
 |----------|----------------|
 | **Memory system** | Mem0 vs ChromaDB vs sqlite-vec vs plain files. Wrong choice wastes months. |
-| **MCP vs Bash + file I/O** | Why is MCP better than `gemini -p 'task' > result.md`? Not yet prototyped. |
+| **CLI delivery mechanism** | Three-tier model emerging: hooks (guaranteed) + MCP (optional) + CLAUDE.md (behavioral). Hooks handle critical path; MCP tools are enhancements. Could the harness be hooks-only + PAL MCP? |
 | **Zero-code baseline test** | PAL MCP + CCProxy + CodexBar covers ~55-60%. Is that enough? NEVER TESTED. |
 
 ## The Honest Competitive Landscape
@@ -416,6 +431,7 @@ End-of-session research (30+ tools evaluated) revealed existing tools cover **~5
 |----------|---------|
 | `docs/PROJECT_CONTEXT.md` | Confidence registry, session history, conduct guide. |
 | `docs/RESEARCH.md` | Evidence base (90+ sources). Competitive landscape, device bug, Gemini gaps. |
+| `docs/INVESTIGATION_QUEUE.md` | 7 primary + 4 auxiliary investigation questions. Dependency graph, wave ordering, status tracking. |
 | `docs/TOOL_ANALYSIS.md` | Tool-by-tool analysis of 8 competing tools. |
 
 ### Illustrative (User Journeys)
@@ -451,4 +467,4 @@ $200 (Claude Max 20x) + $0-20 (Gemini free/AI Pro) = **$200-220/mo**
 
 ---
 
-*Last updated: January 30, 2026 (Session 4 — architecture visual format update)*
+*Last updated: January 30, 2026 (Session 4 — three-tier reliability model, investigation questions, hooks+MCP architecture)*
